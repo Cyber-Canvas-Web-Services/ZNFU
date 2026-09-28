@@ -1,1 +1,72 @@
-N
+# ---------------------------------------------------------------
+# ZNFU website — Node / Vite
+# NOTE: site media is source material and MUST stay tracked:
+#   /assets            -> original masters supplied by ZNFU
+#   /public/media      -> web-ready derivatives served by the site
+# ---------------------------------------------------------------
+
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+.pnp.cjs
+
+# Build output
+dist/
+dist-ssr/
+build/
+*.local
+
+# Vite / bundler caches
+.vite/
+.cache/
+.temp/
+.tmp/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Editors / IDEs
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/launch.json
+
+# Operating system cruft
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+Desktop.ini
+
+# Tooling
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+.prettiercache
+coverage/
+.nyc_output/
+
+# Deploy platforms
+.vercel
+.netlify
+
