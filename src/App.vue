@@ -10,6 +10,14 @@ import NewsSection from '@/components/sections/NewsSection.vue'
 import MembershipSection from '@/components/sections/MembershipSection.vue'
 import PartnersStrip from '@/components/sections/PartnersStrip.vue'
 import SiteFooter from '@/components/sections/SiteFooter.vue'
+import { useSmoothScroll } from '@/composables/useSmoothScroll'
+
+/**
+ * Smooth scrolling for the whole page. Lenis keeps native document scrolling
+ * (so `position: sticky` and `window.scrollY` still behave), it just eases the
+ * scroll position. The anchor offset clears the fixed header.
+ */
+useSmoothScroll({ offset: -84 })
 </script>
 
 <template>

@@ -32,7 +32,7 @@ import { hero, media } from '@/data/home'
         Zambia National Farmers’ Union
       </span>
 
-      <p class="mt-4 font-display text-2xl font-semibold leading-tight text-white sm:text-3xl">
+      <p class="mt-4 font-display text-2xl font-medium leading-tight tracking-[-0.02em] text-white sm:text-3xl">
         {{ hero.tagline }}
       </p>
 

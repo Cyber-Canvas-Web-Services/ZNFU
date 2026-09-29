@@ -29,7 +29,7 @@ const display = computed(() => {
 <template>
   <div ref="elRef" class="flex flex-col gap-2">
     <span
-      class="font-display text-[clamp(2.4rem,5.4vw,3.75rem)] font-semibold leading-none tracking-[-0.03em] text-cream-50"
+      class="font-display text-[clamp(2.4rem,5.4vw,3.75rem)] font-medium leading-none tracking-[-0.04em] text-cream-50"
     >
       <span aria-hidden="true">{{ prefix }}{{ display }}{{ suffix }}</span>
       <span class="sr-only">{{ prefix }}{{ value.toLocaleString('en-US') }}{{ suffix }}</span>

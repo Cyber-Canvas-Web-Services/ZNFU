@@ -27,6 +27,7 @@ import { ArrowDown } from '@lucide/vue'
 
 import { useIsMobile, usePrefersReducedMotion } from '@/composables/useMediaQuery'
 import { useScrollProgress } from '@/composables/useScrollProgress'
+import { useViewportSize } from '@/composables/useViewportSize'
 
 const props = defineProps({
   /** 'video' | 'image' — what the expanding card plays. */
@@ -71,27 +72,74 @@ const progress = computed(() =>
 
 /* ---------------------------------------------------------------- */
 /*  Expansion maths (adapted from the React original)                */
+/*                                                                  */
+/*  Performance note: the card box genuinely changes size *and        */
+/*  aspect* as it opens (roughly 0.75 → 1.79). Animating width/height */
+/*  on an element that contains a <video> forces the browser to       */
+/*  re-layout and re-rasterise the video layer every frame, which was */
+/*  measured as the single most expensive thing on this page.         */
+/*                                                                    */
+/*  So the media is laid out ONCE at the card's maximum size and      */
+/*  never resized. Instead its framing is adjusted with a composited  */
+/*  `transform: scale()` that reproduces exactly what `object-cover`  */
+/*  would have produced at the current card size:                     */
+/*                                                                    */
+/*      scale = max(cardW / stageW, cardH / stageH)                   */
+/*                                                                    */
+/*  The card still animates width/height, but it now only moves its   */
+/*  own clip box (a cheap paint) rather than resizing a video layer.  */
 /* ---------------------------------------------------------------- */
-const metrics = computed(() => {
-  const mobile = isMobile.value
-  return {
-    width: 300 + progress.value * (mobile ? 650 : 1250),
-    height: 400 + progress.value * (mobile ? 200 : 400),
-    // The headline slides out of frame as the media takes over. Frozen at 0
-    // for reduced motion so the title stays centred and readable.
-    textShift: reducedMotion.value ? 0 : progress.value * (mobile ? 180 : 150),
-  }
+const viewport = useViewportSize()
+
+/** The largest the card can ever get — also the media's fixed layout size. */
+const stageWidth = computed(() => viewport.width.value * 0.95)
+const stageHeight = computed(() => viewport.height.value * 0.85)
+
+/** Current card size, clamped in JS so the scale below stays exact. */
+const cardWidth = computed(() => {
+  const natural = 300 + progress.value * (isMobile.value ? 650 : 1250)
+  return Math.min(natural, stageWidth.value)
 })
 
-const cardStyle = computed(() => ({
-  width: `${metrics.value.width}px`,
-  height: `${metrics.value.height}px`,
-  maxWidth: '95vw',
-  maxHeight: '85vh',
+const cardHeight = computed(() => {
+  const natural = 400 + progress.value * (isMobile.value ? 200 : 400)
+  return Math.min(natural, stageHeight.value)
+})
+
+const metrics = computed(() => ({
+  // The headline slides out of frame as the media takes over. Frozen at 0
+  // for reduced motion so the title stays centred and readable.
+  textShift: reducedMotion.value ? 0 : progress.value * (isMobile.value ? 180 : 150),
 }))
 
-/** Background dims away as the foreground card fills the screen. */
+const cardStyle = computed(() => ({
+  width: `${cardWidth.value}px`,
+  height: `${cardHeight.value}px`,
+}))
+
+/** Uniform scale keeping the fixed-size media covering the card. */
+const mediaScale = computed(() => {
+  if (!stageWidth.value || !stageHeight.value) return 1
+  return Math.max(cardWidth.value / stageWidth.value, cardHeight.value / stageHeight.value)
+})
+
+/**
+ * Applied to the video/image inside the card. Width and height are constant
+ * for the whole pin; only `scale` changes, and that is GPU work.
+ */
+const mediaStyle = computed(() => ({
+  width: `${stageWidth.value}px`,
+  height: `${stageHeight.value}px`,
+  transform: `translate(-50%, -50%) scale(${mediaScale.value})`,
+}))
+
+/**
+ * Background dims away as the foreground card fills the screen. Once it is
+ * fully transparent we also stop decoding it — at that point it is a
+ * full-screen video contributing nothing but battery drain.
+ */
 const backgroundOpacity = computed(() => Math.max(0, 1 - progress.value))
+const backgroundStillVisible = computed(() => backgroundOpacity.value > 0.01)
 /** Card scrim eases off as the media expands. */
 const cardScrim = computed(() => Math.max(0.12, 0.58 - progress.value * 0.34))
 /**
@@ -108,6 +156,13 @@ const overlayOpacity = computed(() =>
   Math.min(Math.max((progress.value - 0.82) / 0.18, 0), 1),
 )
 const overlayInteractive = computed(() => overlayOpacity.value > 0.6)
+/**
+ * The end-state panel is only added to the DOM once the expansion is nearly
+ * complete. It carries a `backdrop-filter`, which forces the browser to
+ * re-sample everything beneath it — expensive to keep mounted over a playing
+ * video for the whole duration of the pin.
+ */
+const overlayMounted = computed(() => overlayOpacity.value > 0.01)
 
 const pinHeightCss = computed(() => {
   if (reducedMotion.value) return '100vh'
@@ -151,11 +206,13 @@ onMounted(() => {
   play(backgroundVideo.value)
 })
 
-/* Stop decoding video while the hero is off screen — saves battery/CPU. */
-watch(isInView, (visible) => {
+/* Stop decoding video while the hero is off screen — saves battery/CPU.
+   The background is also parked once it has faded out entirely. */
+watch([isInView, backgroundStillVisible], ([visible, bgVisible]) => {
   if (visible) {
     play(foregroundVideo.value)
-    play(backgroundVideo.value)
+    if (bgVisible) play(backgroundVideo.value)
+    else pause(backgroundVideo.value)
   } else {
     pause(foregroundVideo.value)
     pause(backgroundVideo.value)
@@ -173,15 +230,17 @@ watch(isInView, (visible) => {
   >
     <div class="sticky top-0 h-[100dvh] w-full overflow-hidden bg-forest-950">
       <!-- ============================ Background layer ============================ -->
+      <!-- No CSS transition here: the opacity is already animated per frame
+           from scroll progress, and a transition would restart every frame. -->
       <div
-        class="absolute inset-0 z-0 transition-opacity duration-150 ease-out"
+        class="absolute inset-0 z-0"
         :style="{ opacity: reducedMotion ? 1 : backgroundOpacity }"
         aria-hidden="true"
       >
         <video
           v-if="useBackgroundVideo"
           ref="backgroundVideo"
-          class="absolute inset-0 h-full w-full animate-kenburns object-cover [filter:blur(3px)_saturate(0.72)_brightness(0.88)]"
+          class="absolute inset-0 h-full w-full object-cover"
           autoplay
           muted
           loop
@@ -195,13 +254,15 @@ watch(isInView, (visible) => {
           v-else-if="backgroundImage"
           :src="backgroundImage"
           alt=""
-          class="absolute inset-0 h-full w-full object-cover [filter:blur(3px)_saturate(0.72)_brightness(0.88)]"
+          class="absolute inset-0 h-full w-full object-cover"
         />
 
-        <!-- Tint + vignette so the headline always has contrast -->
-        <div class="absolute inset-0 bg-forest-950/78" />
+        <!-- Tint + vignette: enough to keep the headline legible without
+             hiding the footage. Weighted to the top and bottom edges, where
+             the header and scroll cue sit, leaving the middle open. -->
+        <div class="absolute inset-0 bg-forest-950/45" />
         <div
-          class="absolute inset-0 bg-gradient-to-b from-forest-950/85 via-forest-950/30 to-forest-950/90"
+          class="absolute inset-0 bg-gradient-to-b from-forest-950/50 via-transparent to-forest-950/62"
         />
       </div>
 
@@ -216,7 +277,7 @@ watch(isInView, (visible) => {
       >
         <h1
           id="hero-heading"
-          class="max-w-3xl font-display text-[clamp(2.2rem,6vw,4.4rem)] font-semibold leading-[1.02] tracking-[-0.02em] text-white text-shadow-hero"
+          class="max-w-3xl font-display text-[clamp(2.2rem,6vw,4.4rem)] font-medium leading-[1.05] tracking-[-0.03em] text-white text-shadow-hero"
         >
           {{ title }}
         </h1>
@@ -232,16 +293,20 @@ watch(isInView, (visible) => {
       <template v-else>
         <!-- Expanding card -->
         <div
-          class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2"
+          class="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 [contain:layout_paint]"
           :style="cardStyle"
         >
         <div
           class="relative h-full w-full overflow-hidden rounded-[20px] shadow-card ring-1 ring-white/15 sm:rounded-[26px]"
         >
+          <!-- Laid out once at stage size (see `mediaStyle`); never resized.
+               `max-w-none` is required because Tailwind's preflight caps media
+               at max-width:100%, which would otherwise clamp the stage. -->
           <video
             v-if="useForegroundVideo"
             ref="foregroundVideo"
-            class="absolute inset-0 h-full w-full object-cover"
+            class="absolute left-1/2 top-1/2 max-w-none object-cover will-change-transform"
+            :style="mediaStyle"
             autoplay
             muted
             loop
@@ -255,13 +320,13 @@ watch(isInView, (visible) => {
             v-else-if="foregroundImage"
             :src="foregroundImage"
             alt=""
-            class="absolute inset-0 h-full w-full object-cover"
+            class="absolute left-1/2 top-1/2 max-w-none object-cover will-change-transform"
+            :style="mediaStyle"
           />
 
-          <div
-            class="absolute inset-0"
-            :style="{ backgroundColor: `rgb(4 20 12 / ${cardScrim})` }"
-          />
+          <!-- Animated via opacity (compositor-friendly) rather than by
+               interpolating a background-color string, which repaints. -->
+          <div class="absolute inset-0 bg-forest-950" :style="{ opacity: cardScrim }" />
           <div class="pointer-events-none absolute inset-0 ring-1 ring-inset ring-white/10" />
         </div>
       </div>
@@ -275,14 +340,14 @@ watch(isInView, (visible) => {
         aria-hidden="true"
       >
         <span
-          class="block font-display text-[clamp(2.1rem,7.6vw,5.6rem)] font-semibold leading-[0.98] tracking-[-0.02em] text-white text-shadow-hero"
+          class="block font-display text-[clamp(2.1rem,7.6vw,5.6rem)] font-medium leading-[1.02] tracking-[-0.03em] text-white text-shadow-hero"
           :style="{ transform: `translate3d(${-metrics.textShift}vw, 0, 0)` }"
         >
           {{ headlineWords.first }}
         </span>
         <span
           v-if="headlineWords.rest"
-          class="mt-1 block font-display text-[clamp(1.6rem,5.4vw,4.2rem)] font-semibold leading-[1.04] tracking-[-0.02em] text-maize-100 text-shadow-hero"
+          class="mt-1 block font-display text-[clamp(1.6rem,5.4vw,4.2rem)] font-medium leading-[1.06] tracking-[-0.03em] text-maize-100 text-shadow-hero"
           :style="{ transform: `translate3d(${metrics.textShift}vw, 0, 0)` }"
         >
           {{ headlineWords.rest }}
@@ -310,15 +375,20 @@ watch(isInView, (visible) => {
           aria-valuemax="100"
           aria-label="Hero expansion progress"
         >
+          <!-- scaleX rather than width: no layout, just a composited transform. -->
           <div
-            class="h-full rounded-full bg-maize-400"
-            :style="{ width: `${progress * 100}%` }"
+            class="h-full w-full origin-left rounded-full bg-maize-400"
+            :style="{ transform: `scaleX(${progress})` }"
           />
         </div>
       </div>
 
-      <!-- ============================ Revealed content =========================== -->
+      <!-- ============================ Revealed content ===========================
+           Mounted only once the media is nearly expanded. Its backdrop-filter
+           samples the layer beneath it, so keeping it out of the tree during
+           the expansion avoids re-blurring a playing video every frame. -->
       <div
+        v-if="overlayMounted"
         class="absolute inset-0 z-40 flex items-center justify-center px-5"
         :style="{
           opacity: overlayOpacity,

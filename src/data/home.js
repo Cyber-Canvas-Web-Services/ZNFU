@@ -24,6 +24,17 @@
  */
 
 /* ------------------------------------------------------------------ */
+/*  Brand assets                                                       */
+/* ------------------------------------------------------------------ */
+/**
+ * Imported through the bundler (not copied into /public) so Vite hashes it
+ * and emits it for both dev and production builds.
+ */
+import znfuLogo from '../../assets/znfu-logo.jpeg'
+
+export const logo = znfuLogo
+
+/* ------------------------------------------------------------------ */
 /*  Media — everything is served from /public/media                    */
 /* ------------------------------------------------------------------ */
 export const media = {
@@ -64,10 +75,7 @@ export const navLinks = [
 ]
 
 export const brand = {
-  shortName: 'ZNFU',
   fullName: 'Zambia National Farmers’ Union',
-  established: 'Est. 1905',
-  strapline: 'Growing Zambia, Together',
 }
 
 /* ------------------------------------------------------------------ */

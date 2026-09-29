@@ -45,7 +45,7 @@ onBeforeUnmount(() => desktopQuery.removeEventListener('change', onDesktopChange
     class="fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,padding] duration-300"
     :class="
       scrolled || menuOpen
-        ? 'bg-forest-950/95 py-2.5 shadow-[0_10px_40px_-18px_rgba(4,20,12,0.9)] backdrop-blur-lg'
+        ? 'bg-forest-950/95 py-2.5 shadow-[0_10px_40px_-18px_rgba(4,20,12,0.9)]'
         : 'bg-gradient-to-b from-forest-950/80 via-forest-950/35 to-transparent py-4'
     "
   >

@@ -19,7 +19,10 @@ const year = new Date().getFullYear()
 </script>
 
 <template>
-  <footer id="contact" class="relative scroll-mt-24 overflow-hidden bg-forest-950 text-cream-50">
+  <footer
+    id="contact"
+    class="relative z-10 scroll-mt-24 overflow-hidden bg-forest-950 text-cream-50 lg:rounded-t-[2rem] lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)] lg:ring-1 lg:ring-forest-950/5"
+  >
     <div
       class="pointer-events-none absolute -left-40 -top-20 h-[420px] w-[420px] rounded-full bg-maize-500/8 blur-3xl"
       aria-hidden="true"
@@ -110,7 +113,7 @@ const year = new Date().getFullYear()
           </ul>
 
           <div class="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
-            <p class="font-display text-base font-semibold">{{ footer.newsletter.title }}</p>
+            <p class="font-display text-base font-medium tracking-[-0.02em]">{{ footer.newsletter.title }}</p>
             <p class="mt-2 text-xs leading-relaxed text-cream-200/60">
               {{ footer.newsletter.body }}
             </p>

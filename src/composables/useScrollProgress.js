@@ -7,8 +7,11 @@ import { onBeforeUnmount, onMounted, ref } from 'vue'
  * child that fills the viewport. Progress reaches 1 when the sticky child has
  * finished travelling through the pin.
  *
- * Reads are throttled to one per animation frame so the scroll handler never
- * forces more than a single layout read per frame.
+ * Performance: the pin's geometry is measured **only when layout actually
+ * changes** (mount, resize, orientationchange, or a ResizeObserver callback)
+ * and then cached. The per-frame path reads nothing but `window.scrollY`, so
+ * scrolling never forces a synchronous layout — measuring inside a scroll
+ * handler fights the style writes that follow it and causes visible jank.
  *
  * @param {import('vue').Ref<HTMLElement|null>} targetRef
  * @param {{ enabled?: import('vue').Ref<boolean> }} [options]
@@ -25,24 +28,38 @@ export function useScrollProgress(targetRef, options = {}) {
   let frameId = 0
   let queued = false
   let observer = null
+  let resizeObserver = null
 
-  function read() {
-    const el = targetRef.value
-    if (!el || !isEnabled()) return
+  /* Cached geometry, in document coordinates. */
+  let sectionTop = 0
+  let travel = 0
 
-    const rect = el.getBoundingClientRect()
-    const viewportHeight = window.innerHeight
-    const travel = rect.height - viewportHeight
+  function compute() {
+    if (!isEnabled()) return
 
+    // Layout is unusably small (e.g. a zero-height section) — treat as done.
     if (travel <= 1) {
-      progress.value = rect.top <= 0 ? 1 : 0
+      progress.value = sectionTop - window.scrollY <= 0 ? 1 : 0
       isPinned.value = false
       return
     }
 
-    const travelled = Math.min(Math.max(-rect.top, 0), travel)
+    // Position relative to the top of the pin.
+    const offset = window.scrollY - sectionTop
+    const travelled = offset < 0 ? 0 : offset > travel ? travel : offset
+
     progress.value = travelled / travel
-    isPinned.value = rect.top <= 0 && rect.bottom > viewportHeight
+    isPinned.value = offset >= 0 && offset < travel
+  }
+
+  /** Runs a layout read, then caches the result and recomputes. */
+  function measure() {
+    const el = targetRef.value
+    if (!el) return
+
+    sectionTop = el.getBoundingClientRect().top + window.scrollY
+    travel = el.offsetHeight - window.innerHeight
+    compute()
   }
 
   function schedule() {
@@ -50,12 +67,12 @@ export function useScrollProgress(targetRef, options = {}) {
     queued = true
     frameId = window.requestAnimationFrame(() => {
       queued = false
-      read()
+      compute()
     })
   }
 
   onMounted(() => {
-    read()
+    measure()
 
     if (typeof IntersectionObserver !== 'undefined') {
       observer = new IntersectionObserver(
@@ -69,19 +86,26 @@ export function useScrollProgress(targetRef, options = {}) {
       isInView.value = true
     }
 
+    // A viewport change alters `travel` (the pin is sized in vh), so the
+    // cache has to be rebuilt rather than merely recomputed.
+    if (typeof ResizeObserver !== 'undefined' && targetRef.value) {
+      resizeObserver = new ResizeObserver(measure)
+      resizeObserver.observe(targetRef.value)
+    }
+
     window.addEventListener('scroll', schedule, { passive: true })
-    window.addEventListener('resize', schedule, { passive: true })
-    window.addEventListener('orientationchange', schedule, { passive: true })
-    schedule()
+    window.addEventListener('resize', measure, { passive: true })
+    window.addEventListener('orientationchange', measure, { passive: true })
   })
 
   onBeforeUnmount(() => {
     window.removeEventListener('scroll', schedule)
-    window.removeEventListener('resize', schedule)
-    window.removeEventListener('orientationchange', schedule)
+    window.removeEventListener('resize', measure)
+    window.removeEventListener('orientationchange', measure)
     if (frameId) window.cancelAnimationFrame(frameId)
     observer?.disconnect()
+    resizeObserver?.disconnect()
   })
 
-  return { progress, isPinned, isInView, refresh: read }
+  return { progress, isPinned, isInView, refresh: measure }
 }
