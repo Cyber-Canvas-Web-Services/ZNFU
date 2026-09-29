@@ -135,14 +135,15 @@ export const purposeVision = {
 /* ------------------------------------------------------------------ */
 export const whatWeDo = {
   eyebrow: 'What we do',
-  title: 'Three core functions, one industry voice.',
-  lede: 'Everything the Union does sits on three foundations.',
+  title: 'Our mission',
+  lede: '“Promoting and safeguarding the interest of members as individual farmers, corporations, companies, purveyors and other organisations involved in the business of agriculture — in order to achieve sustainable agriculture, economic and social development”',
+  /* ⚠️ Card copy is confirmed-only. Pending items are tracked in docs/what-we-do-page.md. */
   items: [
     {
       number: '01',
       icon: 'Scale',
       title: 'Lobbying & advocacy',
-      body: 'One voice at the table. We represent members before government, regulators and trading partners on the policies, prices and processes that shape Zambian agriculture.',
+      body: 'We use the Union’s voice to promote and safeguard the interest of our members.',
       image: media.fieldMaizeDemoDay,
       imageAlt: 'Farmers and agronomists inspecting a maize demonstration plot',
     },
@@ -150,15 +151,15 @@ export const whatWeDo = {
       number: '02',
       icon: 'Users',
       title: 'Member services',
-      body: 'Strength in organisation. We bring farmers together into District Farmers’ Associations and commodity bodies, so the industry negotiates as one effective voice.',
+      body: 'We provide services that support our members directly.',
       image: media.livestockGoatsKraal,
       imageAlt: 'A kraal of goats held by farmers at a livestock pen',
     },
     {
       number: '03',
       icon: 'Newspaper',
-      title: 'Information & insight',
-      body: 'Facts for every decision. Market prices, weather outlooks, policy briefs and the Zambian Farmer magazine — reaching members nationwide.',
+      title: 'Information',
+      body: 'We gather and share information for members in the business of agriculture.',
       image: media.horticulturePassionFruit,
       imageAlt: 'Passion fruit ripening on a trellised orchard',
     },
@@ -279,40 +280,56 @@ export const news = {
 /* ------------------------------------------------------------------ */
 export const membership = {
   eyebrow: 'Membership',
-  title: 'Five ways to belong to the Union.',
+  title: 'Who can join?',
   lede: 'Whoever you are in Zambian agriculture, there is a seat for you at the table.',
   image: media.growerMaizeField,
   imageAlt: 'A farmer in a straw hat walking through tall maize',
   imageCaption: 'One Union. Every farmer.',
+  /* ⚠️ Only confirmed facts are listed. Benefits and fees entries
+     to be added when supplied by the Secretariat. */
   ways: [
     {
       number: '01',
-      title: 'District Farmers’ Associations',
-      body: 'The grassroots voice of small and emerging farmers in every province.',
+      title: 'Who may apply',
+      body: 'Any person or organisation in the business of agriculture in Zambia.',
     },
     {
       number: '02',
-      title: 'Commodity & specialised associations',
-      body: 'Crop and livestock groups that speak with technical precision.',
+      title: 'Complete the online form',
+      body: 'Include how many people work on the farm and, if you know it, farm size in hectares.',
     },
     {
       number: '03',
-      title: 'Corporate farming businesses',
-      body: 'Commercial producers anchoring national food and export supply.',
+      title: 'Submit to create your login',
+      body: 'The system issues an invoice from those figures and emails it with a button to checkout.',
     },
     {
       number: '04',
-      title: 'Agribusiness chamber',
-      body: 'Input, finance, processing and trade partners in the value chain.',
+      title: 'Pay by mobile money or Visa',
+      body: 'Pay on the same page. Until then you remain a pending member and can pay later from Invoices.',
     },
     {
       number: '05',
-      title: 'Association members',
-      body: 'Allied organisations working alongside the Union on shared goals.',
+      title: 'Paid members receive',
+      body: 'A membership number and one year of e-Farm Prices and e-Transport. Reminders go out one week, three days and one day before expiry, and again when it ends.',
     },
   ],
-  cta: { label: 'Apply for membership', href: '#contact' },
+  cta: { label: 'Apply for membership', href: '/apply-membership' },
   secondaryCta: { label: 'Types of membership', href: '#membership' },
+}
+
+/* ------------------------------------------------------------------ */
+/*  Apply for Membership — the standalone page reached from the         */
+/*  “Apply for membership” and “Join ZNFU” buttons                      */
+/* ------------------------------------------------------------------ */
+export const applyMembership = {
+  eyebrow: 'Membership',
+  title: 'Apply for Membership',
+  /* Reuses the welcome line already published in the membership section. */
+  lede: membership.lede,
+  /* The same five confirmed application facts shown on the home page. */
+  steps: membership.ways,
+  contactHeading: 'Contact the ZNFU Secretariat',
 }
 
 /* ------------------------------------------------------------------ */
