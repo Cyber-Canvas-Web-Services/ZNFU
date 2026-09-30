@@ -1,94 +1,57 @@
 <script setup>
 /**
- * Member systems — split across one panel per system.
+ * Member systems — one card per system.
  *
- * There are three systems and each needs an image, copy, feature list and a
- * call to action, which is well over a screen of content. Rather than cram
- * them into one over-tall panel (which a sticky layout cannot scroll past),
- * each system becomes its own screen in the stack.
+ * The three systems (e-Farm Prices, e-Transport and ZNFU Market) are shown as
+ * a set of cards on a single dark band. Every title and description comes from
+ * the shared data unchanged, and each card keeps its system’s anchor id so the
+ * footer’s deep links (and the nav’s #systems link) still land correctly.
  */
-import { ArrowRight } from '@lucide/vue'
-
 import AppIcon from '@/components/ui/AppIcon.vue'
 import StackedPanel from '@/components/sections/StackedPanel.vue'
 import { systems } from '@/data/home'
 </script>
 
 <template>
-  <StackedPanel
-    v-for="(item, index) in systems.items"
-    :id="item.id"
-    :key="item.id"
-    surface="bg-forest-950"
-    tone="text-cream-50"
-    :first="index === 0"
-  >
+  <StackedPanel id="systems" surface="bg-forest-950" tone="text-cream-50" compact>
     <div
       class="pointer-events-none absolute -left-40 top-1/4 h-[420px] w-[420px] rounded-full bg-forest-500/10 blur-3xl"
       aria-hidden="true"
     />
 
-    <div
-      class="relative grid items-center gap-10 lg:grid-cols-2 lg:gap-16"
-      :class="index % 2 === 1 ? 'lg:[&>*:first-child]:order-2' : ''"
-    >
-      <!-- Visual -->
-      <div v-reveal class="relative overflow-hidden rounded-3xl ring-1 ring-white/10">
-        <img
-          :src="item.image"
-          :alt="item.imageAlt"
-          class="h-[260px] w-full object-cover sm:h-[340px] lg:h-[440px]"
-          loading="lazy"
-          decoding="async"
-        />
-        <div class="absolute inset-0 bg-gradient-to-t from-forest-950/70 to-transparent" />
-        <p
-          class="absolute bottom-5 left-6 font-display text-sm font-semibold tracking-[0.24em] text-cream-100/75"
+    <div class="relative">
+      <p class="eyebrow text-maize-400" v-reveal>{{ systems.eyebrow }}</p>
+
+      <div class="mt-10 grid gap-6 md:grid-cols-3 lg:mt-12">
+        <article
+          v-for="(item, index) in systems.items"
+          :id="item.id"
+          :key="item.id"
+          v-reveal="{ delay: index * 110 }"
+          class="group flex flex-col rounded-3xl bg-forest-900/60 p-7 ring-1 ring-white/10 transition-transform duration-500 hover:-translate-y-1.5"
         >
-          {{ item.number }} / 03
-        </p>
-      </div>
-
-      <!-- Copy -->
-      <div v-reveal="{ delay: 90 }">
-        <p class="eyebrow text-maize-400">Member systems</p>
-
-        <h2 class="section-title mt-4 text-cream-50">{{ item.title }}</h2>
-        <p class="mt-4 max-w-lg leading-relaxed text-cream-200/70">{{ item.body }}</p>
-
-        <!-- e-Farm Prices shows a sample of the weekly book -->
-        <dl v-if="item.prices" class="mt-7 max-w-lg divide-y divide-white/10 border-y border-white/10">
-          <div
-            v-for="row in item.prices"
-            :key="row.commodity"
-            class="flex items-baseline justify-between gap-4 py-2.5"
-          >
-            <dt class="text-sm text-cream-100/75">{{ row.commodity }}</dt>
-            <dd class="text-right">
-              <span class="font-display text-sm font-semibold text-cream-50">{{ row.price }}</span>
-              <span class="ml-1.5 text-[0.7rem] text-cream-200/50">/ {{ row.unit }}</span>
-            </dd>
+          <div class="flex items-center justify-between gap-4">
+            <span
+              class="grid h-11 w-11 place-items-center rounded-full bg-maize-400 text-forest-950 shadow-lg"
+            >
+              <AppIcon :name="item.icon" class="h-5 w-5" />
+            </span>
+            <p
+              class="font-display text-xs font-semibold tracking-[0.24em] text-cream-100/55"
+            >
+              {{ item.number }} / 03
+            </p>
           </div>
-        </dl>
 
-        <ul v-else class="mt-7 space-y-3">
-          <li
-            v-for="feature in item.features"
-            :key="feature"
-            class="flex items-start gap-3 text-[0.95rem] text-cream-100/85"
+          <h2
+            class="mt-6 font-display text-xl font-medium tracking-[-0.02em] text-cream-50"
           >
-            <span class="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-maize-400" aria-hidden="true" />
-            {{ feature }}
-          </li>
-        </ul>
-
-        <a
-          :href="item.cta.href"
-          class="mt-8 inline-flex items-center gap-2 border-b border-maize-400/50 pb-1 text-sm font-semibold text-maize-300 transition hover:border-maize-300 hover:text-maize-200"
-        >
-          {{ item.cta.label }}
-          <ArrowRight class="h-4 w-4" aria-hidden="true" />
-        </a>
+            {{ item.title }}
+          </h2>
+          <p class="mt-3 text-[0.92rem] leading-relaxed text-cream-200/70">
+            {{ item.body }}
+          </p>
+        </article>
       </div>
     </div>
   </StackedPanel>
