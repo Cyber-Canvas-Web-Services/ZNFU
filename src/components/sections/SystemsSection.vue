@@ -7,13 +7,28 @@
  * the shared data unchanged, and each card keeps its system’s anchor id so the
  * footer’s deep links (and the nav’s #systems link) still land correctly.
  */
-import AppIcon from '@/components/ui/AppIcon.vue'
-import StackedPanel from '@/components/sections/StackedPanel.vue'
-import { systems } from '@/data/home'
+import AppIcon from "@/components/ui/AppIcon.vue";
+import StackedPanel from "@/components/sections/StackedPanel.vue";
+import { systems } from "@/data/home";
+
+/**
+ * Also stands alone at /systems. The band only shows its eyebrow mid-stack,
+ * so in that case the heading and lede already held in the data are shown too,
+ * giving the page its single <h1>.
+ */
+defineProps({
+  standalone: { type: Boolean, default: false },
+});
 </script>
 
 <template>
-  <StackedPanel id="systems" surface="bg-forest-950" tone="text-cream-50" compact>
+  <StackedPanel
+    id="systems"
+    surface="bg-forest-950"
+    tone="text-cream-50"
+    compact
+    :first="standalone"
+  >
     <div
       class="pointer-events-none absolute -left-40 top-1/4 h-[420px] w-[420px] rounded-full bg-forest-500/10 blur-3xl"
       aria-hidden="true"
@@ -21,6 +36,21 @@ import { systems } from '@/data/home'
 
     <div class="relative">
       <p class="eyebrow text-maize-400" v-reveal>{{ systems.eyebrow }}</p>
+
+      <template v-if="standalone">
+        <h1
+          class="section-title mt-4 max-w-2xl text-cream-50"
+          v-reveal="{ delay: 60 }"
+        >
+          {{ systems.title }}
+        </h1>
+        <p
+          class="lede mt-4 max-w-2xl text-cream-200/70"
+          v-reveal="{ delay: 110 }"
+        >
+          {{ systems.lede }}
+        </p>
+      </template>
 
       <div class="mt-10 grid gap-6 md:grid-cols-3 lg:mt-12">
         <article

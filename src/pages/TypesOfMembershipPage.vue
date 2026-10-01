@@ -26,7 +26,12 @@ import { typesOfMembership } from "@/data/home";
         {{ typesOfMembership.title }}
       </h1>
       <p class="lede mt-5 max-w-2xl text-ink-900/65" v-reveal="{ delay: 110 }">
-        {{ typesOfMembership.intro.before }}<a :href="typesOfMembership.intro.linkHref" class="font-medium text-forest-700 underline underline-offset-4 transition hover:text-forest-900">{{ typesOfMembership.intro.linkLabel }}</a>{{ typesOfMembership.intro.after }}
+        {{ typesOfMembership.intro.before
+        }}<a
+          :href="typesOfMembership.intro.linkHref"
+          class="font-medium text-forest-700 underline underline-offset-4 transition hover:text-forest-900"
+          >{{ typesOfMembership.intro.linkLabel }}</a
+        >{{ typesOfMembership.intro.after }}
       </p>
     </div>
 
@@ -72,11 +77,7 @@ import { typesOfMembership } from "@/data/home";
   </StackedPanel>
 
   <!-- Band 2 — the annual subscription bands -->
-  <StackedPanel
-    class="types-of-membership-band"
-    surface="bg-cream-100"
-    compact
-  >
+  <StackedPanel class="types-of-membership-band" surface="bg-cream-100" compact>
     <h2
       class="font-display text-2xl font-medium tracking-[-0.03em] text-forest-950 sm:text-3xl"
       v-reveal
@@ -107,13 +108,17 @@ import { typesOfMembership } from "@/data/home";
               <span class="subscription-row__label">
                 {{ typesOfMembership.bandColumns.people }}
               </span>
-              <span class="subscription-row__range-value">{{ band.people }}</span>
+              <span class="subscription-row__range-value">{{
+                band.people
+              }}</span>
             </span>
             <span class="subscription-row__range">
               <span class="subscription-row__label">
                 {{ typesOfMembership.bandColumns.hectares }}
               </span>
-              <span class="subscription-row__range-value">{{ band.hectares }}</span>
+              <span class="subscription-row__range-value">{{
+                band.hectares
+              }}</span>
             </span>
           </p>
         </div>
