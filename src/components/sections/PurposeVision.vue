@@ -1,10 +1,26 @@
 <script setup>
+/**
+ * Purpose / Vision — the “About” band.
+ *
+ * Also stands alone at /about. In that case the band heads the page, so it
+ * carries the page’s single <h1> and drops the stacked-card edge that would
+ * otherwise draw a rounded top and an upward shadow above the header.
+ */
 import StackedPanel from '@/components/sections/StackedPanel.vue'
 import { purposeVision } from '@/data/home'
+
+defineProps({
+  /** Rendered as the top band of its own page rather than mid-stack. */
+  standalone: { type: Boolean, default: false },
+})
 </script>
 
 <template>
-  <StackedPanel id="about" surface="bg-cream-50">
+  <StackedPanel
+    id="about"
+    surface="bg-cream-50"
+    :first="standalone"
+  >
     <div class="grid items-center gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
       <!-- Visual -->
       <div class="relative" v-reveal>
@@ -34,9 +50,13 @@ import { purposeVision } from '@/data/home'
       <!-- Copy -->
       <div>
         <p class="eyebrow text-forest-600" v-reveal>{{ purposeVision.eyebrow }}</p>
-        <h2 class="section-title mt-5 text-forest-950" v-reveal="{ delay: 60 }">
+        <component
+          :is="standalone ? 'h1' : 'h2'"
+          class="section-title mt-5 text-forest-950"
+          v-reveal="{ delay: 60 }"
+        >
           {{ purposeVision.title }}
-        </h2>
+        </component>
         <p class="lede mt-5 max-w-2xl text-ink-900/70" v-reveal="{ delay: 120 }">
           {{ purposeVision.lede }}
         </p>

@@ -17,6 +17,14 @@ function subscribe() {
   subscribed.value = true
   email.value = ''
 }
+
+/**
+ * Also stands alone at /news, where it heads the page and carries the page’s
+ * single <h1>.
+ */
+defineProps({
+  standalone: { type: Boolean, default: false },
+})
 </script>
 
 <template>
@@ -25,7 +33,12 @@ function subscribe() {
     <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between" v-reveal>
       <div class="max-w-2xl">
         <p class="eyebrow text-forest-600">{{ news.eyebrow }}</p>
-        <h2 class="section-title mt-4 text-forest-950">{{ news.title }}</h2>
+        <component
+          :is="standalone ? 'h1' : 'h2'"
+          class="section-title mt-4 text-forest-950"
+        >
+          {{ news.title }}
+        </component>
       </div>
       <a :href="news.allLink.href" class="btn btn--outline shrink-0">
         {{ news.allLink.label }}
