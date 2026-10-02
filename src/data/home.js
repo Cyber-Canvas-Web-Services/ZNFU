@@ -14,6 +14,10 @@
  *      4. `vision` — drafted copy, not Union-approved wording.
  *      5. `partners` / `affiliations` — confirm which relationships may
  *         be published, and supply approved logos.
+ *      6. `typesOfMembership` — categories condensed from ZNFU’s own
+ *         published membership material; the subscription band ranges
+ *         and fees are placeholders until the Secretariat supplies the
+ *         current schedule.
  *
  *  Facts taken from ZNFU's own published material (safe to keep):
  *      · founded 1905, non-political, member-led
@@ -316,6 +320,93 @@ export const membership = {
   ],
   cta: { label: 'Apply for membership', href: '/apply-membership' },
   secondaryCta: { label: 'Types of membership', href: '#membership' },
+}
+
+/* ------------------------------------------------------------------ */
+/*  Types of Membership — the standalone page at /types-of-membership   */
+/* ------------------------------------------------------------------ */
+/**
+ * ⚠️  The categories below are condensed from ZNFU’s own published
+ * membership material (the Union’s “Types of Membership” page). The band
+ * ranges and fees in `bands` are PLACEHOLDERS in the shape the application
+ * and invoice flow needs — number of people on the farm and farm size in
+ * hectares — and must be replaced with the Secretariat’s current schedule
+ * before launch.
+ */
+export const typesOfMembership = {
+  eyebrow: 'Membership',
+  title: 'Types of Membership',
+  intro: {
+    before:
+      'Membership is open to farmers, individuals, corporations and companies — and any other organisation — engaged in the business of farming in Zambia. Individual farmers join through their ',
+    linkLabel: 'District Farmers’ Association',
+    linkHref: '#contact',
+    after:
+      '; if you are unsure which association covers your area, the Secretariat will point you to your DFA chairman.',
+  },
+
+  categoriesHeading: 'Membership categories',
+  categories: [
+    {
+      title: 'Small-scale farmers',
+      whoFor:
+        'Farmers who grow crops or keep livestock themselves, joining the Union through their District Farmers’ Association.',
+      notes:
+        'The association pays a fixed annual affiliation fee raised from its members. Once it is paid, every member of the association is a member of the Union.',
+    },
+    {
+      title: 'Large-scale & commercial farmers',
+      whoFor:
+        'Commercial and large-scale farming operations, farmed by their owners or by companies.',
+      notes:
+        'Individual members are levied directly by the Union, with the fee based on the scale of the operation.',
+    },
+    {
+      title: 'Corporate members',
+      whoFor:
+        'Large farming businesses and multinationals, and individuals whose operations are at corporate scale.',
+      notes:
+        'Subscriptions are negotiated with the Union, guided by the size and turnover of the operation.',
+    },
+    {
+      title: 'Commodity & specialised associations',
+      whoFor:
+        'Associations organised around one commodity or activity — coffee, tobacco and export vegetables and flowers, for example.',
+      notes:
+        'A levy is collected on the Union’s behalf by the respective association; other enterprises pay directly or through the area association.',
+    },
+    {
+      title: 'Agribusiness members',
+      whoFor:
+        'Processors, traders, and input and service providers across the agricultural value chain.',
+      notes:
+        'Members of the Agri-Business Chamber pay the annual Chamber levy and work with the Union on industry-wide matters.',
+    },
+    {
+      title: 'Associate members',
+      whoFor:
+        'Companies and organisations that work with, or provide a service to, farmers.',
+      notes:
+        'Associate members pay a fixed annual subscription and are non-voting members of the Union.',
+    },
+  ],
+
+  bandsHeading: 'Annual subscription bands',
+  bandsNote:
+    'Subscription is assessed from the number of people on the farm and the farm size in hectares — the two figures the application form asks for. Confirm your band with the Secretariat when you apply.',
+  bandColumns: {
+    people: 'People on the farm',
+    hectares: 'Farm size (ha)',
+    fee: 'Annual fee',
+  },
+  /* ⚠️ PLACEHOLDER ladder — illustrative ranges and fees only. */
+  bands: [
+    { band: 'Band 1', people: '1 – 4', hectares: 'Up to 5', fee: 'ZMW 500' },
+    { band: 'Band 2', people: '5 – 9', hectares: '6 – 20', fee: 'ZMW 1,000' },
+    { band: 'Band 3', people: '10 – 19', hectares: '21 – 50', fee: 'ZMW 2,500' },
+    { band: 'Band 4', people: '20 – 49', hectares: '51 – 200', fee: 'ZMW 5,000' },
+    { band: 'Band 5', people: '50 or more', hectares: 'Over 200', fee: 'ZMW 10,000' },
+  ],
 }
 
 /* ------------------------------------------------------------------ */
