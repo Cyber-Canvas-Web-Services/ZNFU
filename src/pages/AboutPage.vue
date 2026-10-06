@@ -41,7 +41,8 @@ const SAMPLE_CONTENT = {
     },
     {
       name: "Sustainability",
-      description: "We plan for the long-term health of the land and the sector.",
+      description:
+        "We plan for the long-term health of the land and the sector.",
     },
   ],
 

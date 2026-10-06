@@ -8,35 +8,35 @@
  * when a later band slides up over this one — at the top of a page it would
  * draw a rounded corner and an upward shadow above the header.
  */
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from "vue";
 
-import { useInView } from '@/composables/useInView'
-import { media } from '@/data/home'
+import { useInView } from "@/composables/useInView";
+import { media } from "@/data/home";
 
 defineProps({
   /** Rendered as the top band of its own page rather than mid-stack. */
   standalone: { type: Boolean, default: false },
-})
+});
 
-const bandEl = ref(null)
-const videoEl = ref(null)
-const isInView = useInView(bandEl, { rootMargin: '150px' })
+const bandEl = ref(null);
+const videoEl = ref(null);
+const isInView = useInView(bandEl, { rootMargin: "150px" });
 
 function play() {
-  if (!videoEl.value) return
-  videoEl.value.muted = true
-  const attempt = videoEl.value.play()
-  if (attempt && typeof attempt.catch === 'function') attempt.catch(() => {})
+  if (!videoEl.value) return;
+  videoEl.value.muted = true;
+  const attempt = videoEl.value.play();
+  if (attempt && typeof attempt.catch === "function") attempt.catch(() => {});
 }
 
 onMounted(() => {
-  if (isInView.value) play()
-})
+  if (isInView.value) play();
+});
 
 watch(isInView, (visible) => {
-  if (visible) play()
-  else videoEl.value?.pause()
-})
+  if (visible) play();
+  else videoEl.value?.pause();
+});
 </script>
 
 <template>
@@ -94,15 +94,27 @@ watch(isInView, (visible) => {
         class="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-4"
         v-reveal="{ delay: 160 }"
       >
-        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60">
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60"
+        >
           Founded 1905
         </p>
-        <span class="hidden h-4 w-px bg-cream-200/25 sm:block" aria-hidden="true" />
-        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60">
+        <span
+          class="hidden h-4 w-px bg-cream-200/25 sm:block"
+          aria-hidden="true"
+        />
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60"
+        >
           Non-political
         </p>
-        <span class="hidden h-4 w-px bg-cream-200/25 sm:block" aria-hidden="true" />
-        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60">
+        <span
+          class="hidden h-4 w-px bg-cream-200/25 sm:block"
+          aria-hidden="true"
+        />
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60"
+        >
           Member-led
         </p>
       </div>
