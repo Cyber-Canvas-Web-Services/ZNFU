@@ -10,7 +10,14 @@ import { media } from '@/data/home'
 
 const bandEl = ref(null)
 const videoEl = ref(null)
-const isInView = useInView(bandEl, { rootMargin: '150px' })
+/**
+ * 600px of head start, not 150px. This panel sits well below the fold, and
+ * `autoplay` used to make the browser pull the whole clip down during the
+ * initial load — competing with the hero for bandwidth while nobody could see
+ * this section. Playback is driven by this observer instead, so the fetch now
+ * begins only as the panel approaches.
+ */
+const isInView = useInView(bandEl, { rootMargin: '600px' })
 
 function play() {
   if (!videoEl.value) return
@@ -34,8 +41,10 @@ watch(isInView, (visible) => {
     ref="bandEl"
     class="relative isolate flex flex-col justify-center overflow-hidden py-28 motion-safe:lg:sticky motion-safe:lg:top-0 lg:min-h-screen lg:rounded-t-[2rem] lg:py-0 lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)]"
   >
-    <!-- Poster paints immediately; the video fades in behind the tint once it
-         can play, so a slow decode never shows an empty panel. -->
+    <!-- Poster paints immediately and stays put underneath. No `autoplay`
+         attribute on purpose: with it present the browser fetches the whole
+         clip on page load no matter what `preload` says. The intersection
+         observer above starts playback when the panel is actually near. -->
     <img
       :src="media.fieldFootage.poster"
       alt=""
@@ -45,7 +54,6 @@ watch(isInView, (visible) => {
     <video
       ref="videoEl"
       class="absolute inset-0 h-full w-full object-cover"
-      autoplay
       muted
       loop
       playsinline
