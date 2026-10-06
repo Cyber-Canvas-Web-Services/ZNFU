@@ -2,44 +2,52 @@
 /**
  * Full-bleed footage panel — a visual breather between editorial panels.
  * Uses `vid 5` (rain → land preparation → soil in hand) and fills one screen.
+ *
+ * It also opens the About page, where it is the first band on the page rather
+ * than one mid-stack. `standalone` drops the card edge that is only wanted
+ * when a later band slides up over this one — at the top of a page it would
+ * draw a rounded corner and an upward shadow above the header.
  */
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch } from "vue";
 
-import { useInView } from '@/composables/useInView'
-import { media } from '@/data/home'
+import { useInView } from "@/composables/useInView";
+import { media } from "@/data/home";
 
-const bandEl = ref(null)
-const videoEl = ref(null)
-/**
- * 600px of head start, not 150px. This panel sits well below the fold, and
- * `autoplay` used to make the browser pull the whole clip down during the
- * initial load — competing with the hero for bandwidth while nobody could see
- * this section. Playback is driven by this observer instead, so the fetch now
- * begins only as the panel approaches.
- */
-const isInView = useInView(bandEl, { rootMargin: '600px' })
+defineProps({
+  /** Rendered as the top band of its own page rather than mid-stack. */
+  standalone: { type: Boolean, default: false },
+});
+
+const bandEl = ref(null);
+const videoEl = ref(null);
+const isInView = useInView(bandEl, { rootMargin: "150px" });
 
 function play() {
-  if (!videoEl.value) return
-  videoEl.value.muted = true
-  const attempt = videoEl.value.play()
-  if (attempt && typeof attempt.catch === 'function') attempt.catch(() => {})
+  if (!videoEl.value) return;
+  videoEl.value.muted = true;
+  const attempt = videoEl.value.play();
+  if (attempt && typeof attempt.catch === "function") attempt.catch(() => {});
 }
 
 onMounted(() => {
-  if (isInView.value) play()
-})
+  if (isInView.value) play();
+});
 
 watch(isInView, (visible) => {
-  if (visible) play()
-  else videoEl.value?.pause()
-})
+  if (visible) play();
+  else videoEl.value?.pause();
+});
 </script>
 
 <template>
   <section
     ref="bandEl"
-    class="relative isolate flex flex-col justify-center overflow-hidden py-28 motion-safe:lg:sticky motion-safe:lg:top-0 lg:min-h-screen lg:rounded-t-[2rem] lg:py-0 lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)]"
+    class="relative isolate flex flex-col justify-center overflow-hidden py-28 motion-safe:lg:sticky motion-safe:lg:top-0 lg:min-h-screen lg:py-0"
+    :class="
+      standalone
+        ? ''
+        : 'lg:rounded-t-[2rem] lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)]'
+    "
   >
     <!-- Poster paints immediately and stays put underneath. No `autoplay`
          attribute on purpose: with it present the browser fetches the whole
@@ -87,15 +95,27 @@ watch(isInView, (visible) => {
         class="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-4"
         v-reveal="{ delay: 160 }"
       >
-        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60">
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60"
+        >
           Founded 1905
         </p>
-        <span class="hidden h-4 w-px bg-cream-200/25 sm:block" aria-hidden="true" />
-        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60">
+        <span
+          class="hidden h-4 w-px bg-cream-200/25 sm:block"
+          aria-hidden="true"
+        />
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60"
+        >
           Non-political
         </p>
-        <span class="hidden h-4 w-px bg-cream-200/25 sm:block" aria-hidden="true" />
-        <p class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60">
+        <span
+          class="hidden h-4 w-px bg-cream-200/25 sm:block"
+          aria-hidden="true"
+        />
+        <p
+          class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60"
+        >
           Member-led
         </p>
       </div>

@@ -10,23 +10,23 @@
  * the fee ladder already published on the Types of Membership page, so the two
  * can never drift apart.
  */
-import { ArrowRight } from '@lucide/vue'
+import { ArrowRight } from "@lucide/vue";
 
-import StackedPanel from '@/components/sections/StackedPanel.vue'
-import { membership, typesOfMembership } from '@/data/home'
+import StackedPanel from "@/components/sections/StackedPanel.vue";
+import { membership, typesOfMembership } from "@/data/home";
 
 /** The category names, exactly as published on the Types of Membership page. */
 const glanceCategories = typesOfMembership.categories.map(
   (category) => category.title,
-)
+);
 
 /** Numeric value of a published fee, e.g. “ZMW 1,500” → 1500. */
-const feeValue = (fee) => Number(fee.replace(/[^0-9]/g, ''))
+const feeValue = (fee) => Number(fee.replace(/[^0-9]/g, ""));
 
 /** The cheapest band in the published ladder — shown as published. */
 const lowestFee = typesOfMembership.bands.reduce((lowest, band) =>
   feeValue(band.fee) < feeValue(lowest.fee) ? band : lowest,
-).fee
+).fee;
 
 /**
  * Also stands alone at /membership, where it heads the page and carries the
@@ -34,16 +34,12 @@ const lowestFee = typesOfMembership.bands.reduce((lowest, band) =>
  */
 defineProps({
   standalone: { type: Boolean, default: false },
-})
+});
 </script>
 
 <template>
   <!-- Panel 1 — the summary beside the calls to action -->
-  <StackedPanel
-    id="membership"
-    surface="bg-forest-50"
-    :first="true"
-  >
+  <StackedPanel id="membership" surface="bg-forest-50" :first="true">
     <div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
       <div>
         <p class="eyebrow text-forest-600" v-reveal>{{ membership.eyebrow }}</p>
@@ -93,7 +89,9 @@ defineProps({
 
   <!-- Panel 2 — closing image panel -->
   <StackedPanel surface="bg-forest-950" tone="text-cream-50" bleed>
-    <div class="relative flex min-h-[360px] flex-1 flex-col sm:min-h-[440px] lg:min-h-screen">
+    <div
+      class="relative flex min-h-[360px] flex-1 flex-col sm:min-h-[440px] lg:min-h-screen"
+    >
       <img
         :src="membership.image"
         :alt="membership.imageAlt"
@@ -110,11 +108,14 @@ defineProps({
         class="relative mt-auto mx-auto w-full max-w-7xl px-5 pb-14 pt-32 sm:px-8 lg:pb-20"
         v-reveal
       >
-        <p class="eyebrow eyebrow--plain text-maize-400">{{ membership.imageCaption }}</p>
+        <p class="eyebrow eyebrow--plain text-maize-400">
+          {{ membership.imageCaption }}
+        </p>
         <h2
           class="mt-4 max-w-3xl font-display text-[clamp(1.8rem,4vw,3rem)] font-medium leading-[1.12] tracking-[-0.03em] text-cream-50"
         >
-          Whoever you are in Zambian agriculture, there is a seat for you at the table.
+          Whoever you are in Zambian agriculture, there is a seat for you at the
+          table.
         </h2>
         <div class="mt-8 flex flex-wrap gap-3">
           <a :href="membership.cta.href" class="btn btn--maize">
