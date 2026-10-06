@@ -8,7 +8,9 @@ const reducedMotion = usePrefersReducedMotion()
 </script>
 
 <template>
-  <StackedPanel surface="bg-forest-950" tone="text-cream-50">
+  <!-- `top-edge` because this is the panel that peeks above the fold under the
+       hero — the card edge has to read at every breakpoint, not just from lg. -->
+  <StackedPanel surface="bg-forest-950" tone="text-cream-50" top-edge>
     <!-- Decorative glow + gold hairline -->
     <div
       class="pointer-events-none absolute -right-40 top-0 h-[420px] w-[420px] rounded-full bg-maize-500/10 blur-3xl"

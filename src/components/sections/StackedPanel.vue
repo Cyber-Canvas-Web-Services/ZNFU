@@ -37,6 +37,13 @@ defineProps({
    * padding — for panels that manage their own full-bleed layout.
    */
   bleed: { type: Boolean, default: false },
+  /**
+   * Force the card edge at every breakpoint instead of only from `lg` up.
+   * The mobile stacking effect does not exist, so the edge is normally
+   * desktop-only — but a panel that is deliberately *peeking* above the fold
+   * on a phone needs it too, or the peek is just a flat change of colour.
+   */
+  topEdge: { type: Boolean, default: false },
 })
 </script>
 
@@ -57,7 +64,9 @@ defineProps({
           : 'py-20 sm:py-24 lg:min-h-screen lg:py-28',
       first
         ? ''
-        : 'lg:rounded-t-[2rem] lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)] lg:ring-1 lg:ring-forest-950/5',
+        : topEdge
+          ? 'rounded-t-[2rem] shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)] ring-1 ring-forest-950/5'
+          : 'lg:rounded-t-[2rem] lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)] lg:ring-1 lg:ring-forest-950/5',
     ]"
   >
     <div v-if="bleed" class="relative flex w-full flex-1 flex-col">

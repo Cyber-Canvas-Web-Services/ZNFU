@@ -42,28 +42,34 @@ export const logo = znfuLogo;
 /*  Media — everything is served from /public/media                    */
 /* ------------------------------------------------------------------ */
 export const media = {
+  /* Kept: the scroll-expanding hero plays this clip in the card that opens
+     from 300×400 to full-bleed. `origin/main` replaced that hero with an
+     unpinned one and deleted both files, so they are restored alongside it. */
   heroForeground: {
     mp4: "/media/hero-foreground.mp4",
     poster: "/media/hero-foreground-poster.jpg",
   },
   heroBackground: {
+    /* Two encodes of the same montage: 1280×720 desktop, 960×540 phones. */
     mp4: "/media/hero-background.mp4",
-    poster: "/media/hero-background-poster.jpg",
+    mp4Mobile: "/media/hero-background-mobile.mp4",
+    poster: "/media/hero-background-poster.webp",
   },
   fieldFootage: {
     mp4: "/media/field-footage.mp4",
-    poster: "/media/field-footage-poster.jpg",
+    poster: "/media/field-footage-poster.webp",
   },
-  fieldSoybeanTeam: "/media/field-soybean-team.jpg",
-  livestockCattleWater: "/media/livestock-cattle-water.jpg",
-  livestockGoatsKraal: "/media/livestock-goats-kraal.jpg",
-  horticulturePassionFruit: "/media/horticulture-passion-fruit.jpg",
-  fieldMaizeDemoDay: "/media/field-maize-demo-day.jpg",
-  gardenSunsetIrrigation: "/media/garden-sunset-irrigation.jpg",
-  haulageAerialHarvest: "/media/haulage-aerial-harvest.jpg",
-  producePeppersBaskets: "/media/produce-peppers-baskets.jpg",
-  growerCabbageField: "/media/grower-cabbage-field.jpg",
-  growerMaizeField: "/media/grower-maize-field.jpg",
+  /* From origin/main: the stills were re-encoded to WebP. */
+  fieldSoybeanTeam: "/media/field-soybean-team.webp",
+  livestockCattleWater: "/media/livestock-cattle-water.webp",
+  livestockGoatsKraal: "/media/livestock-goats-kraal.webp",
+  horticulturePassionFruit: "/media/horticulture-passion-fruit.webp",
+  fieldMaizeDemoDay: "/media/field-maize-demo-day.webp",
+  gardenSunsetIrrigation: "/media/garden-sunset-irrigation.webp",
+  haulageAerialHarvest: "/media/haulage-aerial-harvest.webp",
+  producePeppersBaskets: "/media/produce-peppers-baskets.webp",
+  growerCabbageField: "/media/grower-cabbage-field.webp",
+  growerMaizeField: "/media/grower-maize-field.webp",
 };
 
 /* ------------------------------------------------------------------ */
@@ -88,6 +94,7 @@ export const brand = {
 /* ------------------------------------------------------------------ */
 export const hero = {
   title: "Growing Zambia, Together",
+  /* Kept from this branch: the scroll-expanding hero renders these two. */
   eyebrow: "Est. 1905 · Lusaka, Zambia",
   scrollHint: "Scroll to expand",
   tagline: "A united voice for Zambian agriculture.",

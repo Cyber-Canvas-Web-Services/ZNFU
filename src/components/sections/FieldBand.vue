@@ -49,8 +49,10 @@ watch(isInView, (visible) => {
         : 'lg:rounded-t-[2rem] lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)]'
     "
   >
-    <!-- Poster paints immediately; the video fades in behind the tint once it
-         can play, so a slow decode never shows an empty panel. -->
+    <!-- Poster paints immediately and stays put underneath. No `autoplay`
+         attribute on purpose: with it present the browser fetches the whole
+         clip on page load no matter what `preload` says. The intersection
+         observer above starts playback when the panel is actually near. -->
     <img
       :src="media.fieldFootage.poster"
       alt=""
@@ -60,7 +62,6 @@ watch(isInView, (visible) => {
     <video
       ref="videoEl"
       class="absolute inset-0 h-full w-full object-cover"
-      autoplay
       muted
       loop
       playsinline
