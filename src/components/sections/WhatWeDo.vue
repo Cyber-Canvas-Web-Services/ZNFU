@@ -1,7 +1,7 @@
 <script setup>
-import AppIcon from '@/components/ui/AppIcon.vue'
-import StackedPanel from '@/components/sections/StackedPanel.vue'
-import { whatWeDo } from '@/data/home'
+import AppIcon from "@/components/ui/AppIcon.vue";
+import StackedPanel from "@/components/sections/StackedPanel.vue";
+import { whatWeDo } from "@/data/home";
 
 /**
  * Copy for the three blocks below the mission cards.
@@ -11,30 +11,30 @@ import { whatWeDo } from '@/data/home'
  * a number or a claim of its own.
  */
 const missionTags = [
-  'Individual farmers',
-  'Corporations',
-  'Companies',
-  'Purveyors',
-  'Other organisations involved in the business of agriculture',
-]
+  "Individual farmers",
+  "Corporations",
+  "Companies",
+  "Purveyors",
+  "Other organisations involved in the business of agriculture",
+];
 
 const focusPillars = [
   {
-    number: '01',
-    title: 'Sustainable Agriculture',
-    line: 'The Union works to achieve sustainable agriculture.',
+    number: "01",
+    title: "Sustainable Agriculture",
+    line: "The Union works to achieve sustainable agriculture.",
   },
   {
-    number: '02',
-    title: 'Economic Development',
-    line: 'The Union works to achieve economic development.',
+    number: "02",
+    title: "Economic Development",
+    line: "The Union works to achieve economic development.",
   },
   {
-    number: '03',
-    title: 'Social Development',
-    line: 'The Union works to achieve social development.',
+    number: "03",
+    title: "Social Development",
+    line: "The Union works to achieve social development.",
   },
-]
+];
 
 /**
  * Also stands alone at /what-we-do, where it heads the page: it then carries
@@ -42,7 +42,7 @@ const focusPillars = [
  */
 defineProps({
   standalone: { type: Boolean, default: false },
-})
+});
 </script>
 
 <template>
@@ -94,7 +94,9 @@ defineProps({
         </div>
 
         <div class="flex flex-1 flex-col p-6">
-          <h3 class="font-display text-xl font-medium tracking-[-0.02em] text-forest-950">
+          <h3
+            class="font-display text-xl font-medium tracking-[-0.02em] text-forest-950"
+          >
             {{ item.title }}
           </h3>
           <p class="mt-3 text-[0.92rem] leading-relaxed text-ink-900/65">
@@ -118,7 +120,11 @@ defineProps({
     <div class="mission-block" v-reveal="{ delay: 80 }">
       <h3 class="mission-block__heading">Our focus</h3>
       <ul class="focus-pillars">
-        <li v-for="pillar in focusPillars" :key="pillar.number" class="focus-pillar">
+        <li
+          v-for="pillar in focusPillars"
+          :key="pillar.number"
+          class="focus-pillar"
+        >
           <p class="focus-pillar__number">{{ pillar.number }}</p>
           <h4 class="focus-pillar__title">{{ pillar.title }}</h4>
           <p class="focus-pillar__line">{{ pillar.line }}</p>
@@ -129,7 +135,9 @@ defineProps({
     <!-- Closing banner — same destination as the header’s “Join ZNFU” button. -->
     <div class="mission-banner" v-reveal="{ delay: 160 }">
       <p class="mission-banner__title">Join the Union</p>
-      <a href="/apply-membership" class="btn btn--maize">Apply for membership</a>
+      <a href="/apply-membership" class="btn btn--maize"
+        >Apply for membership</a
+      >
     </div>
   </StackedPanel>
 </template>
@@ -174,7 +182,8 @@ defineProps({
 
 .mission-tag {
   border-radius: 9999px;
-  border: 1px solid color-mix(in oklab, var(--color-forest-900) 15%, transparent);
+  border: 1px solid
+    color-mix(in oklab, var(--color-forest-900) 15%, transparent);
   background-color: var(--color-cream-50);
   padding: 0.55rem 1.15rem;
   font-size: 0.9rem;

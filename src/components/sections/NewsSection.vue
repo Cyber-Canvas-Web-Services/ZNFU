@@ -3,19 +3,19 @@
  * Newsroom — split into two panels: the featured story, then the latest list
  * with the Friday Briefs signup. Together they are well over a screen tall.
  */
-import { ref } from 'vue'
-import { ArrowRight, Clock, Send } from '@lucide/vue'
+import { ref } from "vue";
+import { ArrowRight, Clock, Send } from "@lucide/vue";
 
-import StackedPanel from '@/components/sections/StackedPanel.vue'
-import { news } from '@/data/home'
+import StackedPanel from "@/components/sections/StackedPanel.vue";
+import { news } from "@/data/home";
 
-const email = ref('')
-const subscribed = ref(false)
+const email = ref("");
+const subscribed = ref(false);
 
 function subscribe() {
-  if (!email.value) return
-  subscribed.value = true
-  email.value = ''
+  if (!email.value) return;
+  subscribed.value = true;
+  email.value = "";
 }
 
 /**
@@ -24,13 +24,16 @@ function subscribe() {
  */
 defineProps({
   standalone: { type: Boolean, default: false },
-})
+});
 </script>
 
 <template>
   <!-- Panel 1 — featured story -->
   <StackedPanel id="news" surface="bg-cream-50" :first="true">
-    <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between" v-reveal>
+    <div
+      class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between"
+      v-reveal
+    >
       <div class="max-w-2xl">
         <p class="eyebrow text-forest-600">{{ news.eyebrow }}</p>
         <component
@@ -59,7 +62,9 @@ defineProps({
             loading="lazy"
             decoding="async"
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-forest-950/60 to-transparent" />
+          <div
+            class="absolute inset-0 bg-gradient-to-t from-forest-950/60 to-transparent"
+          />
           <span
             class="absolute left-5 top-5 rounded-full bg-maize-400 px-3.5 py-1.5 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-forest-950"
           >
@@ -79,7 +84,9 @@ defineProps({
           >
             {{ news.featured.title }}
           </h3>
-          <p class="mt-4 leading-relaxed text-ink-900/65">{{ news.featured.excerpt }}</p>
+          <p class="mt-4 leading-relaxed text-ink-900/65">
+            {{ news.featured.excerpt }}
+          </p>
           <span
             class="mt-7 inline-flex items-center gap-2 text-sm font-semibold text-forest-800 transition group-hover:gap-3"
           >
@@ -96,8 +103,14 @@ defineProps({
     <div class="grid gap-12 lg:grid-cols-[1.25fr_1fr] lg:gap-16">
       <div>
         <p class="eyebrow text-forest-600" v-reveal>Latest</p>
-        <ul class="mt-6 divide-y divide-forest-900/10 border-y border-forest-900/10">
-          <li v-for="(item, index) in news.items" :key="item.title" v-reveal="{ delay: index * 80 }">
+        <ul
+          class="mt-6 divide-y divide-forest-900/10 border-y border-forest-900/10"
+        >
+          <li
+            v-for="(item, index) in news.items"
+            :key="item.title"
+            v-reveal="{ delay: index * 80 }"
+          >
             <a
               :href="item.href"
               class="group flex flex-col gap-3 py-6 transition-colors hover:bg-cream-50/70 sm:flex-row sm:items-start sm:gap-6"
@@ -113,7 +126,9 @@ defineProps({
                 >
                   {{ item.title }}
                 </span>
-                <span class="mt-2 block text-xs uppercase tracking-[0.14em] text-ink-900/45">
+                <span
+                  class="mt-2 block text-xs uppercase tracking-[0.14em] text-ink-900/45"
+                >
                   {{ item.date }}
                 </span>
               </span>
@@ -130,15 +145,23 @@ defineProps({
         v-reveal="{ delay: 140 }"
         class="grain relative flex flex-col justify-center overflow-hidden rounded-3xl bg-forest-900 p-7 text-cream-50 sm:p-9"
       >
-        <p class="eyebrow eyebrow--plain text-maize-400">{{ news.fridayBrief.label }}</p>
-        <h3 class="mt-4 font-display text-2xl font-medium leading-snug tracking-[-0.025em]">
+        <p class="eyebrow eyebrow--plain text-maize-400">
+          {{ news.fridayBrief.label }}
+        </p>
+        <h3
+          class="mt-4 font-display text-2xl font-medium leading-snug tracking-[-0.025em]"
+        >
           {{ news.fridayBrief.title }}
         </h3>
         <p class="mt-4 text-sm leading-relaxed text-cream-200/70">
           {{ news.fridayBrief.body }}
         </p>
 
-        <form v-if="!subscribed" class="mt-6 flex flex-col gap-3 sm:flex-row" @submit.prevent="subscribe">
+        <form
+          v-if="!subscribed"
+          class="mt-6 flex flex-col gap-3 sm:flex-row"
+          @submit.prevent="subscribe"
+        >
           <label class="sr-only" for="news-email">Email address</label>
           <input
             id="news-email"
@@ -153,7 +176,10 @@ defineProps({
             <Send class="h-4 w-4" aria-hidden="true" />
           </button>
         </form>
-        <p v-else class="mt-6 rounded-2xl bg-maize-400/15 px-5 py-4 text-sm text-maize-200">
+        <p
+          v-else
+          class="mt-6 rounded-2xl bg-maize-400/15 px-5 py-4 text-sm text-maize-200"
+        >
           Thank you — please check your inbox to confirm.
         </p>
       </div>
