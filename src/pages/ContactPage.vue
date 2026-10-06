@@ -49,7 +49,9 @@ import { brand, contact } from "@/data/home";
         >
           Visit or write
         </h2>
-        <address class="mt-3 not-italic text-[0.92rem] leading-relaxed text-ink-900/65">
+        <address
+          class="mt-3 not-italic text-[0.92rem] leading-relaxed text-ink-900/65"
+        >
           <span v-for="line in contact.addressLines" :key="line" class="block">
             {{ line }}
           </span>

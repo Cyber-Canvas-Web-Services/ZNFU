@@ -2,25 +2,22 @@
 /**
  * Purpose / Vision — the “About” band.
  *
- * Also stands alone at /about. In that case the band heads the page, so it
- * carries the page’s single <h1> and drops the stacked-card edge that would
- * otherwise draw a rounded top and an upward shadow above the header.
+ * Also appears on the About page at /about, where `standalone` gives it that
+ * page’s single <h1>. It is never the first band on a page — on the home page
+ * other panels sit above it, and on /about the footage panel opens — so it
+ * always keeps the stacked-card edge that later bands slide up over.
  */
-import StackedPanel from '@/components/sections/StackedPanel.vue'
-import { purposeVision } from '@/data/home'
+import StackedPanel from "@/components/sections/StackedPanel.vue";
+import { purposeVision } from "@/data/home";
 
 defineProps({
-  /** Rendered as the top band of its own page rather than mid-stack. */
+  /** Sits on a page of its own, so its heading becomes the page’s <h1>. */
   standalone: { type: Boolean, default: false },
-})
+});
 </script>
 
 <template>
-  <StackedPanel
-    id="about"
-    surface="bg-cream-50"
-    :first="standalone"
-  >
+  <StackedPanel id="about" surface="bg-cream-50">
     <div class="grid items-center gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
       <!-- Visual -->
       <div class="relative" v-reveal>
@@ -38,7 +35,9 @@ defineProps({
         <div
           class="absolute -bottom-6 left-4 rounded-2xl bg-forest-900 px-6 py-5 text-cream-50 shadow-card sm:left-6"
         >
-          <p class="font-display text-3xl font-medium leading-none tracking-[-0.03em] text-maize-400">
+          <p
+            class="font-display text-3xl font-medium leading-none tracking-[-0.03em] text-maize-400"
+          >
             1905
           </p>
           <p class="mt-2 text-xs uppercase tracking-[0.2em] text-cream-200/70">
@@ -49,7 +48,9 @@ defineProps({
 
       <!-- Copy -->
       <div>
-        <p class="eyebrow text-forest-600" v-reveal>{{ purposeVision.eyebrow }}</p>
+        <p class="eyebrow text-forest-600" v-reveal>
+          {{ purposeVision.eyebrow }}
+        </p>
         <component
           :is="standalone ? 'h1' : 'h2'"
           class="section-title mt-5 text-forest-950"
@@ -57,7 +58,10 @@ defineProps({
         >
           {{ purposeVision.title }}
         </component>
-        <p class="lede mt-5 max-w-2xl text-ink-900/70" v-reveal="{ delay: 120 }">
+        <p
+          class="lede mt-5 max-w-2xl text-ink-900/70"
+          v-reveal="{ delay: 120 }"
+        >
           {{ purposeVision.lede }}
         </p>
 
@@ -68,14 +72,20 @@ defineProps({
             v-reveal="{ delay: 160 + index * 90 }"
             class="grid gap-3 sm:grid-cols-[auto_1fr] sm:gap-7"
           >
-            <p class="font-display text-sm font-semibold tracking-[0.2em] text-maize-600 sm:pt-1.5">
+            <p
+              class="font-display text-sm font-semibold tracking-[0.2em] text-maize-600 sm:pt-1.5"
+            >
               {{ block.number }}
             </p>
             <div>
-              <h3 class="font-display text-xl font-medium tracking-[-0.02em] text-forest-950">
+              <h3
+                class="font-display text-xl font-medium tracking-[-0.02em] text-forest-950"
+              >
                 {{ block.heading }}
               </h3>
-              <p class="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-ink-900/65">
+              <p
+                class="mt-3 max-w-xl text-[0.95rem] leading-relaxed text-ink-900/65"
+              >
                 {{ block.body }}
               </p>
               <div class="rule mt-6 text-forest-900/20" />

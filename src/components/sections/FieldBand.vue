@@ -2,11 +2,21 @@
 /**
  * Full-bleed footage panel — a visual breather between editorial panels.
  * Uses `vid 5` (rain → land preparation → soil in hand) and fills one screen.
+ *
+ * It also opens the About page, where it is the first band on the page rather
+ * than one mid-stack. `standalone` drops the card edge that is only wanted
+ * when a later band slides up over this one — at the top of a page it would
+ * draw a rounded corner and an upward shadow above the header.
  */
 import { onMounted, ref, watch } from 'vue'
 
 import { useInView } from '@/composables/useInView'
 import { media } from '@/data/home'
+
+defineProps({
+  /** Rendered as the top band of its own page rather than mid-stack. */
+  standalone: { type: Boolean, default: false },
+})
 
 const bandEl = ref(null)
 const videoEl = ref(null)
@@ -32,7 +42,12 @@ watch(isInView, (visible) => {
 <template>
   <section
     ref="bandEl"
-    class="relative isolate flex flex-col justify-center overflow-hidden py-28 motion-safe:lg:sticky motion-safe:lg:top-0 lg:min-h-screen lg:rounded-t-[2rem] lg:py-0 lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)]"
+    class="relative isolate flex flex-col justify-center overflow-hidden py-28 motion-safe:lg:sticky motion-safe:lg:top-0 lg:min-h-screen lg:py-0"
+    :class="
+      standalone
+        ? ''
+        : 'lg:rounded-t-[2rem] lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)]'
+    "
   >
     <!-- Poster paints immediately; the video fades in behind the tint once it
          can play, so a slow decode never shows an empty panel. -->
