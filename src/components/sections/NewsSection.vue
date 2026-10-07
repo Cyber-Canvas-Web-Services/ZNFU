@@ -43,15 +43,20 @@ defineProps({
           {{ news.title }}
         </component>
       </div>
-      <a :href="news.allLink.href" class="btn btn--outline shrink-0">
+      <!-- An in-app "/…" path, so the shell’s document click handler turns
+           this into a page switch the same way the header’s buttons work —
+           no router, and no change to App.vue needed. -->
+      <a href="/news" class="btn btn--outline shrink-0">
         {{ news.allLink.label }}
         <ArrowRight class="h-4 w-4" aria-hidden="true" />
       </a>
     </div>
 
     <article v-reveal="{ delay: 90 }" class="group mt-10">
+      <!-- The whole card is the “Read story” call to action, so it opens the
+           News page, where this story is shown in full. -->
       <a
-        :href="news.featured.href"
+        href="/news"
         class="grid overflow-hidden rounded-3xl bg-cream-100 shadow-soft ring-1 ring-forest-900/5 lg:grid-cols-2"
       >
         <div class="relative h-56 overflow-hidden lg:h-[400px]">
