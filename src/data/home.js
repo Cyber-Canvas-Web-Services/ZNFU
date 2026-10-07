@@ -42,19 +42,17 @@ export const logo = znfuLogo;
 /*  Media — everything is served from /public/media                    */
 /* ------------------------------------------------------------------ */
 export const media = {
-  /* Kept: the scroll-expanding hero plays this clip in the card that opens
-     from 300×400 to full-bleed. `origin/main` replaced that hero with an
-     unpinned one and deleted both files, so they are restored alongside it. */
-  heroForeground: {
-    mp4: "/media/hero-foreground.mp4",
-    poster: "/media/hero-foreground-poster.jpg",
-  },
+  /* The hero rotates between the montage and two stills of Zambian farmland,
+     so they are grouped together. `scripts/optimize-media.sh` builds all of
+     these from `assets/media-source/`. */
   heroBackground: {
-    /* Two encodes of the same montage: 1280×720 desktop, 960×540 phones. */
+    /* Two encodes of the same montage: 1280×720 desktop, 540×720 phones. */
     mp4: "/media/hero-background.mp4",
     mp4Mobile: "/media/hero-background-mobile.mp4",
     poster: "/media/hero-background-poster.webp",
   },
+  /* Order is the rotation order, after the video. */
+  heroStills: ["/media/agri.webp", "/media/harvest-combine-aerial.webp"],
   fieldFootage: {
     mp4: "/media/field-footage.mp4",
     poster: "/media/field-footage-poster.webp",
@@ -94,9 +92,9 @@ export const brand = {
 /* ------------------------------------------------------------------ */
 export const hero = {
   title: "Growing Zambia, Together",
-  /* Kept from this branch: the scroll-expanding hero renders these two. */
-  eyebrow: "Est. 1905 · Lusaka, Zambia",
-  scrollHint: "Scroll to expand",
+  /* Verified facts only — the badge is the visitor's first introduction to the
+     Union, since the headline deliberately does not name it. */
+  badge: { chip: "Est. 1905", text: "Zambia National Farmers’ Union" },
   tagline: "A united voice for Zambian agriculture.",
   body: "The Zambia National Farmers’ Union is a non-political, member-led union that promotes and safeguards the interests of farmers, commodity associations and agribusinesses across Zambia.",
   primaryCta: { label: "Become a member", href: "#membership" },

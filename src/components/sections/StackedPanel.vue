@@ -44,6 +44,12 @@ defineProps({
    * on a phone needs it too, or the peek is just a flat change of colour.
    */
   topEdge: { type: Boolean, default: false },
+  /**
+   * Tighter vertical rhythm. For the panel that sits directly under the hero,
+   * which has to get real content into the first screenful rather than spend
+   * that space on padding.
+   */
+  dense: { type: Boolean, default: false },
 })
 </script>
 
@@ -57,11 +63,19 @@ defineProps({
       // Only one padding branch may apply: `p-0` and `py-*` are competing
       // utilities, and which one wins depends on stylesheet order rather than
       // the order they are written here.
+      //
+      // These paddings used to be 80/96/112px and every panel also carried
+      // `lg:min-h-screen`. Together that meant a panel with 400px of content
+      // was stretched to a full 800px screen and centred, leaving ~200px of
+      // dead space above and below — which is what made the top of each
+      // section look empty. The panel now takes its height from its content.
       bleed
-        ? 'p-0 lg:min-h-screen'
+        ? 'p-0'
         : compact
-          ? 'py-16 lg:min-h-0 lg:py-24'
-          : 'py-20 sm:py-24 lg:min-h-screen lg:py-28',
+          ? 'py-8 lg:py-10'
+          : dense
+            ? 'py-6 sm:py-7 lg:py-8'
+            : 'py-10 sm:py-12 lg:py-14',
       first
         ? ''
         : topEdge
