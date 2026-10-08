@@ -34,82 +34,104 @@ const year = new Date().getFullYear()
     id="contact"
     class="relative z-10 scroll-mt-24 clip-safe bg-forest-950 text-cream-50 lg:rounded-t-[2rem] lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)] lg:ring-1 lg:ring-forest-950/5"
   >
+    <!-- ==================== Partner band ====================
+         A full-bleed off-white strip across the top of the footer, rather than
+         a block inside the padded shell. Two reasons:
+
+         1. The logo assets are exported with their chip colour set to exactly
+            `--color-cream-100` (see CHIP_BG in scripts/optimize-logos.py), so
+            on this band the chips vanish and the logos appear to sit directly
+            on the section. That only works if the band really is cream-100.
+         2. Full-bleed means the strip reads as its own band above the footer,
+            which is what stops the cream from looking like a stray panel.
+
+         The footer below keeps its dark surface, so this is the one place on
+         the page where the off-white and the forest green meet directly. -->
+    <div class="relative bg-cream-100 pt-12 pb-10 sm:pt-14 sm:pb-12">
+    <div class="shell">
+      <div
+        class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between"
+      >
+        <p class="eyebrow eyebrow--plain shrink-0 text-maize-700">
+          {{ partners.title }}
+        </p>
+
+        <ul class="flex flex-wrap gap-3">
+          <li
+            v-for="affiliation in partners.affiliations"
+            :key="affiliation.label"
+            class="flex items-center gap-3 rounded-2xl border border-forest-900/10 bg-cream-50 px-4 py-2.5"
+          >
+            <ShieldCheck class="h-4 w-4 shrink-0 text-maize-700" aria-hidden="true" />
+            <span>
+              <span
+                class="block text-xs font-bold uppercase tracking-[0.14em] text-forest-950"
+              >
+                {{ affiliation.label }}
+              </span>
+              <span class="block text-[0.68rem] leading-tight text-ink-900/60">
+                {{ affiliation.sub }}
+              </span>
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Partner logos.
+           Each is exported on an identical 200x80 chip whose colour matches
+           this band exactly, so nothing is drawn behind them here — the
+           markup only places them. It must NOT try to resize or fit them, or
+           the even visual weight `scripts/optimize-logos.py` arranges would
+           be lost. `h-20 w-[200px]` is that chip at 1x; the assets carry 3x
+           pixels for high-density screens, so the two must stay in step.
+
+           `gap-5` with the chip's 8px padding keeps 36px between the visible
+           edges of neighbouring logos — the same clearance the old, smaller
+           chip had with `gap-4` and 10px padding. -->
+      <div class="mask-fade-x mt-8 overflow-hidden" aria-label="Working with">
+        <ul class="marquee gap-5">
+          <li
+            v-for="(item, index) in marqueeItems"
+            :key="`${item.name}-${index}`"
+            class="shrink-0"
+          >
+            <img
+              v-if="item.logo"
+              :src="item.logo"
+              :alt="item.name"
+              width="200"
+              height="80"
+              class="h-20 w-[200px]"
+              loading="lazy"
+              decoding="async"
+              :aria-hidden="index >= partners.items.length ? 'true' : undefined"
+            />
+            <!-- The one partner with no logo supplied: same box, name in text.
+                 No chip, because the logos either side have none visible
+                 either — a box here would make the gap more obvious, not less. -->
+            <span
+              v-else
+              class="grid h-20 w-[200px] place-items-center px-3 text-center text-[0.7rem] font-semibold uppercase leading-tight tracking-[0.1em] text-forest-950/70"
+              :aria-hidden="index >= partners.items.length ? 'true' : undefined"
+            >
+              {{ item.name }}
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="shell relative py-20 sm:py-24">
+    <!-- Decorative glow. It lives inside this container rather than at the top
+         of the footer so it sits in the dark area; anchored to the footer it
+         would have been hidden behind the cream band above. -->
     <div
       class="glow -left-40 -top-20 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(233,168,18,0.12),transparent)]"
       aria-hidden="true"
     />
 
-    <div class="shell relative py-20 sm:py-24">
-      <!-- Partners and affiliations — folded in from the separate band that
-           used to sit above this footer. -->
-      <div class="mb-14 border-b border-white/10 pb-10">
-        <div
-          class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between"
-        >
-          <p class="eyebrow eyebrow--plain shrink-0 text-maize-400">
-            {{ partners.title }}
-          </p>
-
-          <ul class="flex flex-wrap gap-3">
-            <li
-              v-for="affiliation in partners.affiliations"
-              :key="affiliation.label"
-              class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5"
-            >
-              <ShieldCheck class="h-4 w-4 shrink-0 text-maize-400" aria-hidden="true" />
-              <span>
-                <span
-                  class="block text-xs font-bold uppercase tracking-[0.14em] text-cream-50"
-                >
-                  {{ affiliation.label }}
-                </span>
-                <span class="block text-[0.68rem] leading-tight text-cream-200/55">
-                  {{ affiliation.sub }}
-                </span>
-              </span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Partner logos.
-             Each item is already exported on an identical 160x64 white chip
-             by `scripts/optimize-logos.py`, so this markup only places them —
-             it must NOT try to resize or fit them, or the even visual weight
-             the script arranges would be lost. `h-16 w-40` is that chip at
-             1x; the assets carry 3x pixels for high-density screens. -->
-        <div class="mask-fade-x mt-8 overflow-hidden" aria-label="Working with">
-          <ul class="marquee gap-4">
-            <li
-              v-for="(item, index) in marqueeItems"
-              :key="`${item.name}-${index}`"
-              class="shrink-0"
-            >
-              <img
-                v-if="item.logo"
-                :src="item.logo"
-                :alt="item.name"
-                width="160"
-                height="64"
-                class="h-16 w-40 rounded-xl"
-                loading="lazy"
-                decoding="async"
-                :aria-hidden="index >= partners.items.length ? 'true' : undefined"
-              />
-              <!-- The one partner with no logo supplied: same chip, name in
-                   text, so the row keeps its rhythm rather than showing a gap. -->
-              <span
-                v-else
-                class="grid h-16 w-40 place-items-center rounded-xl bg-white px-3 text-center text-[0.62rem] font-semibold uppercase leading-tight tracking-[0.08em] text-forest-950"
-                :aria-hidden="index >= partners.items.length ? 'true' : undefined"
-              >
-                {{ item.name }}
-              </span>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="grid gap-14 lg:grid-cols-[1.05fr_1.35fr_1fr]">
+    <div class="grid gap-14 lg:grid-cols-[1.05fr_1.35fr_1fr]">
         <!-- Brand + mission -->
         <div>
           <BrandMark />

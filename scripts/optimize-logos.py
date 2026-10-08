@@ -46,13 +46,39 @@ SOURCE = ROOT / "assets" / "logos"
 OUT = ROOT / "public" / "media" / "partners"
 
 # ---- Chip geometry -------------------------------------------------------
-# Every logo is exported on an identical white chip, so the strip is a row of
+# Every logo is exported on an identical chip, so the strip is a row of
 # matching tiles rather than a row of differently-shaped images. These are
 # design pixels; SCALE multiplies them for high-density screens.
-CHIP_W, CHIP_H = 160, 64
-CHIP_PAD = 10
+CHIP_W, CHIP_H = 200, 80
+CHIP_PAD = 8
 SCALE = 3
-WEBP_QUALITY = 88
+
+# 92, not the 88 used for photography.
+#
+# These are flat colour fields behind thin wordmarks, which is the worst case
+# for a lossy codec and the one place where its artefacts are actually visible.
+# Encoded from a pixel-perfect uniform fill, q88 was the only setting that
+# introduced variation — a spread of 4 across the flat area, which is enough to
+# read as faint mottling where the chip meets a perfectly flat CSS background.
+# q92 holds that spread at 0 for 46 kB across all nine, against 217 kB for
+# lossless. q92 does shift the fill by one unit in the green channel
+# (245,242,232 -> 245,243,232); that is 0.4% luminance, well under the ~1%
+# just-noticeable difference for a large flat area, and it is uniform rather
+# than noise, so there is no edge to see.
+WEBP_QUALITY = 92
+
+# The colour the chip is filled with — which is the band the strip renders on.
+#
+# This must stay in step with `bg-cream-100` on the strip in SiteFooter.vue,
+# which comes from `--color-cream-100` in src/style.css. The chip and the band
+# being the same colour is the entire point: the logos then sit directly on
+# the section with no tile behind them at all. Change one and every logo
+# reappears inside a faint box.
+#
+# (Pure white was the previous value, while the strip sat on dark green. On
+# the off-white band, white chips show as slightly cool rectangles — the hue
+# gap is small but flat areas make it obvious.)
+CHIP_BG = (245, 242, 232)   # --color-cream-100
 
 # Logos are sized to a shared visual AREA rather than a shared height.
 #
@@ -65,10 +91,19 @@ WEBP_QUALITY = 88
 # partner reads as more important than the others.
 #
 # Expressed as a fraction of the content box rather than an absolute pixel
-# area, so it stays correct if the chip is ever resized. 0.30 was chosen by
-# eye: enough that the wordmarks stay legible, little enough that each logo
-# still has clear space around it rather than crowding the chip.
-CONTENT_FILL = 0.30
+# area, so it stays correct if the chip is ever resized.
+#
+# The 0.30 -> 0.27 drop is not a reduction in size. The content box grew from
+# 140x44 to 184x64 at the same time, so the actual target area went from 1848
+# to 3180 and every logo renders about 30% larger. The fraction came down only
+# because the box grew faster than the target did.
+#
+# The limit here is the square emblems (MOF, ZARI, the National Assembly,
+# WARMA, CFU): they are bounded by the content box HEIGHT, so they cannot grow
+# at all without a taller chip. Height-fitting them at 43px of a 44px box was
+# already at the ceiling, which is why enlarging the logos needed a new chip
+# rather than just a bigger CSS size.
+CONTENT_FILL = 0.27
 
 # How close to white a pixel must be to count as background when trimming.
 WHITE_TOLERANCE = 12
@@ -157,12 +192,70 @@ def is_transparent(im):
 
 
 def flatten_onto_white(im):
-    """Composite onto white so every logo shares one background."""
+    """Composite onto white so every logo shares one known background."""
     if im.mode != "RGBA":
         im = im.convert("RGBA")
     canvas = Image.new("RGBA", im.size, (255, 255, 255, 255))
     canvas.alpha_composite(im)
     return canvas.convert("RGB")
+
+
+def retint_flat_white(im, target):
+    """
+    Move a logo off its white background and onto `target`.
+
+    Every supplied logo sits on pure white. The band now wants cream, so the
+    white has to go — otherwise each logo floats inside a faint white box,
+    which is exactly the mismatch the chip was introduced to avoid.
+
+    A threshold will not do. These are wordmarks, so almost every glyph edge
+    is a blend of ink and white, and hard-keying those leaves grey halos
+    against the cream. Instead this recovers how much ink covers each pixel
+    and rebuilds the pixel against the new background:
+
+        rendered = ink*a + white*(1-a)
+        wanted   = ink*a + target*(1-a)
+
+    Subtracting the first from the second gives
+
+        wanted = rendered + (target - white) * (1 - a)
+
+    `a` is estimated from the pixel's weakest channel, which is 0 for pure
+    white and 1 for any saturated ink. So pure white lands exactly on
+    `target`, opaque ink is untouched, and the glyph edges between them are
+    recalculated rather than left behind as grey.
+
+    Finally, pixels that are essentially all background are snapped to
+    exactly `target`. The supplied JPEGs do not have a perfectly uniform
+    white — they carry compression noise, so their "white" wanders over a
+    small range. After retinting, that wander survives as a couple of units
+    of variation in the chip. On a large flat area sitting directly against a
+    flat CSS background, a few units is enough to read as faint mottling, so
+    it is worth removing. Lossless encoding does not help: the variation is in
+    the source, and measurement showed lossless still carried it.
+
+    The snap only touches pixels with a weakest channel at or above 248,
+    which is background at 97% or more. Anything with more ink than that is
+    a genuine glyph edge and is left exactly as the retint computed it.
+    """
+    im = im.convert("RGB")
+    px = im.load()
+    w, h = im.size
+    tr, tg, tb = target
+    for y in range(h):
+        for x in range(w):
+            r, g, b = px[x, y]
+            weakest = min(r, g, b)
+            if weakest >= 248:
+                px[x, y] = target
+                continue
+            background = weakest / 255   # share of the pixel that is backdrop
+            px[x, y] = (
+                max(0, min(255, round(r + (tr - 255) * background))),
+                max(0, min(255, round(g + (tg - 255) * background))),
+                max(0, min(255, round(b + (tb - 255) * background))),
+            )
+    return im
 
 
 def scale_to_area(im, fill_fraction, box_w, box_h):
@@ -186,15 +279,15 @@ def scale_to_area(im, fill_fraction, box_w, box_h):
 
 def compose_chip(logo):
     """
-    Centre a logo on an identical white chip.
+    Centre a logo on an identical chip.
 
     The chip is baked into the asset rather than drawn in CSS so the
     proportions arranged here are exactly what renders — CSS cannot
     accidentally re-fit the logos and undo the area matching.
     """
     cw, ch = CHIP_W * SCALE, CHIP_H * SCALE
-    chip = Image.new("RGB", (cw, ch), (255, 255, 255))
-    # No mask: the logo has already been flattened onto white, so it is fully
+    chip = Image.new("RGB", (cw, ch), CHIP_BG)
+    # No mask: the logo has already been retinted to CHIP_BG, so it is fully
     # opaque and its own background matches the chip it is being placed on.
     chip.paste(logo, ((cw - logo.width) // 2, (ch - logo.height) // 2))
     return chip
@@ -246,7 +339,7 @@ def main():
             else:
                 note = ""
 
-            # Trim dead margin, then flatten to a shared white ground.
+            # Trim dead margin, then flatten to a known white ground.
             im = trim_transparency(im) if is_transparent(im) else trim_flat_background(im)
             im = flatten_onto_white(im)
             # Size in DESIGN pixels, then upscale once for the export. Doing
@@ -257,6 +350,9 @@ def main():
                                CHIP_H - 2 * CHIP_PAD)
             canvas_w, canvas_h = CHIP_W * SCALE, CHIP_H * SCALE
             im = im.resize((im.width * SCALE, im.height * SCALE), Image.LANCZOS)
+            # Retint AFTER resampling: the glyph edges are then rebuilt once,
+            # in the colour they will actually be displayed in.
+            im = retint_flat_white(im, CHIP_BG)
             im = compose_chip(im)
             assert im.size == (canvas_w, canvas_h)
 

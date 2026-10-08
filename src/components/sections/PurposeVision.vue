@@ -31,16 +31,28 @@ defineProps({
           />
         </div>
 
-        <!-- Floating credential card -->
+        <!-- Floating credential card.
+             Maize card with forest-green type, inverted from the dark-green
+             card it used to be, so it reads as an accent against the panel
+             rather than another block of green.
+
+             The base `text-cream-50` came off the wrapper with the colour
+             swap: white on this yellow would be invisible, and leaving it
+             behind would be a trap for anything added here later. Both lines
+             set their own colour.
+
+             Contrast measured against maize-400: the year is 8.27:1, and the
+             caption at 80% is 5.26:1. The caption drops to 4.14:1 at 70%,
+             which fails AA, so 80% is the floor — not a taste choice. -->
         <div
-          class="absolute -bottom-6 left-4 rounded-2xl bg-forest-900 px-6 py-5 text-cream-50 shadow-card sm:left-6"
+          class="absolute -bottom-6 left-4 rounded-2xl bg-maize-400 px-6 py-5 shadow-card sm:left-6"
         >
           <p
-            class="font-display text-3xl font-medium leading-none tracking-[-0.03em] text-maize-400"
+            class="font-display text-3xl font-medium leading-none tracking-[-0.03em] text-forest-900"
           >
             1905
           </p>
-          <p class="mt-2 text-xs uppercase tracking-[0.2em] text-cream-200/70">
+          <p class="mt-2 text-xs uppercase tracking-[0.2em] text-forest-900/80">
             Serving Zambian<br />agriculture since
           </p>
         </div>
