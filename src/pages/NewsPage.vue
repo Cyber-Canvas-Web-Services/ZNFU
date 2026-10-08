@@ -293,7 +293,7 @@ function subscribe() {
           </div>
           <button
             type="button"
-            class="btn news-page-btn-outline"
+            class="btn btn--ghost"
             @click="showFeatured"
           >
             Back to featured
@@ -447,7 +447,7 @@ function subscribe() {
             <input
               v-model="newsletterEmail"
               type="email"
-              class="news-page-search__input news-page-newsletter__input"
+              class="field field--on-light"
               placeholder="you@farm.co.zm"
               aria-label="Email address"
               required
@@ -592,23 +592,6 @@ function subscribe() {
   flex-shrink: 0;
 }
 
-/**
- * Newsletter field: the same pill shape, but on the light strip. Uses the
- * compound selector so it wins over `.news-page-search__input`’s light-on-dark
- * colour — both are single-class rules, so source order would otherwise decide
- * and the text would end up cream on cream.
- */
-.news-page-newsletter__input.news-page-search__input {
-  border-radius: 9999px;
-  border: 1px solid
-    color-mix(in oklab, var(--color-forest-900) 20%, transparent);
-  padding: 0.7rem 1.1rem;
-  color: var(--color-forest-950);
-}
-
-.news-page-newsletter__input.news-page-search__input::placeholder {
-  color: color-mix(in oklab, var(--color-ink-900) 40%, transparent);
-}
 
 /* ---- Header row ---- */
 .news-page-head {
@@ -626,16 +609,8 @@ function subscribe() {
   gap: 0.75rem;
 }
 
-/* Outline button readable on the dark band. */
-.news-page-btn-outline {
-  border: 1px solid rgb(255 255 255 / 0.35);
-  color: var(--color-cream-50);
-}
-
-.news-page-btn-outline:hover {
-  background-color: rgb(255 255 255 / 0.12);
-  border-color: rgb(255 255 255 / 0.6);
-}
+/* Outline button readable on the dark band is now the shared `.btn--ghost`,
+   so the page no longer needs its own variant. */
 
 /* ---- Featured ---- */
 .news-page-feature {
@@ -702,16 +677,14 @@ function subscribe() {
 }
 
 .news-page-filter {
-  border-radius: 9999px;
-  border: 1px solid color-mix(in oklab, var(--color-cream-200) 30%, transparent);
-  padding: 0.5rem 1.1rem;
-  font-size: 0.82rem;
+  border-color: color-mix(in oklab, var(--color-cream-200) 30%, transparent);
   font-weight: 600;
   color: color-mix(in oklab, var(--color-cream-200) 75%, transparent);
   cursor: pointer;
   transition:
     background-color 0.25s ease,
-    color 0.25s ease;
+    color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .news-page-filter:hover {
@@ -729,18 +702,25 @@ function subscribe() {
 .news-page-search {
   display: flex;
   align-items: center;
-  gap: 0.6rem;
-  border-radius: 9999px;
-  border: 1px solid color-mix(in oklab, var(--color-cream-200) 30%, transparent);
-  padding: 0.5rem 1.1rem;
+  gap: 0.5rem;
+  border-color: color-mix(in oklab, var(--color-cream-200) 30%, transparent);
   color: color-mix(in oklab, var(--color-cream-200) 70%, transparent);
 }
 
+/* The container above is the field: it owns the pill, the border and the
+   padding. The input inside it is just the text slot. */
 .news-page-search__input {
   width: 11rem;
+  border: 0;
+  padding: 0;
+  min-height: 0;
   background-color: transparent;
-  font-size: 0.85rem;
+  font-size: inherit;
   color: var(--color-cream-50);
+}
+
+.news-page-search__input:focus {
+  outline: none;
 }
 
 .news-page-search__input::placeholder {

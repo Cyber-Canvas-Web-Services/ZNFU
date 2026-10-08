@@ -53,32 +53,50 @@ defineProps({
       </template>
 
       <div class="mt-10 grid gap-6 md:grid-cols-3 lg:mt-12">
+        <!-- The middle tile is inverted to off-white, and every colour inside
+             it is set from the same `inverted` flag so the card can never end
+             up half-switched — cream background with cream text, say. -->
         <article
           v-for="(item, index) in systems.items"
           :id="item.id"
           :key="item.id"
           v-reveal="{ delay: index * 110 }"
-          class="group flex flex-col rounded-3xl bg-forest-900/60 p-7 ring-1 ring-white/10 transition-transform duration-500 hover:-translate-y-1.5"
+          class="group flex flex-col rounded-3xl p-7 ring-1 transition-transform duration-500 hover:-translate-y-1.5"
+          :class="
+            index === 1
+              ? 'bg-cream-100 ring-forest-950/10'
+              : 'bg-forest-900/60 ring-white/10'
+          "
         >
           <div class="flex items-center justify-between gap-4">
             <span
-              class="grid h-11 w-11 place-items-center rounded-full bg-maize-400 text-forest-950 shadow-lg"
+              class="grid h-11 w-11 place-items-center rounded-full shadow-lg"
+              :class="
+                index === 1
+                  ? 'bg-forest-800 text-maize-300'
+                  : 'bg-maize-400 text-forest-950'
+              "
             >
               <AppIcon :name="item.icon" class="h-5 w-5" />
             </span>
             <p
-              class="font-display text-xs font-semibold tracking-[0.24em] text-cream-100/55"
+              class="font-display text-xs font-semibold tracking-[0.24em]"
+              :class="index === 1 ? 'text-ink-900/50' : 'text-cream-100/55'"
             >
               {{ item.number }} / 03
             </p>
           </div>
 
           <h2
-            class="mt-6 font-display text-xl font-medium tracking-[-0.02em] text-cream-50"
+            class="mt-6 font-display text-xl font-medium tracking-[-0.02em]"
+            :class="index === 1 ? 'text-ink-900' : 'text-cream-50'"
           >
             {{ item.title }}
           </h2>
-          <p class="mt-3 text-[0.92rem] leading-relaxed text-cream-200/70">
+          <p
+            class="mt-3 text-[0.92rem] leading-relaxed"
+            :class="index === 1 ? 'text-ink-900/65' : 'text-cream-200/70'"
+          >
             {{ item.body }}
           </p>
         </article>

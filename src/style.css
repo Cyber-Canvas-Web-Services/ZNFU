@@ -214,18 +214,51 @@
    Components
    ================================================================= */
 @layer components {
+  /* =================================================================
+     Controls — buttons and text fields
+     =================================================================
+     Every control on the site draws its shape from the block below: same
+     radius, same padding, same type size, same height. Only colour varies
+     between variants. The hero's buttons are the reference, and `.btn` is
+     literally the hero's markup, so anything added here inherits that look.
+
+     The height is pinned with `min-height` rather than left to padding +
+     line-height, because that is the only way a text field can be guaranteed
+     to line up with the button beside it. Before this, the newsletter input,
+     the search field, the footer's square submit button and the article
+     filters each had their own padding and font size, and they visibly did
+     not match the buttons next to them.
+     ================================================================= */
+  .btn,
+  .field,
+  .news-page-filter,
+  .news-page-search {
+    /* Local aliases so one edit moves every control at once. */
+    --control-pad-y: 0.5rem;
+    --control-pad-x: 1rem;
+    --control-size: var(--text-xs);
+
+    border-radius: 9999px;
+    padding-block: var(--control-pad-y);
+    padding-inline: var(--control-pad-x);
+    font-size: var(--control-size);
+    line-height: 1.2;
+    min-height: 2.125rem;
+    /* A transparent border on every control keeps the box the same size
+       whether or not a variant draws a visible one. */
+    border: 1px solid transparent;
+  }
+
   /* ---- Buttons ---- */
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    border-radius: 9999px;
-    padding: 0.5rem 1rem;
-    font-size: var(--text-xs);
     font-weight: 600;
     letter-spacing: 0.01em;
-    line-height: 1.2;
+    text-align: center;
+    cursor: pointer;
     transition:
       transform 0.25s ease,
       background-color 0.25s ease,
@@ -236,6 +269,13 @@
 
   .btn:hover {
     transform: translateY(-2px);
+  }
+
+  /* Square button of the same height — for icon-only submits. */
+  .btn--icon {
+    padding-inline: 0;
+    aspect-ratio: 1;
+    width: 2.125rem;
   }
 
   .btn--maize {
@@ -256,7 +296,7 @@
   }
 
   .btn--outline {
-    border: 1px solid color-mix(in oklab, var(--color-forest-900) 45%, transparent);
+    border-color: color-mix(in oklab, var(--color-forest-900) 45%, transparent);
     color: var(--color-forest-900);
   }
   .btn--outline:hover {
@@ -266,7 +306,7 @@
   }
 
   .btn--ghost {
-    border: 1px solid rgb(255 255 255 / 0.4);
+    border-color: rgb(255 255 255 / 0.4);
     color: #fff;
     /* No `backdrop-filter` here, deliberately.
        It sat over a playing video, so Chrome had to re-sample and re-blur the
@@ -278,6 +318,44 @@
   .btn--ghost:hover {
     background-color: rgb(10 30 19 / 0.62);
     border-color: rgb(255 255 255 / 0.7);
+  }
+
+  /* ---- Text fields ----
+     Same geometry as a button, arranged for typing: text left-aligned, full
+     width inside its form, and a background light enough to read as an input
+     without competing with the button beside it. */
+  .field {
+    display: block;
+    width: 100%;
+    font-weight: 500;
+    font-family: inherit;
+    appearance: none;
+    transition:
+      border-color 0.25s ease,
+      background-color 0.25s ease;
+  }
+
+  .field:focus {
+    outline: none;
+    border-color: var(--color-maize-400);
+  }
+
+  .field--on-dark {
+    background-color: rgb(255 255 255 / 0.07);
+    border-color: rgb(255 255 255 / 0.2);
+    color: var(--color-cream-50);
+  }
+  .field--on-dark::placeholder {
+    color: rgb(234 228 212 / 0.45);
+  }
+
+  .field--on-light {
+    background-color: rgb(255 255 255 / 0.75);
+    border-color: color-mix(in oklab, var(--color-forest-900) 22%, transparent);
+    color: var(--color-forest-950);
+  }
+  .field--on-light::placeholder {
+    color: color-mix(in oklab, var(--color-ink-900) 45%, transparent);
   }
 
   /* ---- Page shell ---- */

@@ -1,10 +1,21 @@
 <script setup>
-import { ref } from 'vue'
-import { ArrowRight, Mail, MapPin, Phone, Send } from '@lucide/vue'
+import { computed, ref } from 'vue'
+import { ArrowRight, Mail, MapPin, Phone, Send, ShieldCheck } from '@lucide/vue'
 
 import BrandMark from '@/components/BrandMark.vue'
 import SocialIcon from '@/components/ui/SocialIcon.vue'
-import { brand, contact, footer, navLinks } from '@/data/home'
+import { brand, contact, footer, navLinks, partners } from '@/data/home'
+
+/**
+ * Partners and affiliations used to be their own band — a separate stacked
+ * panel sitting between the membership section and this footer.
+ *
+ * It was 215px of content carrying all the cost of a full section: another
+ * entry in the sticky stack, another composited layer, another thing the
+ * browser has to keep track of while scrolling. Its content is a natural
+ * footer element rather than a section of its own, so it is folded in here.
+ */
+const marqueeItems = computed(() => [...partners.items, ...partners.items])
 
 const email = ref('')
 const subscribed = ref(false)
@@ -29,6 +40,51 @@ const year = new Date().getFullYear()
     />
 
     <div class="shell relative py-20 sm:py-24">
+      <!-- Partners and affiliations — folded in from the separate band that
+           used to sit above this footer. -->
+      <div class="mb-14 border-b border-white/10 pb-10">
+        <div
+          class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between"
+        >
+          <p class="eyebrow eyebrow--plain shrink-0 text-maize-400">
+            {{ partners.title }}
+          </p>
+
+          <ul class="flex flex-wrap gap-3">
+            <li
+              v-for="affiliation in partners.affiliations"
+              :key="affiliation.label"
+              class="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5"
+            >
+              <ShieldCheck class="h-4 w-4 shrink-0 text-maize-400" aria-hidden="true" />
+              <span>
+                <span
+                  class="block text-xs font-bold uppercase tracking-[0.14em] text-cream-50"
+                >
+                  {{ affiliation.label }}
+                </span>
+                <span class="block text-[0.68rem] leading-tight text-cream-200/55">
+                  {{ affiliation.sub }}
+                </span>
+              </span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mask-fade-x mt-8 overflow-hidden" aria-label="Working with">
+          <ul class="marquee gap-4">
+            <li
+              v-for="(item, index) in marqueeItems"
+              :key="`${item}-${index}`"
+              class="shrink-0 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium whitespace-nowrap text-cream-100/75"
+              :aria-hidden="index >= partners.items.length ? 'true' : undefined"
+            >
+              {{ item }}
+            </li>
+          </ul>
+        </div>
+      </div>
+
       <div class="grid gap-14 lg:grid-cols-[1.05fr_1.35fr_1fr]">
         <!-- Brand + mission -->
         <div>
@@ -126,11 +182,11 @@ const year = new Date().getFullYear()
                 type="email"
                 required
                 :placeholder="footer.newsletter.placeholder"
-                class="min-w-0 flex-1 rounded-full border border-white/15 bg-forest-950/60 px-4 py-2.5 text-sm text-cream-50 placeholder:text-cream-200/35 focus:border-maize-400 focus:outline-none"
+                class="field field--on-dark min-w-0 flex-1"
               />
               <button
                 type="submit"
-                class="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-maize-400 text-forest-950 transition hover:bg-maize-300"
+                class="btn btn--maize btn--icon shrink-0"
                 aria-label="Subscribe"
               >
                 <Send class="h-4 w-4" aria-hidden="true" />

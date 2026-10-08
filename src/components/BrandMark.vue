@@ -29,13 +29,13 @@ defineProps({
     <span v-if="!compact" class="flex flex-col leading-tight">
       <span
         class="font-display text-[0.95rem] font-medium tracking-[-0.02em] sm:text-base"
-        :class="tone === 'light' ? 'text-white' : 'text-forest-950'"
+        :class="tone === 'light' ? 'text-white' : 'text-forest-800'"
       >
         Zambia National
       </span>
       <span
         class="font-display text-[0.95rem] font-medium tracking-[-0.02em] sm:text-base"
-        :class="tone === 'light' ? 'text-white' : 'text-forest-950'"
+        :class="tone === 'light' ? 'text-white' : 'text-forest-800'"
       >
         Farmers’ Union
       </span>

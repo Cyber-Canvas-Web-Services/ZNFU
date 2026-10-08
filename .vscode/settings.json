@@ -1,6 +1,12 @@
 {
     "chat.tools.terminal.autoApprove": {
         "git stash": true,
-        "awk": true
+        "awk": true,
+        "/^echo \"=== checksums: assets/ raw vs assets/media-source/ masters ===\" && for f in assets/img\\*; do printf \"%-22s %s\\\\n\" \"\\$\\(basename \"\\$f\"\\)\" \"\\$\\(md5 -q \"\\$f\"\\)\"; done && echo \"---\" && for f in assets/media-source/\\*\\.jpg; do printf \"%-34s %s\\\\n\" \"\\$\\(basename \"\\$f\"\\)\" \"\\$\\(md5 -q \"\\$f\"\\)\"; done && echo && echo \"=== video: raw vs master ===\" && for f in \"assets/vid 1\\.mov\" \"assets/vid 2\\.mov\" \"assets/vid 3\\.mov\" \"assets/vid 4\\.mov\" \"assets/vid 5\\.mov\"; do printf \"%-20s %s\\\\n\" \"\\$\\(basename \"\\$f\"\\)\" \"\\$\\(md5 -q \"\\$f\"\\)\"; done && echo \"---\" && for f in assets/media-source/\\*\\.mp4; do printf \"%-34s %s\\\\n\" \"\\$\\(basename \"\\$f\"\\)\" \"\\$\\(md5 -q \"\\$f\"\\)\"; done && echo && echo \"=== is growerCabbageField referenced anywhere\\? ===\" && \\(grep -rn \"growerCabbageField\\\\\\|grower-cabbage\" src/ index\\.html \\|\\| echo \"  NOT REFERENCED\"\\)$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "printf": true,
+        "sips": true
     }
 }

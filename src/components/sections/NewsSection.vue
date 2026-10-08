@@ -174,7 +174,7 @@ defineProps({
             type="email"
             required
             placeholder="you@farm.co.zm"
-            class="w-full rounded-full border border-white/20 bg-white/5 px-5 py-3 text-sm text-cream-50 placeholder:text-cream-200/40 focus:border-maize-400 focus:outline-none"
+            class="field field--on-dark min-w-0"
           />
           <button type="submit" class="btn btn--maize shrink-0">
             {{ news.fridayBrief.cta }}

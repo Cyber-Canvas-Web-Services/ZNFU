@@ -1,36 +1,44 @@
 <script setup>
-import { onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { ArrowUpRight, Menu, X } from "@lucide/vue";
 
 import BrandMark from "@/components/BrandMark.vue";
+import { useScrolledPast } from "@/composables/useScrolledPast";
 import { brand, navLinks } from "@/data/home";
 
 /**
  * Force the solid header treatment — used on pages without the dark hero
  * behind it, where the transparent header would sit on a light background.
  */
-defineProps({
+const props = defineProps({
   solid: { type: Boolean, default: false },
 });
 
-const scrolled = ref(false);
+/**
+ * Was a `scroll` listener reading `window.scrollY`. Lenis writes the scroll
+ * position every animation frame, so that read landed immediately after a
+ * write and forced style/layout to flush on every frame of every scroll. The
+ * observer answers the same question without touching layout.
+ */
+const scrolled = useScrolledPast(40);
 const menuOpen = ref(false);
 
-function handleScroll() {
-  scrolled.value = window.scrollY > 40;
-}
+/**
+ * True whenever the header is sitting on a light surface: scrolled down, menu
+ * open, or on a page with no dark hero behind it.
+ *
+ * Both the background and every text colour key off this one value, so the
+ * off-white bar and its green text can never end up out of step with each
+ * other — which is exactly what happens when the same condition is repeated
+ * across a dozen bindings.
+ */
+const onLight = computed(() => scrolled.value || menuOpen.value || props.solid);
 
 function closeMenu() {
   menuOpen.value = false;
 }
 
-onMounted(() => {
-  handleScroll();
-  window.addEventListener("scroll", handleScroll, { passive: true });
-});
-
 onBeforeUnmount(() => {
-  window.removeEventListener("scroll", handleScroll);
   document.body.style.overflow = "";
 });
 
@@ -54,8 +62,8 @@ onBeforeUnmount(() =>
   <header
     class="fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,padding] duration-300"
     :class="
-      scrolled || menuOpen || solid
-        ? 'bg-forest-950/95 py-2.5 shadow-[0_10px_40px_-18px_rgba(4,20,12,0.9)]'
+      onLight
+        ? 'bg-cream-50 py-2.5 shadow-[0_8px_30px_-16px_rgba(10,30,19,0.4)]'
         : 'bg-gradient-to-b from-forest-950/80 via-forest-950/35 to-transparent py-4'
     "
   >
@@ -63,7 +71,7 @@ onBeforeUnmount(() =>
       class="shell relative z-20 flex items-center justify-between gap-6"
     >
       <a href="#hero" class="shrink-0" :aria-label="`${brand.fullName} — home`">
-        <BrandMark />
+        <BrandMark :tone="onLight ? 'dark' : 'light'" />
       </a>
 
       <!-- Desktop navigation -->
@@ -75,7 +83,12 @@ onBeforeUnmount(() =>
           v-for="link in navLinks"
           :key="link.href"
           :href="link.href"
-          class="rounded-full px-3.5 py-2 text-sm font-medium text-white/75 transition-colors hover:bg-white/10 hover:text-white"
+          class="rounded-full px-3.5 py-2 text-sm font-medium transition-colors"
+          :class="
+            onLight
+              ? 'text-forest-800 hover:bg-forest-950/8 hover:text-forest-950'
+              : 'text-white/75 hover:bg-white/10 hover:text-white'
+          "
         >
           {{ link.label }}
         </a>
@@ -91,7 +104,12 @@ onBeforeUnmount(() =>
       <!-- Mobile toggle -->
       <button
         type="button"
-        class="grid h-11 w-11 place-items-center rounded-full border border-white/25 text-white transition hover:bg-white/10 lg:hidden"
+        class="grid h-11 w-11 place-items-center rounded-full border transition lg:hidden"
+        :class="
+          onLight
+            ? 'border-forest-900/25 text-forest-900 hover:bg-forest-950/8'
+            : 'border-white/25 text-white hover:bg-white/10'
+        "
         :aria-expanded="menuOpen"
         aria-controls="mobile-menu"
         :aria-label="menuOpen ? 'Close menu' : 'Open menu'"
@@ -110,9 +128,12 @@ onBeforeUnmount(() =>
       leave-to-class="opacity-0"
     >
       <div v-if="menuOpen" class="lg:hidden">
-        <!-- Scrim: dims the page behind the panel and closes the menu on tap -->
+        <!-- Scrim: dims the page behind the panel and closes the menu on tap.
+             No backdrop blur — an opaque tint over a page that may still have
+             video playing is one of the more expensive things to composite,
+             for an effect nobody sees with the menu open. -->
         <div
-          class="fixed inset-0 bg-forest-950/70 backdrop-blur-sm"
+          class="fixed inset-0 bg-forest-950/70"
           aria-hidden="true"
           @click="closeMenu"
         />
@@ -123,20 +144,29 @@ onBeforeUnmount(() =>
           aria-label="Mobile navigation"
         >
           <ul
-            class="clip-safe rounded-2xl border border-white/10 bg-forest-950/95 backdrop-blur-lg"
+            class="clip-safe rounded-2xl border"
+            :class="onLight ? 'border-forest-900/10 bg-cream-50' : 'border-white/10 bg-forest-950/95'"
           >
             <li v-for="(link, index) in navLinks" :key="link.href">
               <a
                 :href="link.href"
-                class="flex items-center justify-between px-5 py-4 text-base font-medium text-white/85 transition hover:bg-white/5 hover:text-white"
-                :class="
-                  index !== navLinks.length - 1 ? 'border-b border-white/5' : ''
-                "
+                class="flex items-center justify-between px-5 py-4 text-base font-medium transition"
+                :class="[
+                  onLight
+                    ? 'text-forest-800 hover:bg-forest-950/5 hover:text-forest-950'
+                    : 'text-white/85 hover:bg-white/5 hover:text-white',
+                  index !== navLinks.length - 1
+                    ? onLight
+                      ? 'border-b border-forest-900/8'
+                      : 'border-b border-white/5'
+                    : '',
+                ]"
                 @click="closeMenu"
               >
                 {{ link.label }}
                 <ArrowUpRight
-                  class="h-4 w-4 text-maize-400"
+                  class="h-4 w-4"
+                  :class="onLight ? 'text-maize-700' : 'text-maize-400'"
                   aria-hidden="true"
                 />
               </a>

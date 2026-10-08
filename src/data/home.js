@@ -66,7 +66,6 @@ export const media = {
   gardenSunsetIrrigation: "/media/garden-sunset-irrigation.webp",
   haulageAerialHarvest: "/media/haulage-aerial-harvest.webp",
   producePeppersBaskets: "/media/produce-peppers-baskets.webp",
-  growerCabbageField: "/media/grower-cabbage-field.webp",
   growerMaizeField: "/media/grower-maize-field.webp",
 };
 
@@ -119,7 +118,13 @@ export const stats = {
     { value: 90, label: "District Farmers’ Associations", suffix: "+" },
     { value: 30, label: "Commodity associations", suffix: "+" },
   ],
-  footnote: "Figures are indicative and pending confirmation by the Union.",
+  /* ⚠️ The figures above are still placeholders awaiting ZNFU confirmation.
+     They used to carry an on-page note saying so; that was removed at the
+     client's request because it read as unfinished on a public page. The
+     caveat therefore lives here and in the TODO block at the top of this file
+     — it must not be dropped from the record just because the page no longer
+     says it. Do not present these numbers as verified until the Secretariat
+     signs them off. */
 };
 
 /* ------------------------------------------------------------------ */

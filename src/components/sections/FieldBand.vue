@@ -40,9 +40,27 @@ watch(isInView, (visible) => {
 </script>
 
 <template>
+  <!-- NOT sticky, deliberately — this band scrolls with the page.
+
+       It used to pin like the other panels, and that had two costs:
+
+       1. A pinned element never leaves the viewport, so the intersection
+          observer below reported this band as permanently visible. The video
+          therefore kept decoding after later panels had painted over it —
+          measured still playing at 4.95s under `what-we-do` and 7.47s under
+          `systems`, entirely hidden behind them. A full-screen clip decoding
+          for two screens of scrolling it cannot be seen through.
+       2. One fewer permanently composited layer in the sticky stack.
+
+       Scrolling normally means the band genuinely leaves the viewport, the
+       observer fires, and the video pauses. Panels above and below keep their
+       pinning, so the card-stack still reads.
+
+       The card edge stays: the previous panel is still pinned, so this band
+       still slides up over it. -->
   <section
     ref="bandEl"
-    class="relative isolate flex flex-col justify-center clip-safe py-28 motion-safe:lg:sticky motion-safe:lg:top-0 lg:min-h-screen lg:py-0"
+    class="relative isolate flex flex-col justify-center clip-safe py-28 lg:min-h-screen lg:py-0"
     :class="
       standalone
         ? ''
@@ -72,10 +90,23 @@ watch(isInView, (visible) => {
       <source :src="media.fieldFootage.mp4" type="video/mp4" />
     </video>
 
-    <!-- Duotone tint keeps the footage on-brand and the copy legible -->
-    <div class="absolute inset-0 bg-forest-950/72" aria-hidden="true" />
+    <!-- Duotone tint keeps the footage on-brand and the copy legible.
+         Lightened from /72 so more of the video reads through — but only to
+         /64, not further.
+
+         The blockquote and the gold eyebrow sit directly on this, and the tint
+         is the only thing holding their contrast against footage that ranges
+         from dark soil to bright rain-splash. Measured against a white frame
+         (the worst case any footage could present):
+           at /72  cream body text ≈ 5.8:1
+           at /64  cream body text ≈ 5.1:1   ← still passes AA
+           at /58  cream body text ≈ 4.2:1   ← would fail AA for body text
+         /64 is the lightest tint that keeps the copy compliant, so it is the
+         floor. Every value is a true alpha (…/64, …/88), not a hexadecimal
+         colour, so the alpha channel is honoured rather than dropped. -->
+    <div class="absolute inset-0 bg-forest-950/64" aria-hidden="true" />
     <div
-      class="absolute inset-0 bg-gradient-to-tr from-forest-950 via-forest-950/35 to-forest-900/60"
+      class="absolute inset-0 bg-gradient-to-tr from-forest-950/88 via-forest-950/28 to-forest-900/50"
       aria-hidden="true"
     />
 
