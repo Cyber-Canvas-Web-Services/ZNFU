@@ -544,7 +544,7 @@ function subscribe() {
 .news-page-title {
   margin-top: 1rem;
   font-family: var(--font-display);
-  font-size: clamp(2rem, 4.4vw, 3.25rem);
+  font-size: var(--text-display);
   font-weight: 500;
   line-height: 1.06;
   letter-spacing: -0.03em;
@@ -552,7 +552,7 @@ function subscribe() {
 }
 
 .news-page-title--compact {
-  font-size: clamp(1.6rem, 3vw, 2.25rem);
+  font-size: var(--text-display-sm);
 }
 
 .news-page-tag {
@@ -668,7 +668,7 @@ function subscribe() {
 .news-page-feature__headline {
   margin-top: 1rem;
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-size: var(--text-display);
   font-weight: 500;
   line-height: 1.15;
   letter-spacing: -0.03em;
@@ -778,7 +778,7 @@ function subscribe() {
 
 .news-page-ledger__headline {
   font-family: var(--font-display);
-  font-size: clamp(1.15rem, 2.1vw, 1.5rem);
+  font-size: var(--text-display-sm);
   font-weight: 500;
   line-height: 1.25;
   letter-spacing: -0.025em;
@@ -838,7 +838,7 @@ function subscribe() {
   margin-top: 1rem;
   max-width: 46rem;
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 3.8vw, 2.75rem);
+  font-size: var(--text-display);
   font-weight: 500;
   line-height: 1.12;
   letter-spacing: -0.03em;

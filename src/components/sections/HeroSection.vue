@@ -187,15 +187,21 @@ watch(
 </script>
 
 <template>
-  <!-- The height leaves a fixed 7rem of the next panel showing, rather than a
+  <!-- The height leaves a fixed 7.5rem of the next panel showing, rather than a
        percentage. A percentage peek grows with the viewport while the panel's
        own heading offset stays roughly fixed in pixels — so on a large display
        a 12% peek is tall enough to reveal the figures underneath, and on a
-       small one it is not. A fixed peek behaves identically everywhere. -->
+       small one it is not. A fixed peek behaves identically everywhere.
+
+       7.5rem rather than a rounder number because the peeking panel's heading
+       grows with the viewport: at 1280 its heading ends ~87px below this edge,
+       but at 1920 (where the fluid type tops out) it ends ~115px below. The
+       peek has to clear the larger of those while still stopping short of the
+       figures at ~127-148px, which pins it to this narrow band. -->
   <section
     id="hero"
     ref="heroEl"
-    class="relative isolate flex min-h-[calc(100svh_-_7rem)] flex-col overflow-hidden bg-forest-950"
+    class="relative isolate flex min-h-[calc(100svh_-_7.5rem)] flex-col clip-safe bg-forest-950"
     aria-labelledby="hero-heading"
   >
     <!-- ============================= Media =============================
@@ -251,9 +257,19 @@ watch(
       />
     </div>
 
-    <!-- ============================ Content ============================ -->
+    <!-- ============================ Content ============================
+         Bottom-anchored and full-bleed, following the AgriSA reference: the
+         headline sits low and to the left and the frame stays filled all the
+         way across.
+
+         This used to be a centred column inside a fixed `max-w-7xl`. On a
+         2560px display that left 640px of dead margin on each side, and
+         because the hero's height grows with the viewport while the headline
+         did not, the copy kept shrinking relative to the space around it — the
+         "awkward on big screens" problem. `justify-end` plus `.shell` (the
+         shared fluid gutter) fills the frame at every resolution instead. -->
     <div
-      class="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center px-5 pb-14 pt-28 sm:px-8"
+      class="shell relative z-10 flex flex-1 flex-col justify-end pb-10 pt-28 sm:pb-12"
     >
       <div v-reveal="{ delay: 40 }">
         <p
@@ -271,10 +287,15 @@ watch(
       </div>
 
       <!-- The h1 carries no reveal animation: fading it in from opacity 0
-           would delay the largest contentful paint. -->
+           would delay the largest contentful paint.
+
+           It caps its own measure rather than sitting in a page-wide
+           container, so the headline stays readable while the block it lives
+           in still fills the width. The cap is sized for the 40px title — a
+           narrower measure forced a second line at that size. -->
       <h1
         id="hero-heading"
-        class="mt-5 max-w-4xl font-display text-hero font-semibold leading-[1.12] tracking-[-0.03em] text-white text-shadow-hero"
+        class="mt-5 max-w-[24ch] font-display text-hero font-semibold leading-[1.06] tracking-[-0.035em] text-white text-shadow-hero"
       >
         {{ hero.title }}
       </h1>
@@ -286,14 +307,11 @@ watch(
         {{ hero.tagline }}
       </p>
 
-      <p v-reveal="{ delay: 190 }" class="mt-3 max-w-xl text-sm leading-relaxed text-white/70">
+      <p v-reveal="{ delay: 190 }" class="mt-3 max-w-2xl text-sm leading-relaxed text-white/70">
         {{ hero.body }}
       </p>
 
-      <div
-        v-reveal="{ delay: 260 }"
-        class="mt-6 flex flex-wrap items-center gap-3"
-      >
+      <div v-reveal="{ delay: 260 }" class="mt-6 flex flex-wrap items-center gap-3">
         <a :href="hero.primaryCta.href" class="btn btn--maize">
           {{ hero.primaryCta.label }}
           <ArrowRight class="h-4 w-4" aria-hidden="true" />
@@ -302,19 +320,32 @@ watch(
           {{ hero.secondaryCta.label }}
         </a>
       </div>
-    </div>
 
-    <!-- Slide indicator, bottom-right, echoing the reference's scroll cue. -->
-    <div
-      class="pointer-events-none absolute bottom-6 right-5 z-10 hidden items-center gap-1.5 sm:flex sm:right-8"
-      aria-hidden="true"
-    >
-      <span
-        v-for="slide in slides"
-        :key="slide"
-        class="h-[3px] rounded-full transition-all duration-700"
-        :class="activeKey === slide ? 'w-6 bg-maize-400' : 'w-2.5 bg-white/35'"
-      />
+      <!-- Bottom meta row — the reference keeps a small wordmark and a scroll
+           cue on this line. Here it holds the union name and the slide
+           indicator, which also stops the indicator from floating over the
+           copy on narrow screens.
+
+           Desktop only, deliberately. It is supplementary (the union name is
+           already in the badge), and on a short phone it cost ~70px of hero
+           height — enough to squeeze the peeking panel down from a full 7rem
+           and clip its heading. Below `sm` the hero keeps its peek instead. -->
+      <div
+        class="mt-10 hidden items-end justify-between gap-6 border-t border-white/15 pt-4 sm:flex"
+      >
+        <p class="text-label font-semibold uppercase tracking-[0.18em] text-white/60">
+          {{ hero.badge.text }}
+        </p>
+
+        <div class="flex items-center gap-1.5" aria-hidden="true">
+          <span
+            v-for="slide in slides"
+            :key="slide"
+            class="h-[3px] rounded-full transition-all duration-700"
+            :class="activeKey === slide ? 'w-6 bg-maize-400' : 'w-2.5 bg-white/35'"
+          />
+        </div>
+      </div>
     </div>
   </section>
 </template>

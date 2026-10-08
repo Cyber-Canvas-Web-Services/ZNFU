@@ -105,14 +105,14 @@ defineProps({
       />
 
       <div
-        class="relative mt-auto mx-auto w-full max-w-7xl px-5 pb-14 pt-32 sm:px-8 lg:pb-20"
+        class="shell relative mt-auto w-full pb-14 pt-32 lg:pb-20"
         v-reveal
       >
         <p class="eyebrow eyebrow--plain text-maize-400">
           {{ membership.imageCaption }}
         </p>
         <h2
-          class="mt-4 max-w-3xl font-display text-[clamp(1.8rem,4vw,3rem)] font-medium leading-[1.12] tracking-[-0.03em] text-cream-50"
+          class="mt-4 max-w-3xl font-display text-display font-medium leading-[1.12] tracking-[-0.03em] text-cream-50"
         >
           Whoever you are in Zambian agriculture, there is a seat for you at the
           table.

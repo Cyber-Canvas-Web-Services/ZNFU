@@ -276,7 +276,7 @@ const vision = purposeVision.blocks[1].body;
 
 .about-band__heading {
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+  font-size: var(--text-display);
   font-weight: 500;
   letter-spacing: -0.03em;
   color: var(--color-forest-950);
@@ -308,7 +308,7 @@ const vision = purposeVision.blocks[1].body;
 .about-story__heading {
   margin-top: 1.25rem;
   font-family: var(--font-display);
-  font-size: clamp(2.1rem, 4.8vw, 3.75rem);
+  font-size: var(--text-display);
   font-weight: 500;
   line-height: 1.05;
   letter-spacing: -0.03em;
@@ -535,7 +535,7 @@ const vision = purposeVision.blocks[1].body;
 
 .about-banner__title {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-size: var(--text-display);
   font-weight: 500;
   letter-spacing: -0.03em;
   color: var(--color-cream-50);

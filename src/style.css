@@ -63,17 +63,31 @@
      ================================================================= */
   /* body, paragraphs, navigation, meta */
   --text-xs: clamp(0.75rem, 0.9375vw, 0.9375rem);
-  --text-sm: clamp(0.75rem, 0.9375vw, 0.9375rem);
+  --text-sm: clamp(0.75rem, 0.9375vw, 1rem);
   /* subtitles, ledes, taglines */
-  --text-base: clamp(0.8125rem, 1.0156vw, 1rem);
+  --text-base: clamp(0.8125rem, 1.0156vw, 1.125rem);
   /* headings — every tier is the same size by design */
   --text-lg: clamp(1rem, 1.25vw, 1.25rem);
   --text-xl: clamp(1rem, 1.25vw, 1.25rem);
   --text-2xl: clamp(1rem, 1.25vw, 1.25rem);
   --text-3xl: clamp(1rem, 1.25vw, 1.25rem);
   --text-4xl: clamp(1rem, 1.25vw, 1.25rem);
-  /* the one exception: the hero title */
-  --text-hero: clamp(1.75rem, 3.125vw, 3.5rem);
+  /* Display type — the three sizes above the heading scale.
+
+     Each is anchored to 1280 (the reference resolution) by its `vw` value and
+     scales down below that, bottoming out at a floor for phones:
+
+       --text-hero        26px floor  ·  32px @1280  ·  32px ceiling
+       --text-display     22px floor  ·  28px @1280  ·  28px ceiling
+       --text-display-sm  20px floor  ·  26px @1280  ·  26px ceiling
+
+     The `vw` figures are chosen so the middle value lands on the target at
+     exactly 1280 — 2.5vw is 32px there, 2.1875vw is 28px, 2.03125vw is 26px —
+     which is what keeps them in step with each other as the viewport changes
+     rather than drifting apart. */
+  --text-hero: clamp(1.625rem, 2.5vw, 2rem);
+  --text-display: clamp(1.375rem, 2.1875vw, 1.75rem);
+  --text-display-sm: clamp(1.25rem, 2.03125vw, 1.625rem);
   /* badge pill — a label has to sit below body copy, not level with it */
   --text-chip: clamp(0.5625rem, 0.78125vw, 0.75rem);   /* 10px @1280 */
   --text-label: clamp(0.625rem, 0.8594vw, 0.8125rem);  /* 11px @1280 */
@@ -164,9 +178,22 @@
     border-radius: 3px;
   }
 
-  /* Prevent horizontal scroll bleed from the hero's sliding headline */
+  /* Contain any stray horizontal overflow — but WITHOUT the side effect the
+     previous `overflow-x: hidden` had.
+
+     CSS computes a `visible` overflow axis to `auto` when the other axis is
+     not visible. So `overflow-x: hidden` was silently giving body
+     `overflow-y: auto`, turning it into a nested scroll container. That takes
+     Chrome off the compositor's fast path for scrolling and onto main-thread
+     scrolling, which is precisely what the sticky panel stack needs to avoid.
+
+     `clip` contains the overflow without creating a scroll container. It also
+     makes the old rule's comment wrong on both counts: it was there to contain
+     the scroll-expansion hero's sliding headline, and that component no longer
+     exists. Nothing overflows horizontally today, so for browsers that predate
+     `clip` this is a no-op guard rather than a load-bearing rule. */
   body {
-    overflow-x: hidden;
+    overflow-x: clip;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -241,15 +268,47 @@
   .btn--ghost {
     border: 1px solid rgb(255 255 255 / 0.4);
     color: #fff;
-    backdrop-filter: blur(8px);
-    background-color: rgb(255 255 255 / 0.06);
+    /* No `backdrop-filter` here, deliberately.
+       It sat over a playing video, so Chrome had to re-sample and re-blur the
+       region behind the button on every single decoded frame — one of the most
+       expensive things on the page, and it showed up as scroll jank. A plain
+       translucent fill looks near-identical and costs nothing per frame. */
+    background-color: rgb(10 30 19 / 0.42);
   }
   .btn--ghost:hover {
-    background-color: rgb(255 255 255 / 0.16);
+    background-color: rgb(10 30 19 / 0.62);
     border-color: rgb(255 255 255 / 0.7);
   }
 
-  /* ---- Typography helpers ---- */
+  /* ---- Page shell ---- */
+  /**
+   * The single shared page gutter. Fluid on purpose: it used to be a fixed
+   * 32px at every size, which is a reasonable margin on a laptop and a
+   * pinprick on a 2560px display. This scales with the viewport so the frame
+   * around the content stays proportionate, and it is shared by the header,
+   * the hero, the body panels and the footer so all four align on the same
+   * left edge at every resolution.
+   *
+   * Deliberately has no max-width. Content fills the screen and individual
+   * prose blocks cap their own measure — the previous `max-w-7xl` container
+   * left 640px empty on each side of a 2560px display.
+   */
+  .shell {
+    width: 100%;
+    padding-inline: clamp(1.25rem, 4vw, 5.5rem);
+  }
+
+  /* ---- Decorative glow ----
+   * A radial gradient rather than `blur-3xl`. A 64px blur is a real filter the
+   * compositor has to rasterise, and there were three of them on large
+   * elements; a gradient is painted once and never touched again. */
+  .glow {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 9999px;
+  }
+
+  /* ---- Text helpers ---- */
   .eyebrow {
     display: inline-flex;
     align-items: center;
@@ -357,6 +416,21 @@
 }
 
 @layer utilities {
+  /* Clip an element without making it a scroll container.
+
+     `overflow: hidden` does two jobs: it clips, and it silently creates a
+     scroll container. On the sticky panels the second job is actively harmful
+     — a scroll container in the sticky chain forces Chrome to resolve sticky
+     offsets on the main thread rather than the compositor.
+
+     `clip` does the clipping without the container. The `hidden` line is the
+     fallback for browsers that predate `clip` (Safari < 16); modern browsers
+     take the second declaration. */
+  .clip-safe {
+    overflow: hidden;
+    overflow: clip;
+  }
+
   .text-shadow-hero {
     text-shadow: 0 1px 14px rgb(3 15 9 / 0.35);
   }

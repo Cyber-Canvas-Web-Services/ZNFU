@@ -60,7 +60,7 @@ onBeforeUnmount(() =>
     "
   >
     <div
-      class="relative z-20 mx-auto flex max-w-7xl items-center justify-between gap-6 px-5 sm:px-8"
+      class="shell relative z-20 flex items-center justify-between gap-6"
     >
       <a href="#hero" class="shrink-0" :aria-label="`${brand.fullName} — home`">
         <BrandMark />
@@ -119,11 +119,11 @@ onBeforeUnmount(() =>
 
         <nav
           id="mobile-menu"
-          class="relative mx-auto mt-3 max-w-7xl px-5 sm:px-8"
+          class="shell relative mt-3"
           aria-label="Mobile navigation"
         >
           <ul
-            class="overflow-hidden rounded-2xl border border-white/10 bg-forest-950/95 backdrop-blur-lg"
+            class="clip-safe rounded-2xl border border-white/10 bg-forest-950/95 backdrop-blur-lg"
           >
             <li v-for="(link, index) in navLinks" :key="link.href">
               <a

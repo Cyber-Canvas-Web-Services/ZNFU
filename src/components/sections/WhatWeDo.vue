@@ -236,7 +236,7 @@ defineProps({
 
 .mission-banner__title {
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  font-size: var(--text-display-sm);
   font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--color-cream-50);

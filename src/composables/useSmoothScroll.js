@@ -35,8 +35,23 @@ export function useSmoothScroll(options = {}) {
       autoRaf: true,
       // Handle in-page `#anchor` clicks, offset so the fixed header clears.
       anchors: { offset },
-      // Lower = longer glide. 0.1 is close to native feel with the edge taken off.
-      lerp: 0.1,
+      /*
+       * 0.25 rather than the usual 0.1.
+       *
+       * `lerp` is the fraction of the remaining distance covered each frame, so
+       * it is the direct trade between glide and input lag. At 0.1 the page
+       * takes roughly 470ms to catch up to the wheel — smooth, but it reads as
+       * the page lagging behind you, especially on a page this tall. At 0.25
+       * that falls to about 170ms: still eased, but no longer feels detached
+       * from the input.
+       *
+       * Worth knowing: Lenis drives scrolling from requestAnimationFrame, so
+       * scrolling runs on the main thread rather than the compositor. Any main
+       * thread work is therefore felt directly in the scroll. Removing Lenis
+       * entirely is the way to make scrolling unconditionally smooth — the
+       * native fallbacks for it already exist below and in App.vue.
+       */
+      lerp: 0.25,
       wheelMultiplier: 1,
       touchMultiplier: 1.6,
       // Opt out with `data-lenis-prevent` for elements that scroll internally.

@@ -392,7 +392,7 @@ function toggleFaq(index) {
 
 .systems-page-heading {
   font-family: var(--font-display);
-  font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+  font-size: var(--text-display);
   font-weight: 500;
   letter-spacing: -0.03em;
   color: var(--color-forest-950);
@@ -443,7 +443,7 @@ function toggleFaq(index) {
 .systems-page-feature__title {
   margin-top: 0.6rem;
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-size: var(--text-display);
   font-weight: 500;
   letter-spacing: -0.03em;
   color: var(--color-forest-950);
@@ -684,7 +684,7 @@ function toggleFaq(index) {
 
 .systems-page-access__heading {
   font-family: var(--font-display);
-  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  font-size: var(--text-display-sm);
   font-weight: 500;
   letter-spacing: -0.03em;
   color: var(--color-forest-950);
@@ -779,7 +779,7 @@ function toggleFaq(index) {
 
 .systems-page-banner__title {
   font-family: var(--font-display);
-  font-size: clamp(1.5rem, 3vw, 2.1rem);
+  font-size: var(--text-display);
   font-weight: 500;
   letter-spacing: -0.03em;
   color: var(--color-cream-50);

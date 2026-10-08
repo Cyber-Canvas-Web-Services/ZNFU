@@ -30,7 +30,7 @@ defineProps({
     :first="standalone"
   >
     <div
-      class="pointer-events-none absolute -left-40 top-1/4 h-[420px] w-[420px] rounded-full bg-forest-500/10 blur-3xl"
+      class="glow -left-40 top-1/4 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(58,125,78,0.28),transparent)]"
       aria-hidden="true"
     />
 

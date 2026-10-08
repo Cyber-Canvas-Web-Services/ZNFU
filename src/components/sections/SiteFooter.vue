@@ -21,14 +21,14 @@ const year = new Date().getFullYear()
 <template>
   <footer
     id="contact"
-    class="relative z-10 scroll-mt-24 overflow-hidden bg-forest-950 text-cream-50 lg:rounded-t-[2rem] lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)] lg:ring-1 lg:ring-forest-950/5"
+    class="relative z-10 scroll-mt-24 clip-safe bg-forest-950 text-cream-50 lg:rounded-t-[2rem] lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)] lg:ring-1 lg:ring-forest-950/5"
   >
     <div
-      class="pointer-events-none absolute -left-40 -top-20 h-[420px] w-[420px] rounded-full bg-maize-500/8 blur-3xl"
+      class="glow -left-40 -top-20 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(233,168,18,0.12),transparent)]"
       aria-hidden="true"
     />
 
-    <div class="relative mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-24">
+    <div class="shell relative py-20 sm:py-24">
       <div class="grid gap-14 lg:grid-cols-[1.05fr_1.35fr_1fr]">
         <!-- Brand + mission -->
         <div>

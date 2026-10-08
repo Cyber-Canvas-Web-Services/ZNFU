@@ -56,7 +56,7 @@ defineProps({
 <template>
   <section
     :id="id"
-    class="relative isolate flex flex-col justify-center overflow-hidden motion-safe:lg:sticky motion-safe:lg:top-0"
+    class="relative isolate flex flex-col justify-center clip-safe motion-safe:lg:sticky motion-safe:lg:top-0"
     :class="[
       surface,
       tone,
@@ -79,14 +79,14 @@ defineProps({
       first
         ? ''
         : topEdge
-          ? 'rounded-t-[2rem] shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)] ring-1 ring-forest-950/5'
-          : 'lg:rounded-t-[2rem] lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)] lg:ring-1 lg:ring-forest-950/5',
+          ? 'rounded-t-[2rem] shadow-[0_-16px_44px_-26px_rgba(10,30,19,0.55)] ring-1 ring-forest-950/5'
+          : 'lg:rounded-t-[2rem] lg:shadow-[0_-16px_44px_-26px_rgba(10,30,19,0.55)] lg:ring-1 lg:ring-forest-950/5',
     ]"
   >
     <div v-if="bleed" class="relative flex w-full flex-1 flex-col">
       <slot />
     </div>
-    <div v-else class="relative mx-auto w-full max-w-7xl px-5 sm:px-8">
+    <div v-else class="shell relative">
       <slot />
     </div>
   </section>

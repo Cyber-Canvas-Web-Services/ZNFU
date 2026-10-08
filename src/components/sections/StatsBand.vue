@@ -23,7 +23,7 @@ const reducedMotion = usePrefersReducedMotion()
   <StackedPanel surface="bg-forest-950" tone="text-cream-50" dense first>
     <!-- Decorative glow + gold hairline -->
     <div
-      class="pointer-events-none absolute -right-40 top-0 h-[420px] w-[420px] rounded-full bg-maize-500/10 blur-3xl"
+      class="glow -right-40 top-0 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(233,168,18,0.15),transparent)]"
       aria-hidden="true"
     />
     <div
@@ -39,8 +39,11 @@ const reducedMotion = usePrefersReducedMotion()
 
       <!-- The gap above the grid is load-bearing, not decorative: it is what
            keeps the figures clear of the peeking edge at every viewport, so
-           the count-up always has to be scrolled to. -->
-      <div class="mt-8 grid grid-cols-2 gap-x-6 gap-y-6 sm:mt-10 sm:gap-x-10 lg:grid-cols-4">
+           the count-up always has to be scrolled to. It is generous because
+           the heading above it grows with the viewport while the peek does
+           not — at 1920 the heading reaches ~115px down and the figures start
+           ~148px down, and this spacing is what holds that window open. -->
+      <div class="mt-10 grid grid-cols-2 gap-x-6 gap-y-6 sm:mt-12 sm:gap-x-10 lg:grid-cols-4">
         <StatCounter
           v-for="(item, index) in stats.items"
           :key="item.label"

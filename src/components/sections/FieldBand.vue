@@ -42,11 +42,11 @@ watch(isInView, (visible) => {
 <template>
   <section
     ref="bandEl"
-    class="relative isolate flex flex-col justify-center overflow-hidden py-28 motion-safe:lg:sticky motion-safe:lg:top-0 lg:min-h-screen lg:py-0"
+    class="relative isolate flex flex-col justify-center clip-safe py-28 motion-safe:lg:sticky motion-safe:lg:top-0 lg:min-h-screen lg:py-0"
     :class="
       standalone
         ? ''
-        : 'lg:rounded-t-[2rem] lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)]'
+        : 'lg:rounded-t-[2rem] lg:shadow-[0_-16px_44px_-26px_rgba(10,30,19,0.55)]'
     "
   >
     <!-- Poster paints immediately and stays put underneath. No `autoplay`
@@ -84,7 +84,7 @@ watch(isInView, (visible) => {
         Why the Union exists
       </p>
       <blockquote
-        class="mt-6 font-display text-[clamp(1.5rem,3.2vw,2.6rem)] font-medium leading-[1.2] tracking-[-0.03em] text-cream-50"
+        class="mt-6 font-display text-display font-medium leading-[1.2] tracking-[-0.03em] text-cream-50"
         v-reveal="{ delay: 80 }"
       >
         “From the first rains to the last bag loaded, Zambian farmers carry the
