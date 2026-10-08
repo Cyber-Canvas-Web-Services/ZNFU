@@ -51,8 +51,10 @@ export const media = {
     mp4Mobile: "/media/hero-background-mobile.mp4",
     poster: "/media/hero-background-poster.webp",
   },
-  /* Order is the rotation order, after the video. */
-  heroStills: ["/media/agri.webp", "/media/harvest-combine-aerial.webp"],
+  /* Still order. The first entry is the hero's opening frame — it is what the
+     visitor sees before the montage plays, so put the strongest photograph
+     here. The rest follow the video in the order listed. */
+  heroStills: ["/media/agri.webp", "/media/cows.webp"],
   fieldFootage: {
     mp4: "/media/field-footage.mp4",
     poster: "/media/field-footage-poster.webp",

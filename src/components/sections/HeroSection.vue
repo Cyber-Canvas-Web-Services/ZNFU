@@ -57,17 +57,30 @@ const videoSrc = computed(() =>
 )
 
 /**
- * The rotation, as a list of keys: the string "video", then a number per
- * still. Building it from what is actually available means the loop can never
- * land on a slide that does not exist — no video on a metered connection just
- * means the stills rotate on their own.
+ * The rotation, as a list of keys: a number per still, and the string "video"
+ * for the montage.
+ *
+ * Order is: the opening still, then the montage, then any remaining stills.
+ * Building it from what is actually available means the loop can never land on
+ * a slide that does not exist — no video on a metered connection just means the
+ * stills rotate on their own, in their own order.
+ *
+ * The montage deliberately sits second rather than first. Opening on a still
+ * means the hero's first impression is a photograph, and on a slow connection
+ * it is a photograph that is already there rather than a video still buffering.
+ * The video then arrives as the second beat.
  */
-const slides = computed(() => [
-  ...(allowVideo.value ? ['video'] : []),
-  ...media.heroStills.map((_, index) => index),
-])
+const slides = computed(() => {
+  const stills = media.heroStills.map((_, index) => index)
+  if (!stills.length) return allowVideo.value ? ['video'] : []
 
-const activeKey = ref(allowVideo.value ? 'video' : 0)
+  const [opening, ...rest] = stills
+  return allowVideo.value ? [opening, 'video', ...rest] : stills
+})
+
+/* Starts on the opening still, matching slides[0]. Falls back to the montage
+   only in the case where there are no stills at all. */
+const activeKey = ref(media.heroStills.length ? 0 : 'video')
 
 const videoActive = computed(() => activeKey.value === 'video')
 const readyStills = computed(
