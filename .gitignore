@@ -70,4 +70,10 @@ coverage/
 .vercel
 .netlify
 
-assets/Screen Recording 2026-10-07 at 3.41.40 PM.mov
+# Screen recordings / raw captures dropped into assets/ while working.
+# NOTE: matched with a wildcard on purpose — macOS names these with a
+# narrow no-break space (U+202F) before "PM"/"AM", so an ignore rule
+# written with an ordinary space silently never matches.
+# GitHub hard-rejects any file over 100 MB, and warns above 50 MB.
+assets/Screen Recording*.mov
+assets/*[Ss]creen*.mov
