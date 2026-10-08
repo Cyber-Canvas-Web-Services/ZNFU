@@ -93,17 +93,17 @@ CHIP_BG = (245, 242, 232)   # --color-cream-100
 # Expressed as a fraction of the content box rather than an absolute pixel
 # area, so it stays correct if the chip is ever resized.
 #
-# The 0.30 -> 0.27 drop is not a reduction in size. The content box grew from
-# 140x44 to 184x64 at the same time, so the actual target area went from 1848
-# to 3180 and every logo renders about 30% larger. The fraction came down only
-# because the box grew faster than the target did.
+# 0.325 is a deliberate step up from 0.27, worth roughly 10% more linear size
+# on every logo. It is close to the practical ceiling: the square emblems are
+# bounded by the content box HEIGHT, and at this fill they render 62px inside
+# a 64px box. Going further starts clipping them.
 #
-# The limit here is the square emblems (MOF, ZARI, the National Assembly,
-# WARMA, CFU): they are bounded by the content box HEIGHT, so they cannot grow
-# at all without a taller chip. Height-fitting them at 43px of a 44px box was
-# already at the ceiling, which is why enlarging the logos needed a new chip
-# rather than just a bigger CSS size.
-CONTENT_FILL = 0.27
+# Two logos — Ministry of Agriculture and WARMA — are already being drawn
+# larger than their supplied files can fill at 3x, so they soften slightly as
+# this number rises. That is a limit of the source artwork, not of the
+# scaling: both arrived at a lower resolution than the rest. Everything is
+# drawn down for display, so it is only apparent on high-density screens.
+CONTENT_FILL = 0.325
 
 # How close to white a pixel must be to count as background when trimming.
 WHITE_TOLERANCE = 12
@@ -293,6 +293,36 @@ def compose_chip(logo):
     return chip
 
 
+def desaturate_on_chip(im):
+    """
+    Greyscale variant, with the chip left exactly as it is.
+
+    The strip shows logos greyed out until hovered. That cannot be done with
+    a CSS `filter: grayscale(1)`, because the filter applies to the whole
+    image including the chip: it turns the cream chip (245,242,232) into a
+    neutral (242,242,242), which differs from the band by 10 units in blue —
+    reinstating exactly the faint rectangle the chip colour was matched to
+    avoid. The greyscale therefore has to be baked in with the chip exempted.
+
+    The exemption is exact rather than approximate. By this point every
+    background pixel has been snapped to precisely CHIP_BG, so "is this pixel
+    background?" is an equality test, and background can be restored bit for
+    bit while everything else is desaturated. Glyph edges, which are blends
+    rather than flat background, grey out with the mark — which is correct.
+
+    Not a `convert("L")` round trip on its own: that would grey the chip too.
+    """
+    grey = im.convert("L").convert("RGB")
+    src = im.load()
+    dst = grey.load()
+    w, h = grey.size
+    for y in range(h):
+        for x in range(w):
+            if src[x, y] == CHIP_BG:
+                dst[x, y] = CHIP_BG
+    return grey
+
+
 # ---------------------------------------------------------------------
 #  The set
 # ---------------------------------------------------------------------
@@ -357,11 +387,16 @@ def main():
             assert im.size == (canvas_w, canvas_h)
 
             dest = OUT / f"{out_name}.webp"
+            grey_dest = OUT / f"{out_name}-grey.webp"
+            # Greyscale is derived from the finished colour chip, so the two
+            # are guaranteed to be the same composition.
+            grey = desaturate_on_chip(im)
             if args.dry_run:
-                print(f"  {out_name:<36}{src_name:<26}{im.size[0]}x{im.size[1]} (dry run) {note}")
+                print(f"  {out_name:<36}{src_name:<26}{im.size[0]}x{im.size[1]} +grey (dry run) {note}")
             else:
                 im.save(dest, "WEBP", quality=WEBP_QUALITY, method=6)
-                kb = dest.stat().st_size / 1024
+                grey.save(grey_dest, "WEBP", quality=WEBP_QUALITY, method=6)
+                kb = (dest.stat().st_size + grey_dest.stat().st_size) / 1024
                 print(f"  {out_name:<36}{src_name:<26}{im.size[0]}x{im.size[1]}  {kb:.0f} kB {note}")
 
 

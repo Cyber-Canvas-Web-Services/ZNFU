@@ -17,6 +17,17 @@ import { brand, contact, footer, navLinks, partners } from '@/data/home'
  */
 const marqueeItems = computed(() => [...partners.items, ...partners.items])
 
+/**
+ * A logo's greyscale file, written next to its colour original by
+ * `scripts/optimize-logos.py` with a `-grey` suffix.
+ *
+ * Derived rather than listed in `home.js` so the two can never drift out of
+ * step — adding a logo means adding one path, not two that must agree.
+ */
+function greyVariant(src) {
+  return src.replace(/\.webp$/, '-grey.webp')
+}
+
 const email = ref('')
 const subscribed = ref(false)
 
@@ -85,36 +96,56 @@ const year = new Date().getFullYear()
            be lost. `h-20 w-[200px]` is that chip at 1x; the assets carry 3x
            pixels for high-density screens, so the two must stay in step.
 
+           Each logo has two files: a greyscale one and the colour original.
+           The greyscale file is baked by the script rather than applied with
+           CSS `filter: grayscale()`, because a filter would also desaturate
+           the cream chip and bring back the faint rectangle the chip colour
+           exists to avoid. The two are stacked, and hovering cross-fades
+           between them — see the scoped styles below.
+
            `gap-5` with the chip's 8px padding keeps 36px between the visible
-           edges of neighbouring logos — the same clearance the old, smaller
-           chip had with `gap-4` and 10px padding. -->
+           edges of neighbouring logos. -->
       <div class="mask-fade-x mt-8 overflow-hidden" aria-label="Working with">
         <ul class="marquee gap-5">
           <li
             v-for="(item, index) in marqueeItems"
             :key="`${item.name}-${index}`"
             class="shrink-0"
+            :aria-hidden="index >= partners.items.length ? 'true' : undefined"
           >
-            <img
-              v-if="item.logo"
-              :src="item.logo"
-              :alt="item.name"
-              width="200"
-              height="80"
-              class="h-20 w-[200px]"
-              loading="lazy"
-              decoding="async"
-              :aria-hidden="index >= partners.items.length ? 'true' : undefined"
-            />
             <!-- The one partner with no logo supplied: same box, name in text.
                  No chip, because the logos either side have none visible
                  either — a box here would make the gap more obvious, not less. -->
             <span
-              v-else
+              v-if="!item.logo"
               class="grid h-20 w-[200px] place-items-center px-3 text-center text-[0.7rem] font-semibold uppercase leading-tight tracking-[0.1em] text-forest-950/70"
-              :aria-hidden="index >= partners.items.length ? 'true' : undefined"
             >
               {{ item.name }}
+            </span>
+
+            <span v-else class="logo-swap relative block h-20 w-[200px]">
+              <!-- Base layer: what is always visible, and what sizes the box. -->
+              <img
+                :src="greyVariant(item.logo)"
+                :alt="index < partners.items.length ? item.name : ''"
+                width="200"
+                height="80"
+                class="h-20 w-[200px]"
+                loading="lazy"
+                decoding="async"
+              />
+              <!-- Colour layer: same image, revealed on hover. Decorative,
+                   because it is the same logo the base layer already names. -->
+              <img
+                :src="item.logo"
+                alt=""
+                aria-hidden="true"
+                width="200"
+                height="80"
+                class="logo-swap__colour absolute inset-0 h-20 w-[200px]"
+                loading="lazy"
+                decoding="async"
+              />
             </span>
           </li>
         </ul>
@@ -275,3 +306,37 @@ const year = new Date().getFullYear()
     </div>
   </footer>
 </template>
+
+<style scoped>
+/**
+ * Logo colour reveal.
+ *
+ * The greyscale file is the base layer and is always visible; the colour file
+ * sits on top at zero opacity and fades in on hover. Both are preloaded, so
+ * the reveal is a cross-fade rather than an image that has to be fetched
+ * mid-hover — which would flash on the first one.
+ *
+ * The transition is left to the global reduced-motion rule in style.css,
+ * which collapses durations for anyone who has asked for less motion.
+ */
+.logo-swap__colour {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.logo-swap:hover .logo-swap__colour,
+.logo-swap:focus-within .logo-swap__colour {
+  opacity: 1;
+}
+
+/**
+ * Touch devices can never hover, so they would be left with a permanently
+ * grey strip. Show the logos in colour there instead — the effect is a
+ * desktop affordance and there is no touch equivalent of it to preserve.
+ */
+@media (hover: none) {
+  .logo-swap__colour {
+    opacity: 1;
+  }
+}
+</style>
