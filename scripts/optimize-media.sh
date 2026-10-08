@@ -309,6 +309,21 @@ if poster.exists():
 PY
 
 # ---------------------------------------------------------------------------
+# Partner logos live in their own folder with their own per-asset rules
+# (see scripts/optimize-logos.py), so they run as a separate step. Kept on
+# this entry point so there is still one command to rebuild every asset.
+section "Partner logos"
+if [ -d "$ROOT/assets/logos" ]; then
+  if [ "$DRY_RUN" = "1" ]; then
+    python3 "$ROOT/scripts/optimize-logos.py" --dry-run
+  else
+    python3 "$ROOT/scripts/optimize-logos.py"
+  fi
+else
+  note "no assets/logos folder — skipped"
+fi
+
+# ---------------------------------------------------------------------------
 section "public/media (shipped)"
 if [ "$DRY_RUN" = "1" ]; then
   note "dry run — nothing written"

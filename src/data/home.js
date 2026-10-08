@@ -481,19 +481,59 @@ export const applyMembership = {
 /* ------------------------------------------------------------------ */
 /*  Partners & affiliations   ⚠️ confirm which may be published        */
 /* ------------------------------------------------------------------ */
+/**
+ * Partner logos are normalised by `scripts/optimize-logos.py`, which trims
+ * each one, flattens it onto a shared white ground and exports it on an
+ * identical 160x64 chip (at 3x). The chips are therefore already the right
+ * shape and size — the markup only places them, it does not fit them.
+ *
+ * Two assets needed repair to be usable as supplied, both documented in that
+ * script: Conservation Farming Unit arrived as a scan with a grey backdrop,
+ * and WARMA arrived with a white wordmark that is invisible on any light
+ * surface (it is cropped to its emblem). If the client can supply vector or
+ * transparent originals, re-run the script and both repairs stop applying.
+ */
 export const partners = {
   title: "Working with",
   items: [
-    "Ministry of Agriculture",
-    "Ministry of Finance & National Planning",
-    "Zambia Statistics Agency",
-    "Agriculture Consultative Forum",
-    "National Assembly of Zambia",
-    "Zambia Meteorological Department",
-    "Conservation Farming Unit",
-    "Zambia Agricultural Research Institute",
-    "Water Resources Management Authority",
-    "Food Reserve Agency",
+    {
+      name: "Ministry of Agriculture",
+      logo: "/media/partners/ministry-of-agriculture.webp",
+    },
+    {
+      name: "Ministry of Finance & National Planning",
+      logo: "/media/partners/ministry-of-finance.webp",
+    },
+    {
+      name: "Zambia Statistics Agency",
+      logo: "/media/partners/zambia-statistics-agency.webp",
+    },
+    /* ⚠️ No logo supplied for this one, so it renders as its name on the same
+       chip rather than a gap in the row. Drop a file into `assets/logos/`,
+       add it to the SET in `scripts/optimize-logos.py`, and give it a `logo`
+       path here to bring it in line with the rest. */
+    { name: "Agriculture Consultative Forum" },
+    {
+      name: "National Assembly of Zambia",
+      logo: "/media/partners/national-assembly.webp",
+    },
+    {
+      name: "Zambia Meteorological Department",
+      logo: "/media/partners/zambia-meteorological-department.webp",
+    },
+    {
+      name: "Conservation Farming Unit",
+      logo: "/media/partners/conservation-farming-unit.webp",
+    },
+    {
+      name: "Zambia Agricultural Research Institute",
+      logo: "/media/partners/zari.webp",
+    },
+    {
+      name: "Water Resources Management Authority",
+      logo: "/media/partners/warma.webp",
+    },
+    { name: "Food Reserve Agency", logo: "/media/partners/food-reserve-agency.webp" },
   ],
   affiliations: [
     {

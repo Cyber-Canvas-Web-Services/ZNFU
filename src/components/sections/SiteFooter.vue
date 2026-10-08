@@ -71,15 +71,39 @@ const year = new Date().getFullYear()
           </ul>
         </div>
 
+        <!-- Partner logos.
+             Each item is already exported on an identical 160x64 white chip
+             by `scripts/optimize-logos.py`, so this markup only places them —
+             it must NOT try to resize or fit them, or the even visual weight
+             the script arranges would be lost. `h-16 w-40` is that chip at
+             1x; the assets carry 3x pixels for high-density screens. -->
         <div class="mask-fade-x mt-8 overflow-hidden" aria-label="Working with">
           <ul class="marquee gap-4">
             <li
               v-for="(item, index) in marqueeItems"
-              :key="`${item}-${index}`"
-              class="shrink-0 rounded-full border border-white/10 bg-white/5 px-6 py-3 text-sm font-medium whitespace-nowrap text-cream-100/75"
-              :aria-hidden="index >= partners.items.length ? 'true' : undefined"
+              :key="`${item.name}-${index}`"
+              class="shrink-0"
             >
-              {{ item }}
+              <img
+                v-if="item.logo"
+                :src="item.logo"
+                :alt="item.name"
+                width="160"
+                height="64"
+                class="h-16 w-40 rounded-xl"
+                loading="lazy"
+                decoding="async"
+                :aria-hidden="index >= partners.items.length ? 'true' : undefined"
+              />
+              <!-- The one partner with no logo supplied: same chip, name in
+                   text, so the row keeps its rhythm rather than showing a gap. -->
+              <span
+                v-else
+                class="grid h-16 w-40 place-items-center rounded-xl bg-white px-3 text-center text-[0.62rem] font-semibold uppercase leading-tight tracking-[0.08em] text-forest-950"
+                :aria-hidden="index >= partners.items.length ? 'true' : undefined"
+              >
+                {{ item.name }}
+              </span>
             </li>
           </ul>
         </div>
