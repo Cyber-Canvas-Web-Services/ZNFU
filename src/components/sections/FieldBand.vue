@@ -111,7 +111,7 @@ watch(isInView, (visible) => {
     />
 
     <div class="relative mx-auto max-w-4xl px-5 text-center sm:px-8 lg:py-28">
-      <p class="eyebrow eyebrow--plain justify-center text-maize-400" v-reveal>
+      <p class="eyebrow justify-center text-maize-400" v-reveal>
         Why the Union exists
       </p>
       <blockquote

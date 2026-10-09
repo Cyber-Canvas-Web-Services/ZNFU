@@ -108,7 +108,7 @@ defineProps({
         class="shell relative mt-auto w-full pb-14 pt-32 lg:pb-20"
         v-reveal
       >
-        <p class="eyebrow eyebrow--plain text-maize-400">
+        <p class="eyebrow text-maize-400">
           {{ membership.imageCaption }}
         </p>
         <h2

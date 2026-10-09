@@ -21,29 +21,30 @@ const reducedMotion = usePrefersReducedMotion()
        flush top edge — its rounded corners used to show the page background
        through them once the panel pinned.
 
-       `bg-cream-100` rather than the site's lighter `cream-50`: this panel sits
-       directly above PurposeVision, which is `cream-50`, and the two share an
-       edge. On the same colour that edge would vanish and the card-stack read
-       as a flat block, so this one steps one shade warmer to hold the join. -->
-  <StackedPanel surface="bg-cream-100" tone="text-ink-900" dense first>
-    <!-- Decorative glow + gold hairline -->
+       `bg-cream-50` (the lightest surface) rather than the warmer `cream-100`:
+       this panel sits directly above PurposeVision, which is `cream-100`, and
+       the two share an edge. On the same colour that edge would vanish and the
+       card-stack would read as a flat block, so the two surfaces stay one step
+       apart — the whitest panel first, the off-white one below it. -->
+  <StackedPanel surface="bg-cream-50" tone="text-ink-900" dense first>
+    <!-- Decorative glow. The gold hairline that used to sit along this panel's
+         top edge is gone at the client's request — against the near-white
+         surface it read as a stray mustard line rather than an accent. -->
     <div
-      class="glow -right-40 top-0 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(233,168,18,0.15),transparent)]"
-      aria-hidden="true"
-    />
-    <div
-      class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-maize-500/40 to-transparent"
+      class="glow -right-40 top-0 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(245,198,42,0.15),transparent)]"
       aria-hidden="true"
     />
 
     <div class="relative">
       <div class="max-w-2xl" v-reveal>
-        <!-- The accent gold is `maize-700`, not the `maize-400` this used to
-             carry. Measured against this cream panel: 400 lands at 1.44:1 and
-             600 — the site's usual light-background gold — at 2.78:1. Both
-             fail WCAG AA, which needs 4.5:1 for text this size. 700 reads
-             4.58:1 and is still unmistakably the brand gold. -->
-        <p class="eyebrow text-maize-700">{{ stats.eyebrow }}</p>
+        <!-- Brand yellow `maize-400`. This used to be `maize-700`, an ochre
+             that read as brown against the light panel; the darker maize steps
+             have since been deleted from the palette entirely, so brown cannot
+             come back. Note the trade-off this encodes: on this surface 400
+             measures ~1.5:1, far below the 4.5:1 WCAG AA needs for text this
+             size. It is a deliberate decorative choice, not an oversight —
+             check before "fixing" it. -->
+        <p class="eyebrow text-maize-400">{{ stats.eyebrow }}</p>
         <h2 class="section-title mt-3 text-ink-900">{{ stats.title }}</h2>
       </div>
 

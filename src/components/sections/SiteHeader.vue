@@ -165,8 +165,7 @@ onBeforeUnmount(() =>
               >
                 {{ link.label }}
                 <ArrowUpRight
-                  class="h-4 w-4"
-                  :class="onLight ? 'text-maize-700' : 'text-maize-400'"
+                  class="h-4 w-4 text-maize-400"
                   aria-hidden="true"
                 />
               </a>

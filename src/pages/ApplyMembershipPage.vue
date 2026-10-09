@@ -43,7 +43,7 @@ import { applyMembership, contact } from "@/data/home";
         class="group rounded-2xl bg-cream-50 p-6 shadow-soft ring-1 ring-forest-900/5"
       >
         <span
-          class="font-display text-sm font-semibold tracking-[0.2em] text-maize-600"
+          class="font-display text-sm font-semibold tracking-[0.2em] text-maize-400"
         >
           {{ step.number }}
         </span>
@@ -76,7 +76,7 @@ import { applyMembership, contact } from "@/data/home";
       <ul class="mt-4 space-y-4 text-sm text-ink-900/65">
         <li class="flex gap-3">
           <MapPin
-            class="mt-0.5 h-4 w-4 shrink-0 text-maize-600"
+            class="mt-0.5 h-4 w-4 shrink-0 text-maize-400"
             aria-hidden="true"
           />
           <address class="not-italic leading-relaxed">
@@ -91,7 +91,7 @@ import { applyMembership, contact } from "@/data/home";
         </li>
         <li class="flex gap-3">
           <Phone
-            class="mt-0.5 h-4 w-4 shrink-0 text-maize-600"
+            class="mt-0.5 h-4 w-4 shrink-0 text-maize-400"
             aria-hidden="true"
           />
           <span class="flex flex-col gap-1">
@@ -107,7 +107,7 @@ import { applyMembership, contact } from "@/data/home";
         </li>
         <li class="flex gap-3">
           <Mail
-            class="mt-0.5 h-4 w-4 shrink-0 text-maize-600"
+            class="mt-0.5 h-4 w-4 shrink-0 text-maize-400"
             aria-hidden="true"
           />
           <a

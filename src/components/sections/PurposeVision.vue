@@ -17,7 +17,10 @@ defineProps({
 </script>
 
 <template>
-  <StackedPanel id="about" surface="bg-cream-50">
+  <!-- `bg-cream-100`, the off-white, so this panel stays distinguishable from
+       the `bg-cream-50` StatsBand directly above it — the two share an edge,
+       and matching colours would erase the card-stack join. -->
+  <StackedPanel id="about" surface="bg-cream-100">
     <div class="grid items-center gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
       <!-- Visual -->
       <div class="relative" v-reveal>
@@ -85,7 +88,7 @@ defineProps({
             class="grid gap-3 sm:grid-cols-[auto_1fr] sm:gap-7"
           >
             <p
-              class="font-display text-sm font-semibold tracking-[0.2em] text-maize-600 sm:pt-1.5"
+              class="font-display text-sm font-semibold tracking-[0.2em] text-maize-400 sm:pt-1.5"
             >
               {{ block.number }}
             </p>

@@ -63,7 +63,7 @@ const year = new Date().getFullYear()
       <div
         class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between"
       >
-        <p class="eyebrow eyebrow--plain shrink-0 text-maize-700">
+        <p class="eyebrow shrink-0 text-maize-400">
           {{ partners.title }}
         </p>
 
@@ -73,7 +73,7 @@ const year = new Date().getFullYear()
             :key="affiliation.label"
             class="flex items-center gap-3 rounded-2xl border border-forest-900/10 bg-cream-50 px-4 py-2.5"
           >
-            <ShieldCheck class="h-4 w-4 shrink-0 text-maize-700" aria-hidden="true" />
+            <ShieldCheck class="h-4 w-4 shrink-0 text-maize-400" aria-hidden="true" />
             <span>
               <span
                 class="block text-xs font-bold uppercase tracking-[0.14em] text-forest-950"
@@ -158,7 +158,7 @@ const year = new Date().getFullYear()
          of the footer so it sits in the dark area; anchored to the footer it
          would have been hidden behind the cream band above. -->
     <div
-      class="glow -left-40 -top-20 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(233,168,18,0.12),transparent)]"
+      class="glow -left-40 -top-20 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(245,198,42,0.12),transparent)]"
       aria-hidden="true"
     />
 

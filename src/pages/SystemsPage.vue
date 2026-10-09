@@ -437,7 +437,7 @@ function toggleFaq(index) {
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.22em;
-  color: var(--color-maize-600);
+  color: var(--color-maize-400);
 }
 
 .systems-page-feature__title {
@@ -520,7 +520,7 @@ function toggleFaq(index) {
   content: "";
   flex-shrink: 0;
   border-radius: 9999px;
-  background-color: var(--color-maize-500);
+  background-color: var(--color-maize-400);
   width: 0.375rem;
   height: 0.375rem;
   margin-top: 0.55rem;
@@ -747,7 +747,7 @@ function toggleFaq(index) {
   font-size: 1.35rem;
   font-weight: 400;
   line-height: 1;
-  color: var(--color-maize-600);
+  color: var(--color-maize-400);
 }
 
 .systems-page-faq__answer {

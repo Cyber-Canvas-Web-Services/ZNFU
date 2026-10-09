@@ -320,7 +320,7 @@ watch(
         {{ hero.tagline }}
       </p>
 
-      <p v-reveal="{ delay: 190 }" class="mt-3 max-w-2xl text-sm leading-relaxed text-white/70">
+      <p v-reveal="{ delay: 190 }" class="mt-3 max-w-2xl text-sm leading-relaxed text-white">
         {{ hero.body }}
       </p>
 

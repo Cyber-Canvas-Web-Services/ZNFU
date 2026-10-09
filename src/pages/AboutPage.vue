@@ -356,7 +356,7 @@ const vision = purposeVision.blocks[1].body;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--color-maize-600);
+  color: var(--color-maize-400);
 }
 
 .about-mvv__body {
@@ -429,7 +429,7 @@ const vision = purposeVision.blocks[1].body;
   font-weight: 600;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--color-maize-600);
+  color: var(--color-maize-400);
 }
 
 .about-timeline__title {
@@ -492,7 +492,7 @@ const vision = purposeVision.blocks[1].body;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--color-maize-600);
+  color: var(--color-maize-400);
 }
 
 /* ---- 5 — Partners row ---- */

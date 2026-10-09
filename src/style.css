@@ -23,18 +23,18 @@
   --color-forest-900: #173524;
   --color-forest-950: #0a1e13;
 
-  /* Maize — accent */
+  /* Maize — accent.
+     The scale deliberately STOPS at 400. Everything from the old 500 upward
+     (#e9a812 … #421e06) darkened through amber into brown, and the client
+     rejected the brown outright: brand yellow is #f5c62a and nothing else.
+     The darker steps were removed rather than left unused so the brown cannot
+     creep back in. If a darker accent is ever needed, add a genuinely
+     different colour rather than reopening this ramp. */
   --color-maize-50: #fefbea;
   --color-maize-100: #fdf5c5;
   --color-maize-200: #fbea8b;
   --color-maize-300: #f8d94f;
   --color-maize-400: #f5c62a;
-  --color-maize-500: #e9a812;
-  --color-maize-600: #cd810c;
-  --color-maize-700: #a35c0e;
-  --color-maize-800: #854812;
-  --color-maize-900: #713c14;
-  --color-maize-950: #421e06;
 
   /* Cream / ink surfaces */
   --color-cream-50: #fbfaf6;
@@ -397,19 +397,6 @@
        as open as it can be while staying compact. */
     letter-spacing: 0.14em;
     text-transform: uppercase;
-  }
-
-  .eyebrow::before {
-    content: '';
-    display: block;
-    width: 2rem;
-    height: 1px;
-    background-color: currentColor;
-    opacity: 0.55;
-  }
-
-  .eyebrow--plain::before {
-    display: none;
   }
 
   .section-title {

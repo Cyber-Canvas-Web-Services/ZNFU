@@ -7,6 +7,7 @@
             "matchCommandLine": true
         },
         "printf": true,
-        "sips": true
+        "sips": true,
+        "lsof": true
     }
 }

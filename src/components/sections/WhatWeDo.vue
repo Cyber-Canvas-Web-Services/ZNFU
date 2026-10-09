@@ -203,7 +203,7 @@ defineProps({
   font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.22em;
-  color: var(--color-maize-600);
+  color: var(--color-maize-400);
 }
 
 .focus-pillar__title {

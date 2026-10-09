@@ -121,7 +121,7 @@ defineProps({
               class="group flex flex-col gap-3 py-6 transition-colors hover:bg-cream-50/70 sm:flex-row sm:items-start sm:gap-6"
             >
               <span
-                class="shrink-0 pt-0.5 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-maize-700 sm:w-32"
+                class="shrink-0 pt-0.5 text-[0.65rem] font-bold uppercase tracking-[0.18em] text-maize-400 sm:w-32"
               >
                 {{ item.category }}
               </span>
@@ -150,7 +150,7 @@ defineProps({
         v-reveal="{ delay: 140 }"
         class="grain relative flex flex-col justify-center overflow-hidden rounded-3xl bg-forest-900 p-7 text-cream-50 sm:p-9"
       >
-        <p class="eyebrow eyebrow--plain text-maize-400">
+        <p class="eyebrow text-maize-400">
           {{ news.fridayBrief.label }}
         </p>
         <h3
