@@ -229,7 +229,8 @@ defineProps({
   justify-content: space-between;
   gap: 1.5rem;
   margin-top: 3.5rem;
-  border-radius: 1.5rem;
+  /* 5px, matching every other card on the site. */
+  border-radius: 5px;
   background-color: var(--color-forest-900);
   padding: 2rem 1.75rem;
 }

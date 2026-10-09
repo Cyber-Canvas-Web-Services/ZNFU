@@ -100,7 +100,32 @@
   --shadow-card: 0 40px 90px -30px rgb(4 20 12 / 0.62);
   --shadow-soft: 0 18px 50px -28px rgb(10 30 19 / 0.35);
 
-  --radius-card: 1.5rem;
+  /* =================================================================
+     Radius — 5px on every rounded corner
+     =================================================================
+     Every card, panel, image frame and input on the site rounds its corners
+     by 5px. Setting it here, on Tailwind's own radius tokens, rather than in
+     the 30-odd places a radius is written means any `rounded-xl|2xl|3xl` a
+     component asks for resolves to 5px — so the scale cannot drift back to
+     the old 24-32px pills one file at a time.
+
+     Pills are deliberately NOT included. `rounded-full` is not token-driven:
+     it compiles to a static `3.40282e38px` (verified in the built CSS), so the
+     buttons, affiliate chips, status dots and circular icon tiles keep their
+     pill and circle shapes. 5px governs corners; a pill has none.
+
+     Scoped `<style>` blocks in the page components still write the 5px
+     literally, since a theme variable that no utility references can be
+     tree-shaken out of the build. Keep the two in step. */
+  --radius-xs: 5px;
+  --radius-sm: 5px;
+  --radius-md: 5px;
+  --radius-lg: 5px;
+  --radius-xl: 5px;
+  --radius-2xl: 5px;
+  --radius-3xl: 5px;
+  --radius-4xl: 5px;
+  --radius-card: 5px;
 
   @keyframes marquee {
     from {

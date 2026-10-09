@@ -1,7 +1,14 @@
 <script setup>
 /**
  * Full-bleed footage panel — a visual breather between editorial panels.
- * Uses `vid 5` (rain → land preparation → soil in hand) and fills one screen.
+ * Uses `vid 5` (rain → land preparation → soil in hand).
+ *
+ * The band hugs its copy: `py-16 → lg:py-24` around the text and no minimum
+ * height. It used to fill the viewport (`lg:min-h-screen`), which put a full
+ * screen of footage between two editorial panels to carry ~200px of words —
+ * measured 900px of band around a 428px content block, so more than half of
+ * it was empty. The card edge stays, so the panel below still slides up over
+ * it.
  *
  * It also opens the About page, where it is the first band on the page rather
  * than one mid-stack. `standalone` drops the card edge that is only wanted
@@ -60,11 +67,11 @@ watch(isInView, (visible) => {
        still slides up over it. -->
   <section
     ref="bandEl"
-    class="relative isolate flex flex-col justify-center clip-safe py-28 lg:min-h-screen lg:py-0"
+    class="relative isolate flex flex-col justify-center clip-safe py-16 sm:py-20 lg:py-24"
     :class="
       standalone
         ? ''
-        : 'lg:rounded-t-[2rem] lg:shadow-[0_-16px_44px_-26px_rgba(10,30,19,0.55)]'
+        : 'lg:rounded-t-card lg:shadow-[0_-16px_44px_-26px_rgba(10,30,19,0.55)]'
     "
   >
     <!-- Poster paints immediately and stays put underneath. No `autoplay`
@@ -110,7 +117,7 @@ watch(isInView, (visible) => {
       aria-hidden="true"
     />
 
-    <div class="relative mx-auto max-w-4xl px-5 text-center sm:px-8 lg:py-28">
+    <div class="relative mx-auto max-w-4xl px-5 text-center sm:px-8">
       <p class="eyebrow justify-center text-maize-400" v-reveal>
         Why the Union exists
       </p>

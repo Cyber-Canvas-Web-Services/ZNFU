@@ -635,7 +635,8 @@ function subscribe() {
 
 .news-page-feature__image {
   width: 100%;
-  border-radius: 1.5rem;
+  /* 5px, matching every other card on the site. */
+  border-radius: 5px;
   object-fit: cover;
   aspect-ratio: 16 / 10;
 }
@@ -869,7 +870,8 @@ function subscribe() {
   gap: 1.25rem;
   width: 100%;
   border: 1px solid color-mix(in oklab, var(--color-cream-200) 20%, transparent);
-  border-radius: 1rem;
+  /* 5px, matching every other card on the site. */
+  border-radius: 5px;
   padding: 1.1rem 1.25rem;
   text-align: left;
   cursor: pointer;

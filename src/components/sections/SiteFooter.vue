@@ -43,7 +43,7 @@ const year = new Date().getFullYear()
 <template>
   <footer
     id="contact"
-    class="relative z-10 scroll-mt-24 clip-safe bg-forest-950 text-cream-50 lg:rounded-t-[2rem] lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)] lg:ring-1 lg:ring-forest-950/5"
+    class="relative z-10 scroll-mt-24 clip-safe bg-forest-950 text-cream-50 lg:rounded-t-card lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)] lg:ring-1 lg:ring-forest-950/5"
   >
     <!-- ==================== Partner band ====================
          A full-bleed off-white strip across the top of the footer, rather than

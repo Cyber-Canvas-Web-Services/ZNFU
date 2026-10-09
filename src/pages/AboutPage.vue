@@ -345,7 +345,8 @@ const vision = purposeVision.blocks[1].body;
 }
 
 .about-mvv__card {
-  border-radius: 1.5rem;
+  /* 5px, matching every other card on the site. */
+  border-radius: 5px;
   background-color: var(--color-cream-50);
   padding: 1.75rem;
   box-shadow: var(--shadow-soft);
@@ -471,7 +472,8 @@ const vision = purposeVision.blocks[1].body;
 }
 
 .about-leadership__card {
-  border-radius: 1.5rem;
+  /* 5px, matching every other card on the site. */
+  border-radius: 5px;
   background-color: var(--color-cream-50);
   padding: 1.75rem;
   box-shadow: var(--shadow-soft);
@@ -522,7 +524,8 @@ const vision = purposeVision.blocks[1].body;
   align-items: center;
   justify-content: space-between;
   gap: 1.75rem;
-  border-radius: 1.75rem;
+  /* 5px, matching every other card on the site. */
+  border-radius: 5px;
   background-color: var(--color-forest-900);
   padding: 2.5rem 2rem;
 }

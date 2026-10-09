@@ -79,8 +79,8 @@ defineProps({
       first
         ? ''
         : topEdge
-          ? 'rounded-t-[2rem] shadow-[0_-16px_44px_-26px_rgba(10,30,19,0.55)] ring-1 ring-forest-950/5'
-          : 'lg:rounded-t-[2rem] lg:shadow-[0_-16px_44px_-26px_rgba(10,30,19,0.55)] lg:ring-1 lg:ring-forest-950/5',
+          ? 'rounded-t-card shadow-[0_-16px_44px_-26px_rgba(10,30,19,0.55)] ring-1 ring-forest-950/5'
+          : 'lg:rounded-t-card lg:shadow-[0_-16px_44px_-26px_rgba(10,30,19,0.55)] lg:ring-1 lg:ring-forest-950/5',
     ]"
   >
     <div v-if="bleed" class="relative flex w-full flex-1 flex-col">

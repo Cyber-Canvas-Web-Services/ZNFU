@@ -80,13 +80,46 @@ LOOP_BLEND=1
 
 # WebP settings.
 #
-# 64 is not as low as it looks. WebP's quality scale is far less aggressive
-# than JPEG's: measured on this project's own photography, q64 + a 1280px cap
-# landed at roughly -50% versus the source JPEGs and was indistinguishable
-# from them at the sizes they are actually displayed (verified against the
-# largest, most detailed image at 2× display size and at 1:1).
+# 64. It was raised to 80 on 2026-10-09 and put straight back, because the
+# measurement said the bytes were not buying anything a visitor can see:
+#
+#     q64   32.0 / 34.1 / 32.4 dB   PSNR
+#     q80   35.0 / 36.6 / 35.0 dB   PSNR   (+31% bytes)
+#
+# +3 dB looks like a real gain on paper, so it was checked visually as well —
+# both the hero poster (dark, low contrast) and the agri still (bright, high
+# detail) were encoded at both settings, cropped to their most detailed region
+# and blown up 3×. They are indistinguishable. Local texture energy moves by
+# 1-7%, which is not perceptible. At these display sizes WebP's q64 is already
+# past the point of visual diminishing returns; q80 only pads the file.
+#
+# CONCLUSION: sharpness on this site is limited by the RESOLUTION of the
+# supplied photography, not by the encoding. Raising quality does not fix a
+# soft image — see the note on source-limited assets below.
+#
+# 1600, raised from 1280. This one is a real fix: several masters are larger
+# than 1280, so the old cap was shipping fewer pixels than the source had and
+# the browser then upscaled them back up. Nothing here exceeds 1600, so this
+# is a ceiling and never upscales a master.
+#
+# ⚠️ SOURCE-LIMITED (do not "fix" by re-encoding — the detail is not in the
+# file; ask the client for the original photograph):
+#     field-soybean-team   604px wide, displayed up to ~930
+#     livestock-goats-kraal 626px wide, displayed up to ~780
+#     grower-maize-field   736px wide, displayed full-bleed (~1600+)
+#     garden-sunset-irrigation 736px wide, displayed up to ~1190
+#     field-footage-poster 848px wide, displayed full-bleed — limited by the
+#                         848×480 video master, so a sharper poster needs a
+#                         sharper clip
+#     agri / cows          1310 / 1334px wide, displayed full-bleed — the most
+#                         visible images on the site and the ones most worth
+#                         replacing with larger originals
+#
+# On performance: the hero poster is still extracted from the encoded 1280×720
+# video and the videos are untouched, so the critical path is unchanged. Every
+# photograph is `loading="lazy"` and below the fold.
 WEBP_QUALITY=64
-WEBP_MAX_EDGE=1280
+WEBP_MAX_EDGE=1600
 
 # Where in the encoded hero the poster frame is taken from. The encoded loop
 # starts 1s into the master, so 3.5s here is the cattle-by-water frame — the
@@ -220,6 +253,35 @@ dry_run = sys.argv[5] == "1"
 
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png"}
 
+# Deliberate framing crops, keyed by master stem → the fraction of the image
+# height to trim off the top before the WebP is written.
+#
+# `grower-maize-field` is a portrait photograph (736×982) used as the backdrop
+# of a short landscape band on the home page, with the copy sitting over its
+# lower half. Left whole, the browser decides where the band's top edge lands,
+# and no `object-position` can be trusted to clear the sky above the farmer's
+# hat: a percentage there is measured against the overflow, which changes with
+# the viewport, so the hat drifts down the frame as the screen widens and
+# eventually crops out entirely. Cropping the asset fixes the framing
+# identically everywhere and lets the band be as short as its copy needs.
+#
+# The band shows the asset's TOP edge (`object-top`), so this crop is what puts
+# the band's own top edge just above the hat — the client's brief. 0.40 keeps
+# the cut at y≈393, about 17px above the crown apex, which measurement puts at
+# y≈410.
+#
+# ⚠️ Measure the hat from a zoomed crop of the head, not from a colour scan of
+# the whole frame: dry maize leaves are the same tan as straw and a per-row
+# straw scan first trips at y≈401 on foliage, ~10px high and far to the left of
+# the hat. That false positive is how this crop was first set too high.
+#
+# Doing this in the pipeline rather than by editing the built file follows the
+# hero's phone encode (see HERO_MOBILE_CROP above): the crop is part of the
+# asset, so a re-run reproduces it instead of silently reverting it.
+CROPS = {
+    "grower-maize-field": 0.40,
+}
+
 
 def human(n: int) -> str:
     if n >= 1048576:
@@ -236,6 +298,10 @@ def encode_webp(src: pathlib.Path, dest: pathlib.Path) -> None:
         im = ImageOps.exif_transpose(im)
         if im.mode != "RGB":
             im = im.convert("RGB")
+
+        trim = CROPS.get(src.stem)
+        if trim:
+            im = im.crop((0, round(im.height * trim), im.width, im.height))
 
         w, h = im.size
         longest = max(w, h)

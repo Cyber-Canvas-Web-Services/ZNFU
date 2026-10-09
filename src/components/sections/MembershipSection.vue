@@ -87,15 +87,31 @@ defineProps({
     </div>
   </StackedPanel>
 
-  <!-- Panel 2 — closing image panel -->
+  <!-- Panel 2 — closing image panel.
+
+       Trimmed to the subject at the client's request. It used to fill the
+       viewport (`lg:min-h-screen`); the band now takes its height from its
+       copy plus a deliberate strip of photograph above it, so the frame opens
+       just above the farmer's hat and closes just below the buttons.
+
+       Two things make that work together, and they must not drift apart:
+         · the asset itself is cropped to the hat in `optimize-media.sh`
+           (CROPS), which is what fixes the framing identically at every
+           viewport — an `object-position` percentage could not, because it is
+           taken from the overflow and so moves with the screen width;
+         · `object-top` then pins the cropped top edge to the band's top edge
+           at every size, so the hat can never slide out of frame.
+
+       The min-height is what holds the strip of photograph open above the
+       copy; the copy itself is bottom-anchored by `mt-auto`. -->
   <StackedPanel surface="bg-forest-950" tone="text-cream-50" bleed>
     <div
-      class="relative flex min-h-[360px] flex-1 flex-col sm:min-h-[440px] lg:min-h-screen"
+      class="relative flex min-h-[380px] flex-1 flex-col sm:min-h-[420px] lg:min-h-[460px]"
     >
       <img
         :src="membership.image"
         :alt="membership.imageAlt"
-        class="absolute inset-0 h-full w-full object-cover"
+        class="absolute inset-0 h-full w-full object-cover object-top"
         loading="lazy"
         decoding="async"
       />
@@ -104,8 +120,12 @@ defineProps({
         aria-hidden="true"
       />
 
+      <!-- `pt` is a floor, not the layout: `mt-auto` puts the copy on the
+           band's bottom edge and the min-height above holds the photograph
+           open. It only bites on a narrow screen, where the heading wraps to
+           enough lines that it would otherwise ride up into the hat. -->
       <div
-        class="shell relative mt-auto w-full pb-14 pt-32 lg:pb-20"
+        class="shell relative mt-auto w-full pb-10 pt-20 sm:pb-12 sm:pt-28"
         v-reveal
       >
         <p class="eyebrow text-maize-400">
@@ -141,7 +161,9 @@ defineProps({
  * with padding and type alone.
  */
 .membership-glance {
-  border-radius: 1.5rem;
+  /* 5px, matching every other card on the site — the radius scale lives on
+     the Tailwind tokens in style.css. */
+  border-radius: 5px;
   background-color: var(--color-cream-50);
   padding: 2rem;
   box-shadow: var(--shadow-soft);

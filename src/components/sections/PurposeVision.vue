@@ -24,7 +24,7 @@ defineProps({
     <div class="grid items-center gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:gap-16">
       <!-- Visual -->
       <div class="relative" v-reveal>
-        <div class="overflow-hidden rounded-[28px] shadow-soft">
+        <div class="overflow-hidden rounded-card shadow-soft">
           <img
             :src="purposeVision.image"
             alt="Farmers walking through a soybean field in Zambia"

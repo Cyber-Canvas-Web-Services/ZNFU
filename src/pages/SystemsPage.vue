@@ -533,7 +533,8 @@ function toggleFaq(index) {
   align-items: center;
   justify-content: center;
   gap: 1.25rem;
-  border-radius: 1.75rem;
+  /* 5px, matching every other card on the site. */
+  border-radius: 5px;
   border: 1px solid
     color-mix(in oklab, var(--color-forest-900) 10%, transparent);
   background-color: var(--color-cream-50);
@@ -609,7 +610,8 @@ function toggleFaq(index) {
   text-align: center;
   gap: 0.6rem;
   flex: 1;
-  border-radius: 1.5rem;
+  /* 5px, matching every other card on the site. */
+  border-radius: 5px;
   border: 1px solid
     color-mix(in oklab, var(--color-forest-900) 10%, transparent);
   background-color: var(--color-cream-50);
@@ -675,7 +677,8 @@ function toggleFaq(index) {
 
 /* ---- 4 — Who can use these systems ---- */
 .systems-page-access {
-  border-radius: 1.75rem;
+  /* 5px, matching every other card on the site. */
+  border-radius: 5px;
   border: 1px solid
     color-mix(in oklab, var(--color-forest-900) 12%, transparent);
   background-color: var(--color-cream-50);
@@ -766,7 +769,8 @@ function toggleFaq(index) {
   align-items: center;
   justify-content: space-between;
   gap: 1.75rem;
-  border-radius: 1.75rem;
+  /* 5px, matching every other card on the site. */
+  border-radius: 5px;
   background-color: var(--color-forest-900);
   padding: 2.5rem 2rem;
 }
