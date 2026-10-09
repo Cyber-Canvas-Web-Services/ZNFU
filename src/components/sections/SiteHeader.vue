@@ -63,7 +63,7 @@ onBeforeUnmount(() =>
     class="fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,padding] duration-300"
     :class="
       onLight
-        ? 'bg-cream-50 py-2.5 shadow-[0_8px_30px_-16px_rgba(10,30,19,0.4)]'
+        ? 'bg-cream-50 py-2.5 shadow-[0_8px_30px_-16px_rgba(10,30,19,0.24)]'
         : 'bg-gradient-to-b from-forest-950/80 via-forest-950/35 to-transparent py-4'
     "
   >

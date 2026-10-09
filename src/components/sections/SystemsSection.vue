@@ -30,7 +30,7 @@ defineProps({
     :first="standalone"
   >
     <div
-      class="glow -left-40 top-1/4 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(58,125,78,0.28),transparent)]"
+      class="glow -left-40 top-1/4 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(58,125,78,0.15),transparent)]"
       aria-hidden="true"
     />
 

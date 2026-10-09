@@ -41,7 +41,7 @@ const year = new Date().getFullYear()
 <template>
   <footer
     id="contact"
-    class="relative z-10 scroll-mt-24 clip-safe bg-forest-950 text-cream-50 lg:rounded-t-card lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.6)] lg:ring-1 lg:ring-forest-950/5"
+    class="relative z-10 scroll-mt-24 clip-safe bg-forest-950 text-cream-50 lg:rounded-t-card lg:shadow-[0_-30px_80px_-45px_rgba(10,30,19,0.33)] lg:ring-1 lg:ring-forest-950/5"
   >
     <!-- ==================== Partner band ====================
          A full-bleed off-white strip across the top of the footer, rather than
@@ -172,9 +172,24 @@ const year = new Date().getFullYear()
   <div class="shell relative pt-10 pb-6 sm:pt-12 sm:pb-7">
     <!-- Decorative glow. It lives inside this container rather than at the top
          of the footer so it sits in the dark area; anchored to the footer it
-         would have been hidden behind the cream band above. -->
+         would have been hidden behind the cream band above.
+
+         ⚠️ `top-0`, NOT `-top-20`. It used to sit 80px ABOVE this container,
+         which painted the tail of the gradient onto the cream band above and
+         read as the cream being dimmed along the seam. The footer's own
+         `overflow: clip` did not stop it: that clips to the FOOTER, and the
+         cream band is inside the footer, so nothing was in the way.
+
+         The gradient reaches zero alpha at its own box edge, so starting it at
+         this container's top edge means it cannot bleed upward at all — and it
+         lands on a soft edge rather than being cut off, which is what clipping
+         it here would have produced.
+
+         Verified by hiding the glows: the cream band then measures a perfectly
+         flat `rgb(245,242,233)` all the way down to the dark edge. The ~7-unit
+         blue drop near the seam was entirely this gradient. -->
     <div
-      class="glow -left-40 -top-20 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(245,198,42,0.12),transparent)]"
+      class="glow -left-40 top-0 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(245,198,42,0.07),transparent)]"
       aria-hidden="true"
     />
 

@@ -29,9 +29,14 @@ const reducedMotion = usePrefersReducedMotion()
   <StackedPanel surface="bg-cream-50" tone="text-ink-900" dense first>
     <!-- Decorative glow. The gold hairline that used to sit along this panel's
          top edge is gone at the client's request — against the near-white
-         surface it read as a stray mustard line rather than an accent. -->
+         surface it read as a stray mustard line rather than an accent.
+
+         The glow itself is also lighter than it was. It sits on a near-white
+         panel, where a wide gold gradient reads as the panel being dimmed or
+         smudged rather than as an accent; the supervisor asked for that to be
+         pulled back everywhere it appears. -->
     <div
-      class="glow -right-40 top-0 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(245,198,42,0.15),transparent)]"
+      class="glow -right-40 top-0 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(245,198,42,0.07),transparent)]"
       aria-hidden="true"
     />
 

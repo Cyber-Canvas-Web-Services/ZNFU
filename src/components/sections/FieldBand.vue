@@ -71,7 +71,7 @@ watch(isInView, (visible) => {
     :class="
       standalone
         ? ''
-        : 'lg:rounded-t-card lg:shadow-[0_-16px_44px_-26px_rgba(10,30,19,0.55)]'
+        : 'lg:rounded-t-card lg:shadow-[0_-16px_44px_-26px_rgba(10,30,19,0.28)]'
     "
   >
     <!-- Poster paints immediately and stays put underneath. No `autoplay`
