@@ -1,14 +1,22 @@
 <script setup>
 /**
- * Membership — split into two panels: the routes into the Union alongside a
- * "Membership at a glance" summary, then a closing image panel carrying the
- * calls to action.
+ * Membership — two panels, but they are not shown together any more.
  *
- * The five application steps that used to sit opposite the heading now live
- * only on the Apply for Membership page, which shares them through
- * `applyMembership.steps`. The summary below is built from the categories and
- * the fee ladder already published on the Types of Membership page, so the two
- * can never drift apart.
+ *   · Panel 1, the summary (heading, “Membership at a glance”, the CTA pair),
+ *     renders ONLY on the standalone /membership page. Everything in it is a
+ *     condensed repeat of `/types-of-membership` (the category list and the
+ *     fee ladder are both read straight out of that page’s data), and the
+ *     lede is reused verbatim on `/apply-membership`. On the home page it was
+ *     therefore a second membership section restating what the two pages it
+ *     links to already say, directly above a band that carries the same two
+ *     buttons — so it was removed from the home page at the client’s request.
+ *     It is NOT deleted: on /membership it is the page.
+ *
+ *   · Panel 2, the closing image band, renders on both.
+ *
+ * The five application steps that used to sit opposite the heading live only
+ * on the Apply for Membership page, which shares them through
+ * `applyMembership.steps`.
  */
 import { ArrowRight } from "@lucide/vue";
 
@@ -29,8 +37,9 @@ const lowestFee = typesOfMembership.bands.reduce((lowest, band) =>
 ).fee;
 
 /**
- * Also stands alone at /membership, where it heads the page and carries the
- * page’s single <h1>.
+ * `standalone` is true at /membership, where this section heads the page and
+ * carries its single <h1>. It also decides WHERE the `#membership` anchor
+ * lives — see the template.
  */
 defineProps({
   standalone: { type: Boolean, default: false },
@@ -38,8 +47,14 @@ defineProps({
 </script>
 
 <template>
-  <!-- Panel 1 — the summary beside the calls to action -->
-  <StackedPanel id="membership" surface="bg-forest-50" :first="true">
+  <!-- Panel 1 — the summary beside the calls to action.
+       Standalone page only. See the note at the top of this file. -->
+  <StackedPanel
+    v-if="standalone"
+    id="membership"
+    surface="bg-forest-50"
+    :first="true"
+  >
     <div class="grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:gap-16">
       <div>
         <p class="eyebrow text-forest-600" v-reveal>{{ membership.eyebrow }}</p>
@@ -103,8 +118,21 @@ defineProps({
            at every size, so the hat can never slide out of frame.
 
        The min-height is what holds the strip of photograph open above the
-       copy; the copy itself is bottom-anchored by `mt-auto`. -->
-  <StackedPanel surface="bg-forest-950" tone="text-cream-50" bleed>
+       copy; the copy itself is bottom-anchored by `mt-auto`.
+
+       On the home page this band also carries the `#membership` id, because
+       the summary panel that used to hold it is no longer rendered there. Two
+       things link to that anchor — the hero’s “Become a member” button and the
+       member-systems “Open the market” button — so it has to keep resolving.
+       It is conditional rather than unconditional because on /membership the
+       summary panel already owns the id, and two elements with the same id
+       would be invalid. -->
+  <StackedPanel
+    :id="standalone ? undefined : 'membership'"
+    surface="bg-forest-950"
+    tone="text-cream-50"
+    bleed
+  >
     <div
       class="relative flex min-h-[380px] flex-1 flex-col sm:min-h-[420px] lg:min-h-[460px]"
     >
