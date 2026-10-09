@@ -37,6 +37,7 @@ import TypesOfMembershipPage from "@/pages/TypesOfMembershipPage.vue";
 import WhatWeDoPage from "@/pages/WhatWeDoPage.vue";
 import SiteFooter from "@/components/sections/SiteFooter.vue";
 import SiteHeader from "@/components/sections/SiteHeader.vue";
+import NewsletterFloat from "@/components/ui/NewsletterFloat.vue";
 import { useSmoothScroll } from "@/composables/useSmoothScroll";
 
 const SITE_NAME = "Zambia National Farmers’ Union";
@@ -266,4 +267,9 @@ onBeforeUnmount(() => {
   </main>
 
   <SiteFooter />
+
+  <!-- Sits outside the footer on purpose. It used to be a block in the
+       footer's right-hand column, where it was the tallest thing in the grid
+       and therefore set the height of the whole footer. See the component. -->
+  <NewsletterFloat />
 </template>

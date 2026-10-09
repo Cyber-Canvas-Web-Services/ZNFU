@@ -1,6 +1,6 @@
 <script setup>
-import { computed, ref } from 'vue'
-import { ArrowRight, Mail, MapPin, Phone, Send, ShieldCheck } from '@lucide/vue'
+import { computed } from 'vue'
+import { ArrowRight, Mail, MapPin, Phone, ShieldCheck } from '@lucide/vue'
 
 import BrandMark from '@/components/BrandMark.vue'
 import SocialIcon from '@/components/ui/SocialIcon.vue'
@@ -28,14 +28,12 @@ function greyVariant(src) {
   return src.replace(/\.webp$/, '-grey.webp')
 }
 
-const email = ref('')
-const subscribed = ref(false)
-
-function subscribe() {
-  if (!email.value) return
-  subscribed.value = true
-  email.value = ''
-}
+/**
+ * The newsletter block that used to live in the right-hand column — and with
+ * it the form state — has moved to `ui/NewsletterFloat.vue`. It remains in
+ * `footer.newsletter` in `data/home.js`, which is where that component reads
+ * it from, so the copy still has exactly one home.
+ */
 
 const year = new Date().getFullYear()
 </script>
@@ -57,8 +55,15 @@ const year = new Date().getFullYear()
             which is what stops the cream from looking like a stray panel.
 
          The footer below keeps its dark surface, so this is the one place on
-         the page where the off-white and the forest green meet directly. -->
-    <div class="relative bg-cream-100 pt-12 pb-10 sm:pt-14 sm:pb-12">
+         the page where the off-white and the forest green meet directly.
+
+         The vertical padding is deliberately tight (28/24px, 32/28px from
+         `sm`). It was 56/48px, which put 104px of air around 166px of content
+         and made the band read as a large empty block rather than a strip —
+         the client asked for the top and bottom to be cut back so it sits
+         neatly. Anything added in here should stay on that footing: this band
+         hugs its content, it does not pad it out. -->
+    <div class="relative bg-cream-100 pt-7 pb-6 sm:pt-8 sm:pb-7">
     <div class="shell">
       <div
         class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between"
@@ -105,7 +110,7 @@ const year = new Date().getFullYear()
 
            `gap-5` with the chip's 8px padding keeps 36px between the visible
            edges of neighbouring logos. -->
-      <div class="mask-fade-x mt-8 overflow-hidden" aria-label="Working with">
+      <div class="mask-fade-x mt-6 overflow-hidden" aria-label="Working with">
         <ul class="marquee gap-5">
           <li
             v-for="(item, index) in marqueeItems"
@@ -153,7 +158,18 @@ const year = new Date().getFullYear()
     </div>
   </div>
 
-  <div class="shell relative py-20 sm:py-24">
+  <!-- Everything below this line is the dark footer proper.
+
+       The vertical rhythm is deliberately tight, and was cut again at the
+       client's request. It was `py-20 sm:py-24` (80/96px) — 96px of empty
+       green above the brandmark and another 96px under the copyright, on a
+       footer whose tallest column is 272px. That is more padding than
+       content, and it read as an unfinished block rather than a footer.
+
+       They are now 40/48px at the top and 24/28px at the bottom. The bottom
+       is the tighter of the two on purpose: it is the end of the page, where
+       a large margin just looks like the page failed to close. -->
+  <div class="shell relative pt-10 pb-6 sm:pt-12 sm:pb-7">
     <!-- Decorative glow. It lives inside this container rather than at the top
          of the footer so it sits in the dark area; anchored to the footer it
          would have been hidden behind the cream band above. -->
@@ -244,39 +260,18 @@ const year = new Date().getFullYear()
               </a>
             </li>
           </ul>
-
-          <div class="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
-            <p class="font-display text-base font-medium tracking-[-0.02em]">{{ footer.newsletter.title }}</p>
-            <p class="mt-2 text-xs leading-relaxed text-cream-200/60">
-              {{ footer.newsletter.body }}
-            </p>
-
-            <form v-if="!subscribed" class="mt-4 flex gap-2" @submit.prevent="subscribe">
-              <label class="sr-only" for="footer-email">Email address</label>
-              <input
-                id="footer-email"
-                v-model="email"
-                type="email"
-                required
-                :placeholder="footer.newsletter.placeholder"
-                class="field field--on-dark min-w-0 flex-1"
-              />
-              <button
-                type="submit"
-                class="btn btn--maize btn--icon shrink-0"
-                aria-label="Subscribe"
-              >
-                <Send class="h-4 w-4" aria-hidden="true" />
-              </button>
-            </form>
-            <p v-else class="mt-4 text-xs text-maize-200">{{ footer.newsletter.success }}</p>
-          </div>
         </div>
       </div>
 
-      <!-- Bottom bar -->
+      <!-- Bottom bar.
+
+           `mt-8 sm:mt-10` is what puts the rule close under the link columns
+           and the social row. It used to be `mt-16` (64px), which was measured
+           against a grid that the newsletter box had stretched to 397px — so
+           the rule sat 189px below the social icons. With the newsletter gone
+           the grid is 272px and the rule now lands 32/40px under them. -->
       <div
-        class="mt-16 flex flex-col gap-5 border-t border-white/10 pt-8 sm:flex-row sm:items-center sm:justify-between"
+        class="mt-8 flex flex-col gap-5 border-t border-white/10 pt-6 sm:mt-10 sm:flex-row sm:items-center sm:justify-between"
       >
         <p class="text-xs text-cream-200/50">
           © {{ year }} {{ brand.fullName }}. All rights reserved.
