@@ -68,7 +68,14 @@ export const media = {
   gardenSunsetIrrigation: "/media/garden-sunset-irrigation.webp",
   haulageAerialHarvest: "/media/haulage-aerial-harvest.webp",
   producePeppersBaskets: "/media/produce-peppers-baskets.webp",
+
+  /* The closing membership band's photograph, in two encodes of the same
+     crop: 736px and a deliberate 2× (see RETINA in scripts/optimize-media.sh).
+     The master is only 736px wide and the band is full-bleed, so a wide or
+     Retina screen was magnifying the 1x file ~3.9× and it read as soft. The
+     browser picks between them from `membership.imageSrcset`. */
   growerMaizeField: "/media/grower-maize-field.webp",
+  growerMaizeField2x: "/media/grower-maize-field-2x.webp",
 };
 
 /* ------------------------------------------------------------------ */
@@ -329,6 +336,13 @@ export const membership = {
   lede: "Whoever you are in Zambian agriculture, there is a seat for you at the table.",
   image: media.growerMaizeField,
   imageAlt: "A farmer in a straw hat walking through tall maize",
+  /* Handed to the browser as `sizes` + `srcset`, so it fetches one image pixel
+     per device pixel of a full-bleed band and no more: 736w for a phone or a
+     1x screen, 1472w for a laptop at DPR 2. `sizes` is `100vw` because the
+     band is the full width of the viewport — the image is width-bound there,
+     which is also why the crop is measured on width. */
+  imageSrcset: `${media.growerMaizeField} 736w, ${media.growerMaizeField2x} 1472w`,
+  imageSizes: "100vw",
   imageCaption: "One Union. Every farmer.",
   /* ⚠️ Only confirmed facts are listed. Benefits and fees entries
      to be added when supplied by the Secretariat. */

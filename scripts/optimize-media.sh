@@ -256,7 +256,7 @@ IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png"}
 # Deliberate framing crops, keyed by master stem → the fraction of the image
 # height to trim off the top before the WebP is written.
 #
-# `grower-maize-field` is a portrait photograph (736×982) used as the backdrop
+# `grower-maize-field` is a portrait photograph (736×981) used as the backdrop
 # of a short landscape band on the home page, with the copy sitting over its
 # lower half. Left whole, the browser decides where the band's top edge lands,
 # and no `object-position` can be trusted to clear the sky above the farmer's
@@ -278,8 +278,43 @@ IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png"}
 # Doing this in the pipeline rather than by editing the built file follows the
 # hero's phone encode (see HERO_MOBILE_CROP above): the crop is part of the
 # asset, so a re-run reproduces it instead of silently reverting it.
+#
+# The master itself was replaced with `assets/img 10.jpeg`, the better of the
+# two copies of this frame that ZNFU supplied (164 kB against 152 kB, and finer
+# JPEG tables). An alignment search over ±6px puts them at the same origin, so
+# the two are the same frame — the swap costs no framing, which is why the
+# 0.40 below still lands where it was measured. Detail in the crop region is up
+# ~7% by edge energy, which is what the site's most magnified image needs.
 CROPS = {
     "grower-maize-field": 0.40,
+}
+
+# Retina variants, keyed by master stem → (upscale factor, WebP quality).
+#
+# ⚠️ This is the one place the pipeline writes more pixels than the master
+# holds, and it is a judgement call, not a free win: an upscale adds no
+# information, it only stops the *browser* from doing the enlarging badly.
+#
+# It exists because `grower-maize-field` is the most magnified asset on the
+# site. The master is 736px wide and the band it backs is full-bleed, so on a
+# 1440px laptop at DPR 2 the browser was stretching 736 source pixels across
+# ~2880 device pixels — 3.9×. At that magnification its own scaler is also
+# enlarging the encode's 8×8 blocks, which is what reads as blur.
+#
+# A Lanczos upscale plus a higher-quality encode halves the work the browser
+# has to do (3.9× → 1.96×) and resamples once, here, instead of on every
+# paint. Measured on the real crop, painted at 2880 device px with the band's
+# own gradient over it:
+#
+#     1x q64    55 kB   3.91×   blocky edges and banding across the hat
+#     2x q80   166 kB   1.96×   those artefacts are gone
+#     2x q88   238 kB   1.96×   no visible gain over q80 for +72 kB
+#
+# So: 2× and q80. It ships as an extra `srcset` candidate rather than as a
+# replacement, so a phone still takes the 1x file — see
+# `membership.imageSrcset` in src/data/home.js.
+RETINA = {
+    "grower-maize-field": (2.0, 80),
 }
 
 
@@ -291,8 +326,12 @@ def human(n: int) -> str:
     return f"{n} B"
 
 
-def encode_webp(src: pathlib.Path, dest: pathlib.Path) -> None:
-    """Write `dest` as WebP, capped and stripped of all metadata."""
+def encode_webp(src: pathlib.Path, dest: pathlib.Path, scale=1.0, quality_override=None) -> None:
+    """Write `dest` as WebP, capped and stripped of all metadata.
+
+    `scale` and `quality_override` are only used by the RETINA variants; every
+    ordinary asset takes the defaults and is untouched by that branch.
+    """
     with Image.open(src) as im:
         # Bake in camera orientation before the metadata is discarded.
         im = ImageOps.exif_transpose(im)
@@ -309,10 +348,15 @@ def encode_webp(src: pathlib.Path, dest: pathlib.Path) -> None:
             ratio = max_edge / longest
             im = im.resize((round(w * ratio), round(h * ratio)), Image.LANCZOS)
 
+        if scale != 1.0:
+            im = im.resize(
+                (round(im.width * scale), round(im.height * scale)), Image.LANCZOS
+            )
+
         # No exif= argument: metadata, GPS included, is dropped rather than
         # copied. Saving is delayed to the end of the block, while the file
         # handle is still open.
-        im.save(dest, "WEBP", quality=quality, method=6)
+        im.save(dest, "WEBP", quality=quality_override or quality, method=6)
 
 
 def report(src: pathlib.Path, dest: pathlib.Path, label=None) -> None:
@@ -335,6 +379,16 @@ for src in sorted(source.iterdir()):
         continue
     encode_webp(src, dest)
     report(src, dest)
+
+    # Deliberate second candidate for the assets listed in RETINA. Written
+    # beside the 1x file and never referenced on its own — the browser only
+    # fetches it when the layout asks for more pixels than 1x can give.
+    retina = RETINA.get(src.stem)
+    if retina:
+        factor, retina_quality = retina
+        hd = media / f"{src.stem}-{factor:g}x.webp"
+        encode_webp(src, hd, scale=factor, quality_override=retina_quality)
+        report(src, hd)
 
 # 2. Posters, freshly extracted from the encoded video this run.
 for png in sorted(media.glob("*-poster.png")):
