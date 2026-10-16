@@ -15,11 +15,26 @@
  * `clip-safe` (`overflow: clip`) ancestor and out of the sticky panel stack,
  * where it would become another composited layer in the scroll path.
  *
+ * WHAT SHOWS — the resting state is a 52px send button, not the card. The card
+ * is 304×142 of permanently occupied corner, held for the whole visit by a
+ * signup nobody asked for; the button costs a 52px circle and still says the
+ * newsletter exists. Pressing the button opens the card — the state this
+ * component used to arrive in — and pressing anywhere else, or Escape, puts it
+ * back.
+ *
+ * That two-stage shape was mobile-only to begin with, on the grounds that a
+ * desktop has room to give a card. It does, but the room is the visitor’s
+ * either way, and the button is now the first thing every viewport sees.
+ *
  * WHEN IT SHOWS — three independent conditions, all of which must hold:
  *   1. the visitor has scrolled about three-quarters of a screen, so the card
  *      never competes with the hero for attention;
  *   2. the footer is NOT on screen — see below;
  *   3. it has not been dismissed.
+ *
+ * Because the button is the resting state, the conditions above now decide
+ * when *anything* appears at all — nothing is on screen until the visitor has
+ * scrolled, on any viewport.
  *
  * (2) matters more than it looks. The card is fixed to the bottom-right, and
  * the footer’s bottom bar puts the legal links and “Back to top” in exactly
@@ -35,7 +50,6 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { Send, X } from '@lucide/vue'
 
-import { useIsMobile } from '@/composables/useMediaQuery'
 import { useScrolledPast } from '@/composables/useScrolledPast'
 import { footer } from '@/data/home'
 
@@ -94,30 +108,30 @@ const visible = computed(
 )
 
 /* ---------------------------------------------------------------- */
-/*  Mobile: a button until it is asked for                           */
+/*  A button until it is asked for                                   */
 /* ---------------------------------------------------------------- */
 /**
- * On a phone the full card is 304×142 of permanently occupied screen — on a
- * 390px-wide display that is a fifth of the height, held for the whole visit
- * by a signup nobody asked for. Below `md` it is therefore just a 52px send
- * button, and tapping it opens the real card.
+ * The card is what pressing the button buys; the button is what the visitor
+ * gets by default, on every viewport.
  *
- * Desktop keeps the card as it was. There is room for it there, and a floating
- * button that has to be opened is a worse trade when the space is free.
+ * It used to be the other way round above `md`: a desktop arrived with the
+ * card already open, because there is room for it there. The client asked for
+ * the button instead — the card is another page’s content parked in the corner
+ * of all nine routes, and on a phone it was a fifth of the screen height on
+ * top of that. Being asked for beats being seen.
  */
-const isMobile = useIsMobile()
 const expanded = ref(false)
 const cardEl = ref(null)
 const fabEl = ref(null)
 
-/** True only while the mobile button is the resting state. */
-const collapsed = computed(() => isMobile.value && !expanded.value)
+/** True while the send button is the resting state. */
+const collapsed = computed(() => !expanded.value)
 
 async function openCard() {
   expanded.value = true
   await nextTick()
   // Move focus into the card rather than to the input. Focusing the input
-  // would raise the on-screen keyboard the instant the button is tapped, and
+  // would raise the on-screen keyboard the instant the button is pressed, and
   // that keyboard covers the card it was opened from. Focusing the container
   // keeps focus off `<body>` (which is where it lands when the button that
   // had it is removed) without assuming the visitor wants to type yet.
@@ -198,7 +212,7 @@ onBeforeUnmount(() => {
       aria-label="Newsletter signup"
       class="pointer-events-none fixed bottom-5 right-5 z-40 grid sm:bottom-6 sm:right-6"
     >
-      <!-- Mobile resting state: the send button. -->
+      <!-- Resting state: the send button. -->
       <Transition name="pop">
         <button
           v-if="collapsed"
@@ -212,8 +226,7 @@ onBeforeUnmount(() => {
         </button>
       </Transition>
 
-      <!-- The card. On desktop this is the resting state; on mobile it is what
-           the button opens. -->
+      <!-- The card — what the button opens. -->
       <Transition name="expand">
         <div
           v-if="!collapsed"
@@ -300,9 +313,9 @@ onBeforeUnmount(() => {
 }
 
 /**
- * Mobile open/close. Transform and opacity only, so the swap costs the
- * compositor and never triggers layout — a width/height animation here would
- * reflow the docked corner on every frame.
+ * Button → card. Transform and opacity only, so the swap costs the compositor
+ * and never triggers layout — a width/height animation here would reflow the
+ * docked corner on every frame.
  *
  * `scale` from the bottom-right origin (set on the card) makes the card read as
  * growing out of the button it came from, which is what makes the relationship

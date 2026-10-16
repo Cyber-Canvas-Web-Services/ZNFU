@@ -136,8 +136,16 @@ defineProps({
     <div
       class="relative flex min-h-[380px] flex-1 flex-col sm:min-h-[420px] lg:min-h-[460px]"
     >
+      <!-- Two candidates, one crop: `srcset` + `sizes` let the browser take
+           the 736px encode on a phone and the 1472px one only where the band
+           is actually painted wider than 736 device pixels. The 1x file is
+           still the `src`, so nothing that ignores `srcset` regresses.
+           Both stay `loading="lazy"`: this band is the last thing on the
+           page, and neither file is fetched until it is nearly in view. -->
       <img
         :src="membership.image"
+        :srcset="membership.imageSrcset"
+        :sizes="membership.imageSizes"
         :alt="membership.imageAlt"
         class="absolute inset-0 h-full w-full object-cover object-top"
         loading="lazy"
