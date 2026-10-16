@@ -37,7 +37,19 @@ import TypesOfMembershipPage from "@/pages/TypesOfMembershipPage.vue";
 import WhatWeDoPage from "@/pages/WhatWeDoPage.vue";
 import SiteFooter from "@/components/sections/SiteFooter.vue";
 import SiteHeader from "@/components/sections/SiteHeader.vue";
-import NewsletterFloat from "@/components/ui/NewsletterFloat.vue";
+
+import "@/v2/v2.css";
+import SiteFooterV2 from "@/v2/SiteFooterV2.vue";
+import SiteHeaderV2 from "@/v2/SiteHeaderV2.vue";
+import AboutV2 from "@/v2/pages/AboutV2.vue";
+import ApplyV2 from "@/v2/pages/ApplyV2.vue";
+import ContactV2 from "@/v2/pages/ContactV2.vue";
+import HomeV2 from "@/v2/pages/HomeV2.vue";
+import MembershipV2 from "@/v2/pages/MembershipV2.vue";
+import NewsV2 from "@/v2/pages/NewsV2.vue";
+import SystemsV2 from "@/v2/pages/SystemsV2.vue";
+import TypesV2 from "@/v2/pages/TypesV2.vue";
+import WhatWeDoV2 from "@/v2/pages/WhatWeDoV2.vue";
 import { useSmoothScroll } from "@/composables/useSmoothScroll";
 
 const SITE_NAME = "Zambia National Farmers’ Union";
@@ -47,7 +59,7 @@ const PAGES = {
   "/": {
     component: HomePage,
     title: `ZNFU — ${SITE_NAME}`,
-    skip: "#about",
+    skip: "#hero",
   },
   "/about": {
     component: AboutPage,
@@ -89,6 +101,36 @@ const PAGES = {
     title: `Types of Membership — ${SITE_NAME}`,
     skip: "#types-of-membership",
   },
+};
+
+/**
+ * Design switch. The site ships two complete designs: 1 (the original editorial
+ * look) and 2 (colour-blocked panels, under src/v2). Open any page with
+ * `?design=2` to see the second one, `?design=1` to go back; the choice is
+ * remembered for the tab, so in-site links keep it.
+ */
+function readDesign() {
+  try {
+    const asked = new URLSearchParams(window.location.search).get("design");
+    if (asked === "1" || asked === "2") sessionStorage.setItem("znfu-design", asked);
+    return sessionStorage.getItem("znfu-design") === "2" ? 2 : 1;
+  } catch {
+    return new URLSearchParams(window.location.search).get("design") === "2" ? 2 : 1;
+  }
+}
+const design = readDesign();
+
+/** Design 2 components, keyed like PAGES. */
+const V2_PAGES = {
+  "/": HomeV2,
+  "/about": AboutV2,
+  "/what-we-do": WhatWeDoV2,
+  "/systems": SystemsV2,
+  "/news": NewsV2,
+  "/membership": MembershipV2,
+  "/contact": ContactV2,
+  "/apply-membership": ApplyV2,
+  "/types-of-membership": TypesV2,
 };
 
 /** Current page, read from the URL and kept in sync with the history API. */
@@ -260,16 +302,13 @@ onBeforeUnmount(() => {
     Skip to content
   </a>
 
-  <SiteHeader :solid="currentPath !== '/'" />
+  <SiteHeaderV2 v-if="design === 2" :path="currentPath" />
+  <SiteHeader v-else :solid="currentPath !== '/'" />
 
   <main>
-    <component :is="currentPage.component" />
+    <component :is="design === 2 ? V2_PAGES[currentPath] : currentPage.component" />
   </main>
 
-  <SiteFooter />
-
-  <!-- Sits outside the footer on purpose. It used to be a block in the
-       footer's right-hand column, where it was the tallest thing in the grid
-       and therefore set the height of the whole footer. See the component. -->
-  <NewsletterFloat />
+  <SiteFooterV2 v-if="design === 2" />
+  <SiteFooter v-else />
 </template>

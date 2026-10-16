@@ -9,7 +9,7 @@
       name="description"
       content="Founded in 1905, the Zambia National Farmers' Union is a non-political, member-led union representing small-scale and commercial farmers, commodity associations and agribusinesses across Zambia."
     />
-    <meta name="theme-color" content="#0a1e13" />
+    <meta name="theme-color" content="#042015" />
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content="ZNFU — Zambia National Farmers' Union" />
@@ -22,14 +22,15 @@
     <meta property="og:image" content="/media/og-image.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
 
-    <!-- The hero poster is the first thing the page paints, and it is rendered
-         by Vue — so without this the browser would not discover it until the
-         bundle had parsed and executed. Preloading it starts the fetch at HTML
-         parse time instead. Same file for every breakpoint. -->
+    <!-- The hero's opening slide is the first thing the page paints, and it is
+         rendered by Vue — so without this the browser would not discover it
+         until the bundle had parsed and executed. Preloading it starts the
+         fetch at HTML parse time instead. Keep this in step with
+         `heroSlides[0]` in src/data/home.js. -->
     <link
       rel="preload"
       as="image"
-      href="/media/hero-background-poster.webp"
+      href="/media/farm-marketplace-hero/slide-1.jpg"
       fetchpriority="high"
     />
   </head>

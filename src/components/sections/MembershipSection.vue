@@ -160,7 +160,7 @@ defineProps({
           {{ membership.imageCaption }}
         </p>
         <h2
-          class="mt-4 max-w-3xl font-display text-display font-medium leading-[1.12] tracking-[-0.03em] text-cream-50"
+          class="mt-4 max-w-3xl font-display text-display font-medium leading-[1.12] tracking-[-0.012em] text-cream-50"
         >
           Whoever you are in Zambian agriculture, there is a seat for you at the
           table.
@@ -201,7 +201,7 @@ defineProps({
   font-family: var(--font-display);
   font-size: 1.35rem;
   font-weight: 500;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.008em;
   color: var(--color-forest-950);
 }
 

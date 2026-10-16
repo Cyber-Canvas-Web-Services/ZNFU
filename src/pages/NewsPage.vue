@@ -17,11 +17,10 @@
  * no router, no extra pages and no packages.
  */
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from "vue";
-import { ArrowLeft, ArrowRight, Clock, Search } from "@lucide/vue";
+import { ArrowLeft, ArrowRight, Search } from "@lucide/vue";
 
-import { news } from "@/data/home";
+import { media, news } from "@/data/home";
 
-const CATEGORIES = ["All", "Policy", "Weather", "Markets", "Member affairs"];
 
 /** True below the `lg` breakpoint — picks the narrow article rendering. */
 const isNarrow = ref(false);
@@ -41,107 +40,20 @@ onBeforeUnmount(() => {
   breakpointQuery?.removeEventListener("change", readBreakpoint);
 });
 
-/* =====================================================================
- *  SAMPLE CONTENT - replace before publishing
- * =====================================================================
- *
- *  Six sample stories written so the newsroom reads as a finished layout.
- *  Every story, summary and article paragraph below is placeholder copy:
- *  none of it is a statistic, a forecast, a quotation, a named person or an
- *  official position. Dates reuse the spacing and month already used by the
- *  site’s own sample headlines.
- *
- *  Where a real fact would be needed, the text says [TO CONFIRM] instead.
- * ===================================================================== */
-const SAMPLE_CONTENT = [
-  {
-    slug: "input-costs",
-    category: "Policy",
-    date: "24 September 2026",
-    title: "Union tables input-cost submission ahead of the national budget",
-    summary:
-      "A short summary of the submission and what it asks for on behalf of members. Sample copy — replace with the newsroom’s own text.",
-    paragraphs: [
-      "The Union has prepared a submission setting out members’ views on the cost of farm inputs, ahead of the national budget. Sample copy — replace with the newsroom’s own reporting.",
-      "The submission draws on points raised by members and associations. [TO CONFIRM — the specific measures requested, and which body they were sent to.]",
-      "The Union’s stated role is to promote and safeguard the interests of members, and to speak for agriculture with a single voice.",
-      "Members who want to add to the Union’s position should contact the Secretariat.",
-    ],
-  },
-  {
-    slug: "fisp",
-    category: "Member affairs",
-    date: "18 September 2026",
-    title: "FISP distribution: guidance for District Farmers’ Associations",
-    summary:
-      "What the guidance covers and who it is for. Sample copy — replace with the newsroom’s own text.",
-    paragraphs: [
-      "Guidance has been prepared for District Farmers’ Associations on distribution under the Farmer Input Support Programme. Sample copy — replace with the newsroom’s own reporting.",
-      "It sets out the steps associations are asked to follow, and who to raise problems with. [TO CONFIRM — the exact steps and the responsible office.]",
-      "Associations are the first office most members meet, and are the Union’s main route to smallholders and emerging farmers in a district.",
-      "Questions from members should go to their association in the first instance.",
-    ],
-  },
-  {
-    slug: "planting-dates",
-    category: "Weather",
-    date: "15 September 2026",
-    title: "Planning planting dates around the seasonal forecast",
-    summary:
-      "Why the timing of the first rains matters, and what to weigh up. Sample copy — replace with the newsroom’s own text.",
-    paragraphs: [
-      "The timing of the first rains shapes planting decisions across the season. Sample copy — replace with the newsroom’s own reporting.",
-      "The Union’s guidance has always been to treat a forecast as one input among several. [TO CONFIRM — the Union’s current seasonal guidance.]",
-      "District Farmers’ Associations pass seasonal information on to their members as it reaches them.",
-      "Members should also take advice on variety choice and input timing for their own district.",
-    ],
-  },
-  {
-    slug: "market-prices",
-    category: "Markets",
-    date: "10 September 2026",
-    title: "Reading the weekly price book: what the movers tell you",
-    summary:
-      "How to use the weekly figures when deciding where to sell. Sample copy — replace with the newsroom’s own text.",
-    paragraphs: [
-      "The Union gathers commodity prices from markets across Zambia each week. Sample copy — replace with the newsroom’s own reporting.",
-      "Comparing markets shows where the week’s movers are, and where a load is worth more than it is locally. [TO CONFIRM — the current price book.]",
-      "Paid-up members receive e-Farm Prices for a year as part of membership.",
-      "Figures should be read alongside transport cost — a higher price is not always a better price once haulage is paid for.",
-    ],
-  },
-  {
-    slug: "transport-window",
-    category: "Markets",
-    date: "8 September 2026",
-    title: "Booking haulage early in the harvest window",
-    summary:
-      "Why transport is the pinch point at harvest, and how to plan around it. Sample copy — replace with the newsroom’s own text.",
-    paragraphs: [
-      "Haulage is the tightest part of the harvest window: everybody needs trucks at the same time. Sample copy — replace with the newsroom’s own reporting.",
-      "e-Transport matches members with hauliers and tracks a job from loading to delivery.",
-      "Booking early, and knowing the tonnage and cargo type, makes matching easier. [TO CONFIRM — the booking process.]",
-      "Members who cannot get a match should contact the Secretariat.",
-    ],
-  },
-  {
-    slug: "member-services",
-    category: "Member affairs",
-    date: "5 September 2026",
-    title: "What membership includes: prices, transport and market access",
-    summary:
-      "A short summary of the services open to paid-up members. Sample copy — replace with the newsroom’s own text.",
-    paragraphs: [
-      "Membership is open to any person or organisation in the business of agriculture in Zambia. Sample copy — replace with the newsroom’s own reporting.",
-      "Paid members receive one year of e-Farm Prices and e-Transport, with reminders before expiry.",
-      "ZNFU Market listings are for paid-up sellers only, and a listing leaves the market the day membership lapses.",
-      "The Secretariat can explain the categories and the annual subscription. [TO CONFIRM — the current fees.]",
-    ],
-  },
-];
+import { CATEGORIES, SAMPLE_CONTENT } from "@/data/newsSample";
 
-/** The three views this page can show. */
-const view = ref("featured");
+/** Two views: the front page with its list, and one article. */
+/** A photograph for each story, chosen by its category (the sample stories
+ *  carry no image of their own). */
+const CATEGORY_PHOTOS = {
+  Policy: media.fieldMaizeDemoDay,
+  "Member affairs": media.fieldSoybeanTeam,
+  Weather: media.gardenSunsetIrrigation,
+  Markets: media.producePeppersBaskets,
+};
+const photoFor = (story) => CATEGORY_PHOTOS[story.category] ?? media.growerMaizeField;
+
+const view = ref("list");
 const activeCategory = ref("All");
 const searchTerm = ref("");
 const openStory = ref(null);
@@ -182,19 +94,6 @@ function scrollToTop() {
   });
 }
 
-function showAllNews() {
-  view.value = "all";
-  scrollToTop();
-}
-
-function showFeatured() {
-  view.value = "featured";
-  openStory.value = null;
-  activeCategory.value = "All";
-  searchTerm.value = "";
-  scrollToTop();
-}
-
 function openArticle(story) {
   openStory.value = story;
   view.value = "article";
@@ -203,7 +102,7 @@ function openArticle(story) {
 
 function closeArticle() {
   openStory.value = null;
-  view.value = "all";
+  view.value = "list";
   scrollToTop();
 }
 
@@ -222,724 +121,647 @@ function subscribe() {
 </script>
 
 <template>
-  <div ref="containerEl" id="news" class="news-page-root">
-    <!-- ===================== View 1 — featured story ===================== -->
-    <section
-      v-if="view === 'featured'"
-      class="news-page-band news-page-band--dark"
-    >
-      <div class="news-page-band__inner">
-        <p class="news-page-eyebrow" v-reveal>{{ news.eyebrow }}</p>
-        <h1 class="news-page-title" v-reveal="{ delay: 60 }">
-          {{ news.title }}
-        </h1>
+  <div ref="containerEl" id="news" class="np">
+    <!-- ================= Front page: masthead, lead story, list ================= -->
+    <template v-if="view === 'list'">
+      <section class="np-masthead" aria-labelledby="np-heading">
+        <div class="np-shell np-masthead__grid">
+          <h1 id="np-heading" class="np-masthead__title" v-reveal>News</h1>
+          <p class="np-masthead__lede" v-reveal="{ delay: 80 }">
+            {{ news.title }} {{ news.lede }}
+          </p>
+        </div>
+      </section>
 
-        <header class="news-page-head">
-          <div class="news-page-actions" v-reveal="{ delay: 120 }">
-            <button type="button" class="btn btn--maize" @click="showAllNews">
-              All news
-              <ArrowRight class="news-page-icon" aria-hidden="true" />
-            </button>
-          </div>
-        </header>
-
-        <article class="news-page-feature" v-reveal="{ delay: 160 }">
-          <div class="news-page-feature__row">
-            <div class="news-page-feature__media">
-              <img
-                :src="news.featured.image"
-                :alt="news.featured.imageAlt"
-                class="news-page-feature__image"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-
-            <div class="news-page-feature__text">
-              <p class="news-page-tag">{{ news.featured.category }}</p>
-              <p class="news-page-date">
-                <Clock class="news-page-icon" aria-hidden="true" />
+      <section class="np-lead" aria-label="Lead story">
+        <div class="np-shell">
+          <article class="np-lead__card">
+            <img
+              :src="news.featured.image"
+              :alt="news.featured.imageAlt"
+              class="np-lead__image"
+              width="1200"
+              height="800"
+              fetchpriority="high"
+              decoding="async"
+            />
+            <div class="np-lead__text">
+              <p class="np-meta">
+                <span class="np-meta__category">{{ news.featured.category }}</span>
                 {{ news.featured.date }}
               </p>
-              <h2 class="news-page-feature__headline">
-                {{ news.featured.title }}
-              </h2>
-              <p class="news-page-body">{{ news.featured.excerpt }}</p>
-
+              <h2 class="np-lead__headline">{{ news.featured.title }}</h2>
+              <p class="np-lead__excerpt">{{ news.featured.excerpt }}</p>
               <button
                 type="button"
-                class="btn btn--forest news-page-feature__cta"
+                class="np-link"
                 @click="openArticle(featuredStory)"
               >
-                Read full story
-                <ArrowRight class="news-page-icon" aria-hidden="true" />
+                Read the story
+                <ArrowRight class="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
-          </div>
-        </article>
-      </div>
-    </section>
+          </article>
+        </div>
+      </section>
 
-    <!-- ===================== View 2 — all news ===================== -->
-    <section
-      v-else-if="view === 'all'"
-      class="news-page-band news-page-band--dark"
-    >
-      <div class="news-page-band__inner">
-        <header class="news-page-head">
-          <div>
-            <p class="news-page-eyebrow">{{ news.eyebrow }}</p>
-            <h1 class="news-page-title news-page-title--compact">All news</h1>
-          </div>
-          <button
-            type="button"
-            class="btn btn--ghost"
-            @click="showFeatured"
-          >
-            Back to featured
-          </button>
-        </header>
+      <section class="np-list" aria-labelledby="np-list-heading">
+        <div class="np-shell">
+          <div class="np-tools">
+            <h2 id="np-list-heading" class="np-tools__heading">Latest stories</h2>
 
-        <!-- Filter and search -->
-        <div class="news-page-tools">
-          <div
-            class="news-page-filters"
-            role="group"
-            aria-label="Filter stories by category"
-          >
+            <div class="np-filters" role="group" aria-label="Filter stories by category">
+              <button
+                v-for="category in CATEGORIES"
+                :key="category"
+                type="button"
+                class="np-filter"
+                :class="{ 'np-filter--active': activeCategory === category }"
+                :aria-pressed="activeCategory === category ? 'true' : 'false'"
+                @click="activeCategory = category"
+              >
+                {{ category }}
+              </button>
+            </div>
+
+            <label class="np-search">
+              <Search class="h-4 w-4" aria-hidden="true" />
+              <input
+                v-model="searchTerm"
+                type="search"
+                placeholder="Search stories"
+                aria-label="Search stories"
+              />
+            </label>
+          </div>
+
+          <ul v-if="visibleStories.length" class="np-rows">
+            <li v-for="story in visibleStories" :key="story.slug">
+              <button type="button" class="np-row" @click="openArticle(story)">
+                <span class="np-row__meta">
+                  <span class="np-meta__category">{{ story.category }}</span>
+                  <span>{{ story.date }}</span>
+                </span>
+                <span class="np-row__main">
+                  <span class="np-row__headline">{{ story.title }}</span>
+                  <span class="np-row__summary">{{ story.summary }}</span>
+                </span>
+                <ArrowRight class="np-row__arrow" aria-hidden="true" />
+              </button>
+            </li>
+          </ul>
+
+          <div v-else class="np-empty" role="status">
+            <p>
+              No stories match
+              <template v-if="searchTerm">“{{ searchTerm }}”</template>
+              <template v-else>this category</template>
+              yet.
+            </p>
             <button
-              v-for="category in CATEGORIES"
-              :key="category"
               type="button"
-              class="news-page-filter"
-              :class="{
-                'news-page-filter--active': activeCategory === category,
-              }"
-              :aria-pressed="activeCategory === category ? 'true' : 'false'"
-              @click="activeCategory = category"
+              class="np-link"
+              @click="
+                activeCategory = 'All';
+                searchTerm = '';
+              "
             >
-              {{ category }}
+              Show all stories
             </button>
           </div>
-
-          <label class="news-page-search">
-            <Search class="news-page-icon" aria-hidden="true" />
-            <input
-              v-model="searchTerm"
-              type="search"
-              class="news-page-search__input"
-              placeholder="Search stories"
-              aria-label="Search stories"
-            />
-          </label>
         </div>
+      </section>
+    </template>
 
-        <!-- Ledger list — rules and a category rail, not cards -->
-        <ul v-if="visibleStories.length" class="news-page-ledger">
-          <li
-            v-for="(story, index) in visibleStories"
-            :key="story.slug"
-            class="news-page-ledger__item"
-            v-reveal="{ delay: Math.min(index, 5) * 60 }"
-          >
-            <div class="news-page-ledger__rail">
-              <p class="news-page-tag news-page-tag--ledger">
-                {{ story.category }}
-              </p>
-              <p class="news-page-date">{{ story.date }}</p>
-            </div>
-
-            <div class="news-page-ledger__main">
-              <h2 class="news-page-ledger__headline">{{ story.title }}</h2>
-              <p class="news-page-ledger__summary">{{ story.summary }}</p>
-              <button
-                type="button"
-                class="news-page-readmore"
-                @click="openArticle(story)"
-              >
-                Read full story
-                <ArrowRight class="news-page-icon" aria-hidden="true" />
-              </button>
-            </div>
-          </li>
-        </ul>
-
-        <p v-else class="news-page-empty">
-          No stories match that filter yet. [TO CONFIRM — more sample stories.]
-        </p>
-      </div>
-    </section>
-
-    <!-- ===================== View 3 — one article ===================== -->
-    <section v-else class="news-page-band news-page-band--dark">
-      <div class="news-page-band__inner">
-        <button type="button" class="news-page-back" @click="closeArticle">
-          <ArrowLeft class="news-page-icon" aria-hidden="true" />
-          Back to all news
+    <!-- ================= One article ================= -->
+    <section v-else class="np-article-wrap">
+      <div class="np-shell">
+        <button type="button" class="np-back" @click="closeArticle">
+          <ArrowLeft class="h-4 w-4" aria-hidden="true" />
+          All news
         </button>
 
-        <article v-if="openStory" class="news-page-article">
-          <p class="news-page-tag">{{ openStory.category }}</p>
-          <p class="news-page-date">
-            <Clock class="news-page-icon" aria-hidden="true" />
+        <article v-if="openStory" class="np-article">
+          <p class="np-meta">
+            <span class="np-meta__category">{{ openStory.category }}</span>
             {{ openStory.date }}
           </p>
-          <h1 class="news-page-article__headline">{{ openStory.title }}</h1>
+          <h1 class="np-article__headline">{{ openStory.title }}</h1>
 
-          <!-- Wide: one element per paragraph. -->
-          <div v-if="!isNarrow" class="news-page-article__body">
-            <p
-              v-for="(paragraph, index) in openStory.paragraphs"
-              :key="index"
-              class="news-page-article__paragraph"
-            >
-              {{ paragraph }}
+          <img
+            class="np-article__photo"
+            :src="photoFor(openStory)"
+            alt=""
+            width="1400"
+            height="560"
+            decoding="async"
+          />
+
+          <div class="np-article__grid">
+            <!-- Wide: one element per paragraph. -->
+            <div v-if="!isNarrow" class="np-article__body">
+              <p v-for="(paragraph, index) in openStory.paragraphs" :key="index">
+                {{ paragraph }}
+              </p>
+            </div>
+
+            <!-- Narrow: one element, so no overflow rule is needed. -->
+            <p v-else class="np-article__body">
+              <template v-for="(paragraph, index) in openStory.paragraphs" :key="index">
+                <br v-if="index > 0" />
+                {{ paragraph }}
+              </template>
             </p>
-          </div>
 
-          <!-- Narrow: one element, so no overflow rule is needed. -->
-          <p v-else class="news-page-article__paragraph">
-            <template
-              v-for="(paragraph, index) in openStory.paragraphs"
-              :key="index"
-            >
-              <br v-if="index > 0" />
-              {{ paragraph }}
-            </template>
-          </p>
-
-          <div class="news-page-related">
-            <h2 class="news-page-related__heading">Related stories</h2>
-            <ul class="news-page-related__list">
-              <li v-for="story in relatedStories" :key="story.slug">
-                <button
-                  type="button"
-                  class="news-page-related__link"
-                  @click="showRelated(story)"
-                >
-                  <span class="news-page-related__category">{{
-                    story.category
-                  }}</span>
-                  <span class="news-page-related__title">{{
-                    story.title
-                  }}</span>
-                  <ArrowRight class="news-page-icon" aria-hidden="true" />
-                </button>
-              </li>
-            </ul>
+            <aside class="np-related" aria-labelledby="np-related-heading">
+              <h2 id="np-related-heading">Keep reading</h2>
+              <ul>
+                <li v-for="story in relatedStories" :key="story.slug">
+                  <button type="button" class="np-row np-row--compact" @click="showRelated(story)">
+                    <span class="np-row__meta">
+                      <span class="np-meta__category">{{ story.category }}</span>
+                      <span>{{ story.date }}</span>
+                    </span>
+                    <span class="np-row__headline">{{ story.title }}</span>
+                    <ArrowRight class="np-row__arrow" aria-hidden="true" />
+                  </button>
+                </li>
+              </ul>
+            </aside>
           </div>
         </article>
       </div>
     </section>
 
-    <!-- ===================== Newsletter strip ===================== -->
-    <section class="news-page-band news-page-band--strip">
-      <div class="news-page-band__inner">
-        <div class="news-page-newsletter">
-          <div>
-            <p class="news-page-newsletter__title">Stay informed</p>
-            <p class="news-page-newsletter__body">
-              {{ news.fridayBrief.body }}
-            </p>
-          </div>
-
-          <form class="news-page-newsletter__form" @submit.prevent="subscribe">
-            <input
-              v-model="newsletterEmail"
-              type="email"
-              class="field field--on-light"
-              placeholder="you@farm.co.zm"
-              aria-label="Email address"
-              required
-            />
-            <button type="submit" class="btn btn--maize">
-              {{ news.fridayBrief.cta }}
-            </button>
-          </form>
-
-          <p
-            v-if="newsletterSent"
-            class="news-page-newsletter__thanks"
-            role="status"
-          >
-            Thank you — this is a preview, so nothing was sent.
-          </p>
+    <!-- ================= Newsletter ================= -->
+    <section class="np-newsletter" aria-labelledby="np-news-heading">
+      <div class="np-shell np-newsletter__grid">
+        <div>
+          <h2 id="np-news-heading">{{ news.fridayBrief.label }}</h2>
+          <p>{{ news.fridayBrief.body }}</p>
         </div>
+
+        <form class="np-newsletter__form" @submit.prevent="subscribe">
+          <label for="np-email" class="sr-only">Email address</label>
+          <input
+            id="np-email"
+            v-model="newsletterEmail"
+            type="email"
+            placeholder="you@farm.co.zm"
+            required
+          />
+          <button type="submit">{{ news.fridayBrief.cta }}</button>
+        </form>
+        <p v-if="newsletterSent" class="np-newsletter__thanks" role="status">
+          Thank you — this is a preview, so nothing was sent.
+        </p>
       </div>
     </section>
   </div>
 </template>
 
 <style scoped>
-/**
- * The newsroom uses a ledger, not cards: hairline rules, a category rail and
- * a serif-free editorial rhythm, so it reads differently from the card grids
- * on About, Systems and Membership.
- *
- * The two panels this page replaces were `position: sticky` at desktop widths
- * — but note those panels are gone now; this page draws its own bands. The
- * bands still carry their own stacking level so they behave identically to the
- * other pages if a pinned panel is ever put back above them, and an opaque
- * background so nothing shows through the text.
- *
- * `position` and `z-index` are confined to `.news-page-band`. Every band is
- * laid out with padding, borders, grid and type alone — no height, no overflow
- * and no transform — so no section can be clipped.
- */
-/* The root keeps a real box so the skip link’s `#news` target stays a
-   scrollable, focusable landmark. */
-.news-page-root {
-  background-color: var(--color-cream-50);
-}
-
-.news-page-band {
+.np {
   position: relative;
   z-index: 1;
-  background-color: var(--color-cream-50);
-  padding-top: 4rem;
-  padding-bottom: 4rem;
-}
-
-.news-page-band--dark {
-  background-color: var(--color-forest-950);
-}
-
-.news-page-band--strip {
-  background-color: var(--color-cream-100);
-  padding-top: 3rem;
-  padding-bottom: 3rem;
-}
-
-.news-page-band__inner {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 72rem;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-
-@media (min-width: 40rem) {
-  .news-page-band__inner {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-}
-
-@media (min-width: 64rem) {
-  .news-page-band {
-    padding-top: 5.5rem;
-    padding-bottom: 5.5rem;
-  }
-}
-
-/* ---- Shared type ---- */
-.news-page-eyebrow {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--color-maize-400);
-}
-
-.news-page-title {
-  margin-top: 1rem;
-  font-family: var(--font-display);
-  font-size: var(--text-display);
-  font-weight: 500;
-  line-height: 1.06;
-  letter-spacing: -0.03em;
-  color: var(--color-cream-50);
-}
-
-.news-page-title--compact {
-  font-size: var(--text-display-sm);
-}
-
-.news-page-tag {
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-maize-400);
-}
-
-.news-page-tag--ledger {
-  color: var(--color-forest-600);
-}
-
-.news-page-date {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-top: 0.5rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--color-cream-200) 60%, transparent);
-}
-
-.news-page-body {
-  margin-top: 1rem;
-  max-width: 40rem;
-  font-size: 1rem;
-  line-height: 1.75;
-  color: color-mix(in oklab, var(--color-cream-200) 78%, transparent);
-}
-
-.news-page-icon {
-  width: 1rem;
-  height: 1rem;
-  flex-shrink: 0;
-}
-
-
-/* ---- Header row ---- */
-.news-page-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1.5rem;
-  margin-top: 2.5rem;
-}
-
-.news-page-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-/* Outline button readable on the dark band is now the shared `.btn--ghost`,
-   so the page no longer needs its own variant. */
-
-/* ---- Featured ---- */
-.news-page-feature {
-  margin-top: 2.5rem;
-  border-top: 1px solid
-    color-mix(in oklab, var(--color-cream-200) 22%, transparent);
-  padding-top: 2.5rem;
-}
-
-.news-page-feature__row {
-  display: grid;
-  gap: 2rem;
-}
-
-@media (min-width: 64rem) {
-  .news-page-feature__row {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: 3.5rem;
-    align-items: center;
-  }
-}
-
-.news-page-feature__image {
-  width: 100%;
-  /* 5px, matching every other card on the site. */
-  border-radius: 5px;
-  object-fit: cover;
-  aspect-ratio: 16 / 10;
-}
-
-.news-page-feature__headline {
-  margin-top: 1rem;
-  font-family: var(--font-display);
-  font-size: var(--text-display);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  color: var(--color-cream-50);
-}
-
-.news-page-feature__cta {
-  margin-top: 1.75rem;
-}
-
-/* ---- Filter and search ---- */
-.news-page-tools {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.25rem;
-  margin-top: 2.5rem;
-  border-top: 1px solid
-    color-mix(in oklab, var(--color-cream-200) 22%, transparent);
-  border-bottom: 1px solid
-    color-mix(in oklab, var(--color-cream-200) 22%, transparent);
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
-}
-
-.news-page-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.news-page-filter {
-  border-color: color-mix(in oklab, var(--color-cream-200) 30%, transparent);
-  font-weight: 600;
-  color: color-mix(in oklab, var(--color-cream-200) 75%, transparent);
-  cursor: pointer;
-  transition:
-    background-color 0.25s ease,
-    color 0.25s ease,
-    border-color 0.25s ease;
-}
-
-.news-page-filter:hover {
-  background-color: rgb(255 255 255 / 0.08);
-  color: var(--color-cream-50);
-}
-
-.news-page-filter--active,
-.news-page-filter--active:hover {
-  background-color: var(--color-maize-400);
-  border-color: var(--color-maize-400);
+  overflow: clip;
+  background: var(--color-cream-50);
   color: var(--color-forest-950);
 }
 
-.news-page-search {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  border-color: color-mix(in oklab, var(--color-cream-200) 30%, transparent);
-  color: color-mix(in oklab, var(--color-cream-200) 70%, transparent);
+.np-shell {
+  width: 100%;
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding-inline: var(--shell-pad);
 }
 
-/* The container above is the field: it owns the pill, the border and the
-   padding. The input inside it is just the text slot. */
-.news-page-search__input {
-  width: 11rem;
-  border: 0;
-  padding: 0;
-  min-height: 0;
-  background-color: transparent;
-  font-size: inherit;
+.np-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.85rem;
+  color: rgb(19 24 19 / 0.6);
+  font-size: 0.85rem;
+}
+
+.np-meta__category {
+  color: var(--color-forest-600);
+  font-weight: 650;
+}
+
+.np-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--color-forest-950);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+  cursor: pointer;
+}
+
+.np-link:focus-visible,
+.np-filter:focus-visible,
+.np-row:focus-visible,
+.np-back:focus-visible,
+.np-search:focus-within,
+.np-newsletter input:focus-visible,
+.np-newsletter button:focus-visible {
+  outline: 3px solid var(--color-forest-600);
+  outline-offset: 3px;
+}
+
+/* ---- Masthead ---- */
+.np-masthead {
+  padding-block: clamp(5.5rem, 6.5vw, 6.25rem) var(--space-section);
+}
+
+/* Title with its description directly beneath, as on every other page. */
+.np-masthead__grid {
+  display: block;
+}
+
+.np-masthead__title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--page-title);
+  letter-spacing: var(--page-title-tracking);
+  line-height: var(--page-title-leading);
+}
+
+.np-masthead__lede {
+  margin-top: 1rem;
+  color: rgb(19 24 19 / 0.72);
+  font-size: var(--page-lede);
+  line-height: var(--page-lede-leading);
+  max-width: var(--page-lede-measure);
+}
+
+/* ---- Lead story ---- */
+.np-lead {
+  padding-bottom: clamp(2rem, 3.5vw, 3rem);
+}
+
+.np-lead__card {
+  display: grid;
+  gap: 1.25rem;
+  align-items: center;
+}
+
+.np-lead__image {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.np-lead__headline {
+  margin-top: 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.2vw, 1.875rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.np-lead__excerpt {
+  max-width: 34rem;
+  margin: 0.85rem 0 1.1rem;
+  color: rgb(19 24 19 / 0.72);
+  font-size: var(--page-lede);
+  line-height: var(--page-lede-leading);
+}
+
+/* ---- List ---- */
+.np-list {
+  padding-block: var(--space-section) var(--space-section);
+  border-top: 1px solid rgb(4 32 21 / 0.2);
+}
+
+.np-tools {
+  display: grid;
+  gap: 0.9rem;
+  align-items: center;
+}
+
+.np-tools__heading {
+  font-family: var(--font-display);
+  font-size: var(--section-title);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+}
+
+.np-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.np-filter {
+  padding: 0.45rem 0.95rem;
+  border: 1px solid rgb(4 32 21 / 0.22);
+  border-radius: 9999px;
+  font-size: 0.86rem;
+  font-weight: 560;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.np-filter:hover {
+  background: rgb(4 32 21 / 0.06);
+}
+
+.np-filter--active {
+  border-color: var(--color-forest-950);
+  background: var(--color-forest-950);
   color: var(--color-cream-50);
 }
 
-.news-page-search__input:focus {
+.np-search {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid rgb(4 32 21 / 0.22);
+  border-radius: 9999px;
+  background: #fff;
+}
+
+.np-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font-size: 0.9rem;
   outline: none;
 }
 
-.news-page-search__input::placeholder {
-  color: color-mix(in oklab, var(--color-cream-200) 45%, transparent);
-}
-
-/* ---- Ledger list ---- */
-.news-page-ledger {
-  margin-top: 0.5rem;
+.np-rows {
+  margin: 1rem 0 0;
   padding: 0;
   list-style: none;
 }
 
-.news-page-ledger__item {
+.np-row {
   display: grid;
-  gap: 0.75rem;
-  border-bottom: 1px solid
-    color-mix(in oklab, var(--color-cream-200) 16%, transparent);
-  padding-top: 2rem;
-  padding-bottom: 2rem;
+  width: 100%;
+  gap: 0.4rem;
+  align-items: start;
+  padding-block: 1.1rem;
+  border-top: 1px solid rgb(4 32 21 / 0.14);
+  text-align: left;
+  cursor: pointer;
 }
 
-@media (min-width: 48rem) {
-  .news-page-ledger__item {
-    grid-template-columns: 12rem minmax(0, 1fr);
-    gap: 2.5rem;
-  }
+.np-rows li:last-child .np-row {
+  border-bottom: 1px solid rgb(4 32 21 / 0.14);
 }
 
-.news-page-ledger__rail {
+.np-row__meta {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.8rem;
+  color: rgb(19 24 19 / 0.6);
+  font-size: 0.85rem;
+}
+
+.np-row__main {
+  display: grid;
   gap: 0.35rem;
 }
 
-.news-page-ledger__headline {
+.np-row__headline {
   font-family: var(--font-display);
-  font-size: var(--text-display-sm);
+  font-size: clamp(1.15rem, 1.5vw, 1.35rem);
   font-weight: 500;
-  line-height: 1.25;
-  letter-spacing: -0.025em;
-  color: var(--color-cream-50);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
-.news-page-ledger__summary {
-  margin-top: 0.7rem;
-  max-width: 44rem;
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: color-mix(in oklab, var(--color-cream-200) 68%, transparent);
+.np-row__summary {
+  max-width: 42rem;
+  color: rgb(19 24 19 / 0.65);
+  font-size: var(--page-lede);
+  line-height: 1.55;
 }
 
-.news-page-readmore {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  margin-top: 1.1rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-maize-400);
-  cursor: pointer;
-  transition: gap 0.25s ease;
+.np-row__arrow {
+  display: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-forest-600);
+  transition: transform 180ms ease;
 }
 
-.news-page-readmore:hover {
+.np-row:hover .np-row__headline {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.np-row:hover .np-row__arrow {
+  transform: translateX(4px);
+}
+
+.np-empty {
+  display: grid;
   gap: 0.75rem;
-}
-
-.news-page-empty {
-  margin-top: 2.5rem;
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: color-mix(in oklab, var(--color-cream-200) 60%, transparent);
+  justify-items: start;
+  margin-top: 1.25rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid rgb(4 32 21 / 0.14);
 }
 
 /* ---- Article ---- */
-.news-page-back {
+.np-article-wrap {
+  padding-block: clamp(5.5rem, 6.5vw, 6.25rem) var(--space-section);
+}
+
+.np-back {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--color-maize-400);
+  color: var(--color-forest-600);
+  font-weight: 650;
   cursor: pointer;
 }
 
-.news-page-article {
-  margin-top: 2.5rem;
-  border-top: 1px solid
-    color-mix(in oklab, var(--color-cream-200) 22%, transparent);
-  padding-top: 2.5rem;
+.np-article {
+  margin: 1.25rem 0 0;
 }
 
-.news-page-article__headline {
-  margin-top: 1rem;
-  max-width: 46rem;
+.np-article__headline {
+  max-width: 48rem;
+  margin-top: 0.6rem;
   font-family: var(--font-display);
-  font-size: var(--text-display);
+  font-size: var(--page-title);
   font-weight: 500;
-  line-height: 1.12;
-  letter-spacing: -0.03em;
-  color: var(--color-cream-50);
+  letter-spacing: var(--page-title-tracking);
+  line-height: var(--page-title-leading);
+  text-wrap: pretty;
 }
 
-.news-page-article__paragraph {
-  margin-top: 1.35rem;
-  max-width: 44rem;
-  font-size: 1.02rem;
-  line-height: 1.8;
-  color: color-mix(in oklab, var(--color-cream-200) 78%, transparent);
-}
-
-.news-page-related {
-  margin-top: 3rem;
-  border-top: 1px solid
-    color-mix(in oklab, var(--color-cream-200) 22%, transparent);
-  padding-top: 2rem;
-}
-
-.news-page-related__heading {
-  font-family: var(--font-display);
-  font-size: 1.15rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--color-cream-50);
-}
-
-.news-page-related__list {
-  display: grid;
-  gap: 1rem;
+.np-article__photo {
+  width: 100%;
+  height: clamp(12rem, 24vw, 20rem);
   margin-top: 1.25rem;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+.np-article__grid {
+  display: grid;
+  gap: 1.5rem var(--space-gap);
+  margin-top: 1.5rem;
+}
+
+.np-article__body {
+  max-width: 44rem;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.np-article__body p + p {
+  margin-top: 1rem;
+}
+
+.np-related h2 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.np-related ul {
+  margin: 0.5rem 0 0;
   padding: 0;
   list-style: none;
 }
 
-@media (min-width: 48rem) {
-  .news-page-related__list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.np-row--compact {
+  grid-template-columns: 1fr auto;
 }
 
-.news-page-related__link {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.25rem;
-  width: 100%;
-  border: 1px solid color-mix(in oklab, var(--color-cream-200) 20%, transparent);
-  /* 5px, matching every other card on the site. */
-  border-radius: 5px;
-  padding: 1.1rem 1.25rem;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    background-color 0.25s ease,
-    border-color 0.25s ease;
+.np-row--compact .np-row__meta {
+  grid-column: 1 / -1;
 }
 
-.news-page-related__link:hover {
-  background-color: rgb(255 255 255 / 0.06);
-  border-color: color-mix(in oklab, var(--color-maize-400) 45%, transparent);
-}
-
-.news-page-related__category {
+.np-row--compact .np-row__arrow {
   display: block;
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-maize-400);
 }
 
-.news-page-related__title {
-  display: block;
-  margin-top: 0.4rem;
-  font-family: var(--font-display);
-  font-size: 0.98rem;
-  font-weight: 500;
-  line-height: 1.35;
-  letter-spacing: -0.02em;
+/* ---- Newsletter ---- */
+.np-newsletter {
+  padding-block: var(--space-section);
+  background: var(--color-forest-900);
   color: var(--color-cream-50);
 }
 
-/* ---- Newsletter strip ---- */
-.news-page-newsletter {
-  display: flex;
-  flex-wrap: wrap;
+.np-newsletter__grid {
+  display: grid;
+  gap: 1.25rem;
   align-items: center;
-  justify-content: space-between;
-  gap: 1.5rem;
 }
 
-.news-page-newsletter__title {
+.np-newsletter h2 {
   font-family: var(--font-display);
-  font-size: 1.35rem;
+  font-size: var(--section-title);
   font-weight: 500;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
+}
+
+.np-newsletter p {
+  max-width: 30rem;
+  margin-top: 0.5rem;
+  color: rgb(251 249 243 / 0.72);
+  line-height: 1.6;
+}
+
+.np-newsletter__form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.np-newsletter input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.8rem 1.1rem;
+  border-radius: 9999px;
+  border: 0;
+  background: var(--color-cream-50);
   color: var(--color-forest-950);
 }
 
-.news-page-newsletter__body {
-  margin-top: 0.5rem;
-  max-width: 34rem;
-  font-size: 0.92rem;
-  line-height: 1.65;
-  color: color-mix(in oklab, var(--color-ink-900) 65%, transparent);
+.np-newsletter button {
+  padding-inline: 1.4rem;
+  border-radius: 9999px;
+  background: var(--color-maize-400);
+  color: var(--color-forest-950);
+  font-weight: 650;
+  cursor: pointer;
 }
 
-.news-page-newsletter__form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+.np-newsletter button:hover {
+  background: var(--color-maize-300);
 }
 
-.news-page-newsletter__thanks {
-  width: 100%;
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: var(--color-forest-700);
+.np-newsletter__thanks {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+@media (min-width: 64rem) {
+  .np-article__grid {
+    grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .np-related {
+    position: sticky;
+    top: 6.5rem;
+  }
+}
+
+@media (min-width: 48rem) {
+  .np-lead__card {
+    grid-template-columns: 1.3fr 1fr;
+    gap: var(--space-gap);
+  }
+
+  /* The photo takes its height from the text beside it, so it can never be
+     taller than the copy and leave empty space around it. */
+  .np-lead__image {
+    align-self: stretch;
+    height: 100%;
+    min-height: 12rem;
+    aspect-ratio: auto;
+    contain: size;
+  }
+
+  .np-tools {
+    grid-template-columns: auto 1fr minmax(13rem, 17rem);
+    gap: 1.5rem;
+  }
+
+  .np-row {
+    grid-template-columns: 11rem minmax(0, 1fr) auto;
+    gap: 1.5rem;
+  }
+
+  .np-row__meta {
+    flex-direction: column;
+  }
+
+  .np-row__arrow {
+    display: block;
+  }
+
+  .np-row--compact {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .np-newsletter__grid {
+    grid-template-columns: 1fr minmax(18rem, 26rem);
+    gap: 2rem;
+  }
 }
 </style>

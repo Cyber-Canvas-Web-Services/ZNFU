@@ -6,549 +6,522 @@
  * screen; it and its effects are untouched. Below it are the About-specific
  * sections, which replace the band that used to repeat the home page.
  */
-import { ArrowRight, User } from "@lucide/vue";
+import { onBeforeUnmount, onMounted, ref } from "vue";
 
 import FieldBand from "@/components/sections/FieldBand.vue";
-import { purposeVision } from "@/data/home";
+import { partners as partnerData, purposeVision } from "@/data/home";
 
-/* =====================================================================
- *  SAMPLE CONTENT — REPLACE BEFORE PUBLISHING
- * =====================================================================
- *
- *  Every string below is placeholder copy, written so the page reads as a
- *  finished layout for client review. None of it was supplied by the Union,
- *  and none of it is a real name, date, figure or statistic.
- *
- *  To go live, swap each entry for approved wording and delete this note.
- *  Nothing else on the page needs to change — the sections read straight
- *  from this object.
- * ===================================================================== */
-const SAMPLE_CONTENT = {
-  /** Two generic paragraphs. No dates and no claims. */
-  storyParagraphs: [
-    "The Union began with a small group of farmers who saw that their interests would be served better together than apart. From those early meetings it grew into a national body speaking for members across the country.",
-    "Today the Union exists to give its members a single, strong voice — promoting and safeguarding their interests, and working towards sustainable agriculture for the benefit of members and the wider economy.",
-  ],
-
-  values: [
-    {
-      name: "Integrity",
-      description: "We act honestly and in the interests of our members.",
-    },
-    {
-      name: "Collaboration",
-      description: "We work together with members, partners and government.",
-    },
-    {
-      name: "Sustainability",
-      description:
-        "We plan for the long-term health of the land and the sector.",
-    },
-  ],
-
-  milestones: [
-    {
-      year: "Year 1",
-      title: "Milestone heading",
-      description: "A short line describing what happened at this stage.",
-    },
-    {
-      year: "Year 2",
-      title: "Milestone heading",
-      description: "A short line describing what happened at this stage.",
-    },
-    {
-      year: "Year 3",
-      title: "Milestone heading",
-      description: "A short line describing what happened at this stage.",
-    },
-    {
-      year: "Year 4",
-      title: "Milestone heading",
-      description: "A short line describing what happened at this stage.",
-    },
-  ],
-
-  leadership: [
-    { name: "Full Name", role: "Position" },
-    { name: "Full Name", role: "Position" },
-    { name: "Full Name", role: "Position" },
-    { name: "Full Name", role: "Position" },
-  ],
-
-  partners: {
-    heading: "Our Partners",
-    names: [
-      "Partner Name",
-      "Partner Name",
-      "Partner Name",
-      "Partner Name",
-      "Partner Name",
-      "Partner Name",
-    ],
-  },
-
-  banner: {
-    title: "Get in touch with the Union",
-    text: "For membership enquiries, partnerships or anything else, the Secretariat is glad to help.",
-    ctaLabel: "Contact us",
-    ctaHref: "/contact",
-  },
-};
+import { SAMPLE_CONTENT } from "@/data/about";
 
 /* The mission statement is Secretariat-supplied, and the vision is the site’s
    existing wording. Both are real, so they stay outside SAMPLE_CONTENT. */
 const mission = purposeVision.blocks[0].body;
 const vision = purposeVision.blocks[1].body;
+
+/* Working-with carousel: the track slides continuously and each logo lights
+   up to full colour as it crosses the centre. The list is rendered twice so
+   the wrap-around is seamless. */
+const colorLogo = (src) => src?.replace(/\.webp$/, "-color.webp");
+const partnerItems = partnerData.items.map((p) => ({ ...p, logo: colorLogo(p.logo) }));
+const loopedPartners = [...partnerItems, ...partnerItems];
+const activePerson = ref(0);
+
+const marquee = ref(null);
+const track = ref(null);
+const SPEED = 45; // px per second
+let frame = 0;
+let offset = 0;
+let last = 0;
+let paused = false;
+let reduceMotion = false;
+
+function render() {
+  const box = marquee.value;
+  const list = track.value;
+  if (!box || !list) return;
+  const setWidth = list.scrollWidth / 2;
+  const center = box.clientWidth / 2;
+  list.style.transform = `translate3d(${-offset}px,0,0)`;
+  for (const el of list.children) {
+    const x = el.offsetLeft + el.offsetWidth / 2 - offset;
+    const focus = Math.max(0, 1 - Math.abs(x - center) / (el.offsetWidth * 1.25));
+    el.style.setProperty("--focus", focus.toFixed(3));
+  }
+  return setWidth;
+}
+
+function tick(now) {
+  const dt = Math.min(now - last, 64) / 1000;
+  last = now;
+  const setWidth = render();
+  if (!paused && setWidth) offset = (offset + SPEED * dt) % setWidth;
+  frame = requestAnimationFrame(tick);
+}
+
+onMounted(() => {
+  reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (reduceMotion) {
+    track.value?.style.setProperty("--focus", "1");
+    for (const el of track.value?.children ?? []) el.style.setProperty("--focus", "1");
+    return;
+  }
+  const box = marquee.value;
+  box.addEventListener("pointerenter", () => (paused = true));
+  box.addEventListener("pointerleave", () => (paused = false));
+  last = performance.now();
+  frame = requestAnimationFrame(tick);
+});
+
+onBeforeUnmount(() => {
+  cancelAnimationFrame(frame);
+});
 </script>
 
 <template>
-  <FieldBand standalone />
-
-  <!-- 1 — Our Story -->
-  <section class="about-band">
-    <div class="about-band__inner">
-      <p class="about-story__eyebrow" v-reveal>About the Union</p>
-      <h1 class="about-story__heading" v-reveal="{ delay: 60 }">Our Story</h1>
-      <p class="about-story__lede" v-reveal="{ delay: 110 }">
-        The Zambia National Farmers’ Union was founded in 1905 and is based in
-        Lusaka. It is a non-political, member-led union.
-      </p>
-      <p
-        v-for="(paragraph, index) in SAMPLE_CONTENT.storyParagraphs"
-        :key="index"
-        class="about-story__paragraph"
-        v-reveal="{ delay: 160 + index * 60 }"
-      >
-        {{ paragraph }}
-      </p>
-    </div>
-  </section>
-
-  <!-- 2 — Mission, Vision and Values -->
-  <section class="about-band about-band--cream">
-    <div class="about-band__inner">
-      <h2 class="about-band__heading" v-reveal>Mission, Vision and Values</h2>
-
-      <div class="about-mvv">
-        <article class="about-mvv__card" v-reveal="{ delay: 120 }">
-          <p class="about-mvv__label">Mission</p>
-          <p class="about-mvv__body">{{ mission }}</p>
-        </article>
-
-        <article class="about-mvv__card" v-reveal="{ delay: 180 }">
-          <p class="about-mvv__label">Vision</p>
-          <p class="about-mvv__body">{{ vision }}</p>
-        </article>
+  <div class="ab">
+    <!-- 1 — Opening statement -->
+    <section id="about" class="ab-hero" aria-labelledby="ab-heading">
+      <div class="ab-shell">
+        <h1 id="ab-heading" class="ab-hero__title" v-reveal>Our Story</h1>
+        <p class="ab-hero__lede" v-reveal="{ delay: 80 }">
+          The Zambia National Farmers’ Union was founded in 1905 and is based in
+          Lusaka. It is a non-political, member-led union.
+        </p>
       </div>
+    </section>
 
-      <h3 class="about-mvv__values-heading" v-reveal>Values</h3>
-      <ul class="about-mvv__values">
-        <li
-          v-for="(value, index) in SAMPLE_CONTENT.values"
-          :key="value.name"
-          class="about-mvv__value"
-          v-reveal="{ delay: 120 + index * 70 }"
-        >
-          <p class="about-mvv__value-name">{{ value.name }}</p>
-          <p class="about-mvv__value-text">{{ value.description }}</p>
-        </li>
-      </ul>
+    <!-- 2 — Footage with the mission and vision -->
+    <div id="about-purpose" class="ab-footage">
+      <FieldBand standalone :mission="mission" :vision="vision" />
     </div>
-  </section>
 
-  <!-- 3 — Milestones as a vertical timeline -->
-  <section class="about-band">
-    <div class="about-band__inner">
-      <h2 class="about-band__heading" v-reveal>Milestones</h2>
+    <!-- 3 — Chapters: a pinned index beside the scrolling content -->
+    <div class="ab-shell ab-chapters">
+      <div class="ab-content">
+        <section id="ab-story" class="ab-block" aria-labelledby="ab-story-heading">
+          <h2 id="ab-story-heading" class="ab-heading">Where we come from</h2>
+          <div class="ab-story">
+            <p v-for="(paragraph, index) in SAMPLE_CONTENT.storyParagraphs" :key="index">
+              {{ paragraph }}
+            </p>
+          </div>
+        </section>
 
-      <ol class="about-timeline">
-        <li
-          v-for="(milestone, index) in SAMPLE_CONTENT.milestones"
-          :key="index"
-          class="about-timeline__item"
-          v-reveal="{ delay: 120 + index * 70 }"
-        >
-          <p class="about-timeline__year">{{ milestone.year }}</p>
-          <h3 class="about-timeline__title">{{ milestone.title }}</h3>
-          <p class="about-timeline__text">{{ milestone.description }}</p>
-        </li>
-      </ol>
+        <section id="ab-values" class="ab-block" aria-labelledby="ab-values-heading">
+          <h2 id="ab-values-heading" class="ab-heading">What we stand for</h2>
+          <ul class="ab-values">
+            <li v-for="value in SAMPLE_CONTENT.values" :key="value.name">
+              <p class="ab-values__name">{{ value.name }}</p>
+              <p class="ab-values__text">{{ value.description }}</p>
+            </li>
+          </ul>
+        </section>
+
+        <section id="ab-journey" class="ab-block" aria-labelledby="ab-journey-heading">
+          <h2 id="ab-journey-heading" class="ab-heading">Our journey</h2>
+          <ol class="ab-timeline">
+            <li v-for="milestone in SAMPLE_CONTENT.milestones" :key="milestone.year">
+              <p class="ab-timeline__year">{{ milestone.year }}</p>
+              <div>
+                <h3>{{ milestone.title }}</h3>
+                <p>{{ milestone.description }}</p>
+              </div>
+            </li>
+          </ol>
+        </section>
+
+        <section id="ab-people" class="ab-block" aria-labelledby="ab-people-heading">
+          <h2 id="ab-people-heading" class="ab-heading">The people serving the Union</h2>
+          <div class="ab-people">
+            <ul class="ab-people__list">
+              <li v-for="(person, index) in SAMPLE_CONTENT.leadership" :key="person.name">
+                <button
+                  type="button"
+                  :class="{ 'is-active': index === activePerson }"
+                  :aria-pressed="index === activePerson"
+                  @mouseenter="activePerson = index"
+                  @focus="activePerson = index"
+                  @click="activePerson = index"
+                >
+                  <span class="ab-people__name">{{ person.name }}</span>
+                  <span class="ab-people__role">{{ person.role }}</span>
+                </button>
+              </li>
+            </ul>
+
+            <div class="ab-people__photo" aria-hidden="true">
+              <img
+                v-for="(person, index) in SAMPLE_CONTENT.leadership"
+                :key="person.name"
+                :class="{ 'is-on': index === activePerson }"
+                :src="person.image"
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
-  </section>
 
-  <!-- 4 — Leadership as a team grid -->
-  <section class="about-band about-band--cream">
-    <div class="about-band__inner">
-      <h2 class="about-band__heading" v-reveal>Leadership</h2>
-
-      <ul class="about-leadership">
-        <li
-          v-for="(person, index) in SAMPLE_CONTENT.leadership"
-          :key="index"
-          class="about-leadership__card"
-          v-reveal="{ delay: 120 + index * 70 }"
-        >
-          <span
-            class="grid h-12 w-12 place-items-center rounded-full bg-maize-400 text-forest-950 shadow-lg"
-          >
-            <User class="h-5 w-5" aria-hidden="true" />
-          </span>
-          <p class="about-leadership__name">{{ person.name }}</p>
-          <p class="about-leadership__role">{{ person.role }}</p>
-        </li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- 5 — Partners as a row -->
-  <section class="about-band">
-    <div class="about-band__inner">
-      <h2 class="about-band__heading" v-reveal>
-        {{ SAMPLE_CONTENT.partners.heading }}
-      </h2>
-
-      <ul class="about-partners" v-reveal="{ delay: 120 }">
-        <li
-          v-for="(partner, index) in SAMPLE_CONTENT.partners.names"
-          :key="index"
-          class="about-partners__item"
-        >
-          {{ partner }}
-        </li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- 6 — Closing banner -->
-  <section class="about-band">
-    <div class="about-band__inner">
-      <div class="about-banner" v-reveal>
-        <div>
-          <p class="about-banner__title">{{ SAMPLE_CONTENT.banner.title }}</p>
-          <p class="about-banner__text">{{ SAMPLE_CONTENT.banner.text }}</p>
+    <!-- 4 — Partners -->
+    <section class="ab-partners" aria-labelledby="ab-partners-heading">
+      <div class="ab-shell">
+        <h2 id="ab-partners-heading" class="ab-partners__heading">
+          {{ partnerData.title }}
+        </h2>
+        <div ref="marquee" class="ab-marquee">
+          <ul ref="track" class="ab-marquee__track">
+            <li
+              v-for="(partner, index) in loopedPartners"
+              :key="index"
+              class="ab-marquee__item"
+              :aria-hidden="index >= partnerData.items.length || undefined"
+            >
+              <img v-if="partner.logo" :src="partner.logo" :alt="partner.name" />
+              <span v-else>{{ partner.name }}</span>
+            </li>
+          </ul>
         </div>
-
-        <a
-          :href="SAMPLE_CONTENT.banner.ctaHref"
-          class="btn btn--maize about-banner__cta"
-        >
-          {{ SAMPLE_CONTENT.banner.ctaLabel }}
-          <ArrowRight class="h-4 w-4" aria-hidden="true" />
-        </a>
       </div>
-    </div>
-  </section>
+    </section>
+  </div>
 </template>
 
 <style scoped>
-/**
- * The video panel above these sections is `position: sticky` at desktop
- * widths — a positioned element, which paints over plain in-flow content no
- * matter what follows it in the document. These bands are therefore given
- * their own stacking level (the same thing SiteFooter does with `relative
- * z-10`), so they pass over the pinned video instead of behind it, and an
- * opaque background so the video never shows through the text.
- *
- * `position` and `z-index` are confined to `.about-band` itself — scoped and
- * uniquely named, so no parent, no other page and no global style is touched.
- * The footage panel, its pinning and its playback are untouched.
- */
-.about-band {
+.ab {
   position: relative;
   z-index: 1;
-  background-color: var(--color-cream-50);
-  padding-top: 4.5rem;
-  padding-bottom: 4.5rem;
-}
-
-.about-band--cream {
-  background-color: var(--color-cream-100);
-}
-
-.about-band__inner {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 80rem;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-
-.about-band__heading {
-  font-family: var(--font-display);
-  font-size: var(--text-display);
-  font-weight: 500;
-  letter-spacing: -0.03em;
+  background: var(--color-cream-50);
   color: var(--color-forest-950);
 }
 
-@media (min-width: 40rem) {
-  .about-band__inner {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
+.ab-shell {
+  width: 100%;
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding-inline: var(--shell-pad);
 }
 
-@media (min-width: 64rem) {
-  .about-band {
-    padding-top: 6rem;
-    padding-bottom: 6rem;
-  }
-}
-
-/* ---- 1 — Our Story ---- */
-.about-story__eyebrow {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--color-forest-600);
-}
-
-.about-story__heading {
-  margin-top: 1.25rem;
+.ab-heading {
   font-family: var(--font-display);
-  font-size: var(--text-display);
+  font-size: var(--section-title);
   font-weight: 500;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  color: var(--color-forest-950);
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  text-wrap: balance;
 }
 
-.about-story__lede {
-  margin-top: 1.5rem;
-  max-width: 48rem;
-  font-size: clamp(1.05rem, 1.6vw, 1.3rem);
-  line-height: 1.6;
-  color: color-mix(in oklab, var(--color-ink-900) 70%, transparent);
+/* ---- 1: opening ---- */
+.ab-hero {
+  padding-block: clamp(5.5rem, 6.5vw, 6.25rem) var(--space-section);
 }
 
-.about-story__paragraph {
-  margin-top: 1.5rem;
-  max-width: 48rem;
-  font-size: 0.98rem;
-  line-height: 1.75;
-  color: color-mix(in oklab, var(--color-ink-900) 70%, transparent);
+.ab-hero__title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--page-title);
+  letter-spacing: var(--page-title-tracking);
+  line-height: var(--page-title-leading);
 }
 
-/* ---- 2 — Mission, Vision and Values ---- */
-.about-mvv {
-  display: grid;
-  gap: 1.5rem;
-  margin-top: 2.5rem;
-}
-
-@media (min-width: 48rem) {
-  .about-mvv {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.about-mvv__card {
-  /* 5px, matching every other card on the site. */
-  border-radius: 5px;
-  background-color: var(--color-cream-50);
-  padding: 1.75rem;
-  box-shadow: var(--shadow-soft);
-}
-
-.about-mvv__label {
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--color-maize-400);
-}
-
-.about-mvv__body {
+.ab-hero__lede {
+  color: rgb(19 24 19 / 0.78);
+  font-size: var(--page-lede);
+  line-height: var(--page-lede-leading);
+  max-width: var(--page-lede-measure);
+  font-family: var(--font-sans);
+  letter-spacing: normal;
   margin-top: 1rem;
-  font-size: 0.98rem;
-  line-height: 1.7;
-  color: color-mix(in oklab, var(--color-ink-900) 75%, transparent);
 }
 
-.about-mvv__values-heading {
-  margin-top: 3.5rem;
+.ab-footage {
+  position: relative;
+  z-index: 2;
+  overflow: clip;
+}
+
+/* ---- 3: chapters ---- */
+.ab-chapters {
+  display: grid;
+  gap: 1rem;
+  padding-block: var(--space-section);
+}
+
+.ab-block {
+  padding-block: var(--space-section);
+  border-top: 1px solid rgb(4 32 21 / 0.2);
+  scroll-margin-top: 6rem;
+}
+
+.ab-block:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.ab-story {
+  display: grid;
+  gap: 1rem var(--space-gap);
+  margin-top: 1rem;
+  color: rgb(19 24 19 / 0.74);
+  font-size: 1.05rem;
+  line-height: 1.75;
+}
+
+/* Values: one yellow slab holding three plain rows */
+.ab-values {
+  margin: 1.25rem 0 0;
+  padding: clamp(1rem, 2vw, 1.5rem) clamp(1.25rem, 2.5vw, 2rem);
+  border-radius: 5px;
+  background: #f5c62a;
+  list-style: none;
+}
+
+.ab-values li {
+  display: grid;
+  gap: 0.35rem;
+  padding-block: 1rem;
+  border-top: 1px solid rgb(4 32 21 / 0.3);
+}
+
+.ab-values li:first-child {
+  border-top: 0;
+}
+
+.ab-values__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2vw, 1.75rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.ab-values__text {
+  max-width: 34rem;
+  color: rgb(4 32 21 / 0.82);
+  font-size: var(--page-lede);
+  line-height: var(--page-lede-leading);
+}
+
+/* Journey: a grid of milestones, each under its own rule */
+.ab-timeline {
+  display: grid;
+  gap: 0 var(--space-gap);
+  margin: 1.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ab-timeline li {
+  display: grid;
+  align-content: start;
+  gap: 0.3rem;
+  padding-block: 1rem 1.25rem;
+  border-top: 3px solid var(--color-forest-950);
+}
+
+.ab-timeline__year {
+  color: var(--color-forest-600);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.4vw, 3rem);
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.ab-timeline h3 {
   font-family: var(--font-display);
   font-size: 1.35rem;
   font-weight: 500;
   letter-spacing: -0.02em;
-  color: var(--color-forest-950);
 }
 
-.about-mvv__values {
+.ab-timeline li p:last-child {
+  max-width: 26rem;
+  margin-top: 0.35rem;
+  color: rgb(19 24 19 / 0.68);
+  line-height: 1.6;
+}
+
+/* People: names as a list; the portrait follows hover, focus or tap */
+.ab-people {
   display: grid;
-  gap: 1.25rem;
-  margin-top: 1.5rem;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.ab-people__list {
+  margin: 0;
   padding: 0;
   list-style: none;
+}
+
+.ab-people__list button {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding-block: 0.9rem;
+  border-top: 1px solid rgb(4 32 21 / 0.2);
+  text-align: left;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity 200ms ease;
+}
+
+.ab-people__list li:last-child button {
+  border-bottom: 1px solid rgb(4 32 21 / 0.2);
+}
+
+.ab-people__list button.is-active,
+.ab-people__list button:hover {
+  opacity: 1;
+}
+
+.ab-people__name {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 2.6vw, 2.3rem);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.ab-people__role {
+  color: var(--color-forest-600);
+  font-size: 0.92rem;
+  font-weight: 600;
+}
+
+.ab-people__photo {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  max-height: 26rem;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--color-forest-900);
+}
+
+.ab-people__photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  opacity: 0;
+  transition: opacity 350ms ease;
+}
+
+.ab-people__photo img.is-on {
+  opacity: 1;
+}
+
+.ab-people__list button:focus-visible {
+  outline: 3px solid var(--color-forest-600);
+  outline-offset: 3px;
+}
+
+/* ---- 4: partners ---- */
+.ab-partners {
+  padding-block: var(--space-section);
+  background: #fff;
+  overflow: clip;
+}
+
+.ab-partners__heading {
+  font-size: 0.9rem;
+  font-weight: 560;
+  text-align: center;
+}
+
+.ab-marquee {
+  position: relative;
+  margin-top: 1rem;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 15%, #000 85%, transparent);
+}
+
+.ab-marquee__track {
+  display: flex;
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  will-change: transform;
+}
+
+.ab-marquee__item {
+  --focus: 0;
+  display: grid;
+  width: 12rem;
+  min-width: 12rem;
+  min-height: 5.5rem;
+  place-items: center;
+  padding: 0.5rem 0.75rem;
+  color: rgb(4 32 21 / 0.68);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: center;
+  filter: grayscale(calc(1 - var(--focus)));
+  opacity: calc(0.4 + 0.6 * var(--focus));
+  transform: scale(calc(0.88 + 0.16 * var(--focus)));
+}
+
+.ab-marquee__item img {
+  width: 100%;
+  max-width: 10rem;
+  height: 4rem;
+  object-fit: contain;
 }
 
 @media (min-width: 48rem) {
-  .about-mvv__values {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* Name and description centred on each other, so the big word and its
+     one-line explanation sit on the same horizontal axis. */
+  .ab-values li {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1.5rem;
+    align-items: center;
   }
-}
 
-.about-mvv__value {
-  border-top: 2px solid
-    color-mix(in oklab, var(--color-forest-900) 12%, transparent);
-  padding-top: 1.25rem;
-}
+  .ab-values__text {
+    margin-top: 0;
+  }
 
-.about-mvv__value-name {
-  font-family: var(--font-display);
-  font-size: 1.05rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--color-forest-950);
-}
-
-.about-mvv__value-text {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: color-mix(in oklab, var(--color-ink-900) 60%, transparent);
-}
-
-/* ---- 3 — Milestones timeline ---- */
-.about-timeline {
-  margin-top: 2.5rem;
-  padding-left: 1.75rem;
-  border-left: 1px solid
-    color-mix(in oklab, var(--color-forest-900) 16%, transparent);
-  list-style: none;
-}
-
-.about-timeline__item + .about-timeline__item {
-  margin-top: 2.75rem;
-}
-
-.about-timeline__year {
-  font-family: var(--font-display);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--color-maize-400);
-}
-
-.about-timeline__title {
-  margin-top: 0.6rem;
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--color-forest-950);
-}
-
-.about-timeline__text {
-  margin-top: 0.5rem;
-  max-width: 44rem;
-  font-size: 0.92rem;
-  line-height: 1.65;
-  color: color-mix(in oklab, var(--color-ink-900) 65%, transparent);
-}
-
-/* ---- 4 — Leadership grid ---- */
-.about-leadership {
-  display: grid;
-  gap: 1.5rem;
-  margin-top: 2.5rem;
-  padding: 0;
-  list-style: none;
-}
-
-@media (min-width: 40rem) {
-  .about-leadership {
+  .ab-story {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ab-timeline {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ab-people {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: var(--space-gap);
+    align-items: stretch;
+  }
+
+  /* The portrait takes its height from the list of names beside it. */
+  .ab-people__photo {
+    aspect-ratio: auto;
+    max-height: none;
+    min-height: 14rem;
+    contain: size;
   }
 }
 
 @media (min-width: 64rem) {
-  .about-leadership {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .ab-timeline {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-.about-leadership__card {
-  /* 5px, matching every other card on the site. */
-  border-radius: 5px;
-  background-color: var(--color-cream-50);
-  padding: 1.75rem;
-  box-shadow: var(--shadow-soft);
-}
-
-.about-leadership__name {
-  margin-top: 1.25rem;
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--color-forest-950);
-}
-
-.about-leadership__role {
-  margin-top: 0.35rem;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--color-maize-400);
-}
-
-/* ---- 5 — Partners row ---- */
-.about-partners {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 2.5rem;
-  padding: 0;
-  list-style: none;
-}
-
-.about-partners__item {
-  border-radius: 9999px;
-  border: 1px solid
-    color-mix(in oklab, var(--color-forest-900) 12%, transparent);
-  background-color: var(--color-cream-100);
-  padding: 0.65rem 1.4rem;
-  font-size: 0.9rem;
-  color: color-mix(in oklab, var(--color-forest-950) 75%, transparent);
-}
-
-/* ---- 6 — Closing banner ---- */
-.about-banner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.75rem;
-  /* 5px, matching every other card on the site. */
-  border-radius: 5px;
-  background-color: var(--color-forest-900);
-  padding: 2.5rem 2rem;
-}
-
-@media (min-width: 48rem) {
-  .about-banner {
-    padding: 3rem;
+@media (prefers-reduced-motion: reduce) {
+  .ab-people__photo img,
+  .ab-people__list button {
+    transition: none;
   }
-}
-
-.about-banner__title {
-  font-family: var(--font-display);
-  font-size: var(--text-display);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  color: var(--color-cream-50);
-}
-
-.about-banner__text {
-  margin-top: 0.75rem;
-  max-width: 34rem;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: color-mix(in oklab, var(--color-cream-200) 75%, transparent);
 }
 </style>

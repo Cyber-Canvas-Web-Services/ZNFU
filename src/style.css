@@ -5,23 +5,23 @@
    Forest green (primary) · maize gold (accent) · cream (surface)
    ================================================================= */
 @theme {
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system,
+  --font-sans: 'Outfit Variable', ui-sans-serif, system-ui, -apple-system,
     'Segoe UI', Roboto, sans-serif;
-  --font-display: 'Plus Jakarta Sans Variable', 'Inter Variable',
-    ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Fraunces Variable', 'Outfit Variable', ui-sans-serif,
+    system-ui, sans-serif;
 
   /* Forest — ZNFU primary */
-  --color-forest-50: #f0f7f1;
-  --color-forest-100: #dcebde;
-  --color-forest-200: #bbd8c1;
-  --color-forest-300: #8ebd99;
-  --color-forest-400: #5c9a6d;
-  --color-forest-500: #3a7d4e;
-  --color-forest-600: #2a633d;
-  --color-forest-700: #225032;
-  --color-forest-800: #1c402a;
-  --color-forest-900: #173524;
-  --color-forest-950: #0a1e13;
+  --color-forest-50: #f5faf7;
+  --color-forest-100: #dff1e7;
+  --color-forest-200: #b7e1c9;
+  --color-forest-300: #7dcf9c;
+  --color-forest-400: #3bba65;
+  --color-forest-500: #1a8f3c;
+  --color-forest-600: #126d31;
+  --color-forest-700: #0b4a24;
+  --color-forest-800: #083a1f;
+  --color-forest-900: #062d1b;
+  --color-forest-950: #042015;
 
   /* Maize — accent.
      The scale deliberately STOPS at 400. Everything from the old 500 upward
@@ -37,11 +37,11 @@
   --color-maize-400: #f5c62a;
 
   /* Cream / ink surfaces */
-  --color-cream-50: #fbfaf6;
-  --color-cream-100: #f5f2e8;
-  --color-cream-200: #eae4d4;
-  --color-cream-300: #dcd3bb;
-  --color-ink-900: #0b110d;
+  --color-cream-50: #fbf9f3;
+  --color-cream-100: #f4f0e8;
+  --color-cream-200: #e6ddcc;
+  --color-cream-300: #d1c3a9;
+  --color-ink-900: #131813;
 
   /* =================================================================
      Type scale — anchored to the 1280×800 viewport
@@ -77,15 +77,34 @@
      Each is anchored to 1280 (the reference resolution) by its `vw` value and
      scales down below that, bottoming out at a floor for phones:
 
-       --text-hero        26px floor  ·  32px @1280  ·  32px ceiling
+       --text-hero        40px floor  ·  64px @1280  ·  88px ceiling
        --text-display     22px floor  ·  28px @1280  ·  28px ceiling
        --text-display-sm  20px floor  ·  26px @1280  ·  26px ceiling
 
-     The `vw` figures are chosen so the middle value lands on the target at
-     exactly 1280 — 2.5vw is 32px there, 2.1875vw is 28px, 2.03125vw is 26px —
-     which is what keeps them in step with each other as the viewport changes
-     rather than drifting apart. */
-  --text-hero: clamp(1.625rem, 2.5vw, 2rem);
+     `--text-hero` was bumped from a 32px ceiling to this bolder statement
+     size when the home hero adopted the Farm-Marketplace reference's
+     big-bold-headline treatment — the other two display tiers are untouched
+     and still hold the original 1280-anchored `vw` math (2.1875vw is 28px
+     there, 2.03125vw is 26px). `--text-hero` instead scales continuously with
+     the viewport rather than plateauing at 1280, since a headline this size
+     is meant to keep growing on large displays rather than cap early. */
+  --text-hero: clamp(2.5rem, 5vw, 5.5rem);
+  /* One title / description pair for every page's opening block. Change the
+     numbers here and all pages (both designs) move together. */
+  --page-title: clamp(2rem, 3.3vw, 2.875rem);   /* 32px floor · 46px ceiling */
+  --page-title-leading: 1.08;
+  --page-title-tracking: -0.03em;
+  /* Vertical rhythm: one section padding and one column gap for every page. */
+  /* One page container: header, hero, every section and the footer share it,
+     so their left and right edges line up at every screen width. */
+  --shell-max: 96rem;
+  --shell-pad: clamp(1.25rem, 4vw, 5.5rem);
+  --space-section: clamp(1.5rem, 2.5vw, 2.25rem);
+  --space-gap: clamp(1.25rem, 2.5vw, 2.25rem);
+  --section-title: clamp(1.5rem, 2.3vw, 2rem);   /* always below --page-title */
+  --page-lede: clamp(1rem, 1.15vw, 1.0625rem);  /* 16px floor · 17px ceiling */
+  --page-lede-leading: 1.65;
+  --page-lede-measure: 34rem;
   --text-display: clamp(1.375rem, 2.1875vw, 1.75rem);
   --text-display-sm: clamp(1.25rem, 2.03125vw, 1.625rem);
   /* badge pill — a label has to sit below body copy, not level with it */
@@ -96,9 +115,13 @@
   --animate-marquee: marquee 48s linear infinite;
   --animate-nudge: nudge 2.4s ease-in-out infinite;
   --animate-pulse-ring: pulse-ring 2.6s ease-out infinite;
+  /* Hero slide-progress fill. The 9s duration must match `SLIDE_MS` in
+     HeroSection.vue — restarted on every slide change by re-keying the
+     element, not by a JS timer, so there is no rAF loop driving it. */
+  --animate-hero-progress: hero-progress 9s linear forwards;
 
-  --shadow-card: 0 40px 90px -30px rgb(4 20 12 / 0.62);
-  --shadow-soft: 0 18px 50px -28px rgb(10 30 19 / 0.35);
+  --shadow-card: 0 40px 90px -30px rgb(2 21 13 / 0.62);
+  --shadow-soft: 0 18px 50px -28px rgb(4 32 21 / 0.35);
 
   /* =================================================================
      Radius — 5px on every rounded corner
@@ -155,6 +178,14 @@
     }
     100% {
       opacity: 0;
+    }
+  }
+  @keyframes hero-progress {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
     }
   }
 }
@@ -320,6 +351,15 @@
     background-color: var(--color-forest-700);
   }
 
+  /* Cream pill with a leading accent dot — the home hero's primary CTA. */
+  .btn--cream {
+    background-color: var(--color-cream-50);
+    color: var(--color-forest-900);
+  }
+  .btn--cream:hover {
+    background-color: #fff;
+  }
+
   .btn--outline {
     border-color: color-mix(in oklab, var(--color-forest-900) 45%, transparent);
     color: var(--color-forest-900);
@@ -338,10 +378,10 @@
        region behind the button on every single decoded frame — one of the most
        expensive things on the page, and it showed up as scroll jank. A plain
        translucent fill looks near-identical and costs nothing per frame. */
-    background-color: rgb(10 30 19 / 0.42);
+    background-color: rgb(4 32 21 / 0.42);
   }
   .btn--ghost:hover {
-    background-color: rgb(10 30 19 / 0.62);
+    background-color: rgb(4 32 21 / 0.62);
     border-color: rgb(255 255 255 / 0.7);
   }
 
@@ -398,7 +438,9 @@
    */
   .shell {
     width: 100%;
-    padding-inline: clamp(1.25rem, 4vw, 5.5rem);
+    max-width: var(--shell-max);
+    margin-inline: auto;
+    padding-inline: var(--shell-pad);
   }
 
   /* ---- Decorative glow ----
@@ -427,8 +469,8 @@
   .section-title {
     font-size: var(--text-lg);
     line-height: 1.3;
-    letter-spacing: -0.01em;
-    font-weight: 600;
+    letter-spacing: -0.005em;
+    font-weight: 580;
     text-wrap: balance;
   }
 
@@ -470,6 +512,11 @@
 
   .marquee:hover {
     animation-play-state: paused;
+  }
+
+  /* ---- Hero slide-progress fill ---- */
+  .hero-progress-fill {
+    animation: var(--animate-hero-progress);
   }
 
   .mask-fade-x {

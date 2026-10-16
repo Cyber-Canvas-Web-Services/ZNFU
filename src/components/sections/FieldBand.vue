@@ -3,7 +3,7 @@
  * Full-bleed footage panel — a visual breather between editorial panels.
  * Uses `vid 5` (rain → land preparation → soil in hand).
  *
- * The band hugs its copy: `py-16 → lg:py-24` around the text and no minimum
+ * The band hugs its copy: `py-12 → lg:py-16` around the text and no minimum
  * height. It used to fill the viewport (`lg:min-h-screen`), which put a full
  * screen of footage between two editorial panels to carry ~200px of words —
  * measured 900px of band around a 428px content block, so more than half of
@@ -23,6 +23,8 @@ import { media } from "@/data/home";
 defineProps({
   /** Rendered as the top band of its own page rather than mid-stack. */
   standalone: { type: Boolean, default: false },
+  mission: { type: String, default: "" },
+  vision: { type: String, default: "" },
 });
 
 const bandEl = ref(null);
@@ -67,11 +69,11 @@ watch(isInView, (visible) => {
        still slides up over it. -->
   <section
     ref="bandEl"
-    class="relative isolate flex flex-col justify-center clip-safe py-16 sm:py-20 lg:py-24"
+    class="relative isolate flex flex-col justify-center clip-safe py-12 sm:py-14 lg:py-16"
     :class="
       standalone
         ? ''
-        : 'lg:rounded-t-card lg:shadow-[0_-16px_44px_-26px_rgba(10,30,19,0.28)]'
+        : 'lg:rounded-t-card lg:shadow-[0_-16px_44px_-26px_rgba(4,32,21,0.28)]'
     "
   >
     <!-- Poster paints immediately and stays put underneath. No `autoplay`
@@ -117,46 +119,87 @@ watch(isInView, (visible) => {
       aria-hidden="true"
     />
 
-    <div class="relative mx-auto max-w-4xl px-5 text-center sm:px-8">
-      <p class="eyebrow justify-center text-maize-400" v-reveal>
-        Why the Union exists
-      </p>
-      <blockquote
-        class="mt-6 font-display text-display font-medium leading-[1.2] tracking-[-0.03em] text-cream-50"
-        v-reveal="{ delay: 80 }"
-      >
-        “From the first rains to the last bag loaded, Zambian farmers carry the
-        country. The Union exists so that burden is shared — and so the rewards
-        are too.”
-      </blockquote>
-      <div
-        class="mt-10 flex flex-wrap items-center justify-center gap-x-10 gap-y-4"
-        v-reveal="{ delay: 160 }"
-      >
-        <p
-          class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60"
-        >
-          Founded 1905
-        </p>
-        <span
-          class="hidden h-4 w-px bg-cream-200/25 sm:block"
-          aria-hidden="true"
-        />
-        <p
-          class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60"
-        >
-          Non-political
-        </p>
-        <span
-          class="hidden h-4 w-px bg-cream-200/25 sm:block"
-          aria-hidden="true"
-        />
-        <p
-          class="text-xs font-semibold uppercase tracking-[0.24em] text-cream-200/60"
-        >
-          Member-led
-        </p>
+    <div class="field-band__inner relative mx-auto">
+      <div class="field-band__content">
+        <div>
+          <p class="eyebrow text-maize-400" v-reveal>Why the Union exists</p>
+          <blockquote
+            class="mt-5 font-display text-3xl font-medium leading-[1.12] tracking-[-0.012em] text-cream-50 sm:text-4xl"
+            v-reveal="{ delay: 80 }"
+          >
+            “A single, strong voice for Zambia’s farmers.”
+          </blockquote>
+        </div>
+
+        <div v-if="mission || vision" class="field-band__statements">
+          <article v-if="mission" class="field-band__statement" v-reveal="{ delay: 120 }">
+            <p class="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-maize-400">Mission</p>
+            <p class="mt-3 text-sm leading-relaxed text-cream-100/85 sm:text-base">{{ mission }}</p>
+          </article>
+          <article v-if="vision" class="field-band__statement" v-reveal="{ delay: 170 }">
+            <p class="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-maize-400">Vision</p>
+            <p class="mt-3 text-sm leading-relaxed text-cream-100/85 sm:text-base">{{ vision }}</p>
+          </article>
+        </div>
+      </div>
+
+      <div class="field-band__facts" v-reveal="{ delay: 210 }">
+        <p>Founded 1905</p>
+        <p>Non-political</p>
+        <p>Member-led</p>
       </div>
     </div>
   </section>
 </template>
+
+<style scoped>
+/* Same width and side margin as the header, hero, footer and every page
+   section, so this band's text lines up with them. */
+.field-band__inner {
+  width: 100%;
+  max-width: var(--shell-max);
+  padding-inline: var(--shell-pad);
+}
+
+.field-band__content {
+  display: grid;
+  gap: 2rem;
+}
+
+.field-band__statements {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.field-band__statement {
+  border-top: 1px solid rgb(255 255 255 / 0.2);
+  padding-top: 1rem;
+}
+
+.field-band__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2.5rem;
+  margin-top: 2rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgb(255 255 255 / 0.2);
+  color: rgb(250 248 239 / 0.6);
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+@media (min-width: 48rem) {
+  .field-band__content {
+    grid-template-columns: minmax(15rem, 0.7fr) minmax(0, 1.3fr);
+    align-items: start;
+    gap: 3rem;
+  }
+
+  .field-band__statements {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2rem;
+  }
+}
+</style>

@@ -44,14 +44,16 @@ defineProps({
              behind would be a trap for anything added here later. Both lines
              set their own colour.
 
-             Contrast measured against maize-400: the year is 8.27:1, and the
-             caption at 80% is 5.26:1. The caption drops to 4.14:1 at 70%,
-             which fails AA, so 80% is the floor — not a taste choice. -->
+             Contrast measured against maize-400: the year is 9.29:1, and the
+             caption at 80% is 5.88:1. The caption drops to 4.57:1 at 70%,
+             which is cutting it too close to the AA floor, so 80% stays the
+             floor — not a taste choice. -->
         <div
           class="absolute -bottom-6 left-4 rounded-2xl bg-maize-400 px-6 py-5 shadow-card sm:left-6"
         >
           <p
-            class="font-display text-3xl font-medium leading-none tracking-[-0.03em] text-forest-900"
+            class="font-display text-3xl font-medium leading-none tracking-[-0.01em] text-forest-900"
+            style="font-variant-numeric: tabular-nums"
           >
             1905
           </p>
@@ -94,7 +96,7 @@ defineProps({
             </p>
             <div>
               <h3
-                class="font-display text-xl font-medium tracking-[-0.02em] text-forest-950"
+                class="font-display text-xl font-medium tracking-[-0.008em] text-forest-950"
               >
                 {{ block.heading }}
               </h3>

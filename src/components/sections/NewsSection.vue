@@ -85,7 +85,7 @@ defineProps({
             {{ news.featured.date }}
           </p>
           <h3
-            class="mt-4 font-display text-2xl font-medium leading-snug tracking-[-0.025em] text-forest-950 lg:text-3xl"
+            class="mt-4 font-display text-2xl font-medium leading-snug tracking-[-0.01em] text-forest-950 lg:text-3xl"
           >
             {{ news.featured.title }}
           </h3>
@@ -127,7 +127,7 @@ defineProps({
               </span>
               <span class="flex-1">
                 <span
-                  class="block font-display text-lg font-medium leading-snug tracking-[-0.02em] text-forest-950 transition group-hover:text-forest-700"
+                  class="block font-display text-lg font-medium leading-snug tracking-[-0.008em] text-forest-950 transition group-hover:text-forest-700"
                 >
                   {{ item.title }}
                 </span>
@@ -154,7 +154,7 @@ defineProps({
           {{ news.fridayBrief.label }}
         </p>
         <h3
-          class="mt-4 font-display text-2xl font-medium leading-snug tracking-[-0.025em]"
+          class="mt-4 font-display text-2xl font-medium leading-snug tracking-[-0.01em]"
         >
           {{ news.fridayBrief.title }}
         </h3>

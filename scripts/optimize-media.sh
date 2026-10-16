@@ -17,13 +17,13 @@
 #
 #  What it does
 #  ------------
-#   1. hero montage  → 1280×720 desktop + 540×720 (3:4) phone, with the
-#      loop seam crossfaded so the montage repeats without a visible cut.
-#   2. field footage → re-encoded at its native size.
-#   3. Poster frames → WebP, taken from the *freshly encoded* video so the
+#   1. field footage → re-encoded at its native size.
+#   2. Poster frames → WebP, taken from the *freshly encoded* video so the
 #      poster matches what the visitor actually sees first.
-#   4. Every photo in the master folder → WebP, longest edge capped,
-#      EXIF (including GPS) stripped.
+#   3. Every photo in the master folder → WebP, longest edge capped,
+#      EXIF (including GPS) stripped. This includes the home hero's
+#      `hero-*` slides — there is no hero video any more, the hero is a
+#      plain WebP crossfade slider (see HeroSection.vue).
 #
 #  It is deliberately non-destructive: nothing in assets/media-source is
 #  ever modified, so it can be re-run freely. Re-encoding an already
@@ -57,19 +57,9 @@ FFMPEG="${FFMPEG:-ffmpeg}"
 FFPROBE="${FFPROBE:-ffprobe}"
 
 # ---- tuning ---------------------------------------------------------------
-HERO_MASTER="$SOURCE/hero-background-master.mp4"
-HERO_DESKTOP_W=1280
-HERO_DESKTOP_H=720
-HERO_DESKTOP_CRF=28
-# The phone encode is cropped to 3:4 before it is scaled, rather than being a
-# shrunken landscape frame. A hero on a 390×760 phone occupies a portrait
-# slot, so a 16:9 source is cropped to ~27% of its width and *then* upscaled
-# ~2.8×; a 3:4 crop is sharper, better framed, and fewer pixels to encode.
-HERO_MOBILE_CROP="crop=ih*3/4:ih"
-HERO_MOBILE_W=540
-HERO_MOBILE_H=720
-HERO_MOBILE_CRF=30
-
+# The home hero used to rotate a video montage; it is a plain WebP crossfade
+# slider now (see HeroSection.vue), so there is no hero video to encode here
+# any more — only the field-footage clip used elsewhere on the site.
 FIELD_MASTER="$SOURCE/field-footage-master.mp4"
 FIELD_W=848
 FIELD_H=480
@@ -111,20 +101,15 @@ LOOP_BLEND=1
 #     field-footage-poster 848px wide, displayed full-bleed — limited by the
 #                         848×480 video master, so a sharper poster needs a
 #                         sharper clip
-#     agri / cows          1310 / 1334px wide, displayed full-bleed — the most
-#                         visible images on the site and the ones most worth
-#                         replacing with larger originals
 #
-# On performance: the hero poster is still extracted from the encoded 1280×720
-# video and the videos are untouched, so the critical path is unchanged. Every
-# photograph is `loading="lazy"` and below the fold.
+# On performance: the four `hero-*` stills are the home hero's slider, so the
+# first one (whichever `heroSlides[0]` names in data/home.js) is the LCP
+# element — loaded eager with `fetchpriority="high"` and preloaded from
+# index.html, not lazy. The rest of this folder's photography stays
+# `loading="lazy"` and below the fold, same as always.
 WEBP_QUALITY=64
 WEBP_MAX_EDGE=1600
 
-# Where in the encoded hero the poster frame is taken from. The encoded loop
-# starts 1s into the master, so 3.5s here is the cattle-by-water frame — the
-# most legible of the three sequences and free of the watermark.
-HERO_POSTER_AT=3.5
 FIELD_POSTER_AT=1.0
 # ---------------------------------------------------------------------------
 
@@ -218,19 +203,11 @@ extract_poster() {
 
 # ---------------------------------------------------------------------------
 section "Video"
-note "hero montage → desktop 1280×720"
-encode_to "$HERO_MASTER" "$MEDIA/hero-background.mp4" \
-  "$HERO_DESKTOP_W" "$HERO_DESKTOP_H" "$HERO_DESKTOP_CRF" yes
-note "hero montage → phone 540×720 (3:4 crop)"
-encode_to "$HERO_MASTER" "$MEDIA/hero-background-mobile.mp4" \
-  "$HERO_MOBILE_W" "$HERO_MOBILE_H" "$HERO_MOBILE_CRF" yes "$HERO_MOBILE_CROP"
 note "field footage (${FIELD_W}×${FIELD_H})"
 encode_to "$FIELD_MASTER" "$MEDIA/field-footage.mp4" \
   "$FIELD_W" "$FIELD_H" "$FIELD_CRF" no
 
 section "Poster frames"
-extract_poster "$MEDIA/hero-background.mp4" "$HERO_POSTER_AT" \
-  "$MEDIA/hero-background-poster.png"
 extract_poster "$MEDIA/field-footage.mp4" "$FIELD_POSTER_AT" \
   "$MEDIA/field-footage-poster.png"
 
@@ -359,7 +336,9 @@ if not dry_run:
 #    fetched by link scrapers rather than browsers, and several of them still
 #    cannot read WebP, so it is the one image that must not be converted. It is
 #    never requested by a visitor, so its size does not affect the page.
-poster = media / "hero-background-poster.webp"
+#    Sourced from the home hero's opening slide — keep this in step with
+#    `heroSlides[0]` in src/data/home.js if that ever changes.
+poster = media / "hero-soybean-field-tractor.webp"
 if poster.exists():
     dest = media / "og-image.jpg"
     if dry_run:

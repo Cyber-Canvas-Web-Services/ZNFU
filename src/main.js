@@ -1,9 +1,13 @@
 import { createApp } from 'vue'
 
-// Self-hosted variable fonts — weight axis only (smallest useful payload).
-// Fontsource declares unicode-ranges, so unused subsets are never downloaded.
-import '@fontsource-variable/inter/wght.css'
-import '@fontsource-variable/plus-jakarta-sans/wght.css'
+// Self-hosted variable fonts. Fontsource declares unicode-ranges, so unused
+// subsets are never downloaded. Outfit is weight-only (smallest useful
+// payload); Fraunces additionally carries the optical-size (`opsz`) axis via
+// `opsz.css`, so the same file reads crisp at heading sizes and richer at the
+// hero's larger display size — `font-optical-sizing: auto` is the browser
+// default, no extra CSS needed.
+import '@fontsource-variable/outfit/wght.css'
+import '@fontsource-variable/fraunces/opsz.css'
 
 import './style.css'
 import App from './App.vue'

@@ -2,798 +2,507 @@
 /**
  * Member systems — the standalone page at /systems.
  *
- * The band at the top is the same component the home page stacks, given
- * `standalone` so it heads the page and carries the page’s single <h1>. It is
- * untouched here: same headline, same three system cards, same anchor ids the
- * footer’s deep links use.
+ * Design: the page opens with the product itself — a weekly price ledger —
+ * rather than a description of it. Below, the three systems are laid out as
+ * the journey they really are (check prices, arrange transport, sell), so the
+ * step numbers earn their place. Each system keeps its anchor id because the
+ * footer deep-links to /systems#e-farm-prices, #e-transport and #znfu-market.
  *
- * Everything below it is added by this page:
- *   1. an intro under the headline
- *   2. one alternating feature row per system
- *   3. how the systems work together
- *   4. who can use them
- *   5. an FAQ
- *   6. a closing banner
+ * Copy comes from `systems` in src/data/home.js. The price rows are sample
+ * data (flagged there); the FAQ answers marked [TO CONFIRM] still need the
+ * Secretariat's wording.
  */
-import { ref } from "vue";
-import { ArrowDown, ArrowRight } from "@lucide/vue";
+import { ArrowRight } from "@lucide/vue";
 
 import AppIcon from "@/components/ui/AppIcon.vue";
-import SystemsSection from "@/components/sections/SystemsSection.vue";
 import { systems } from "@/data/home";
 
-/* =====================================================================
- *  SAMPLE CONTENT — REPLACE BEFORE PUBLISHING
- * =====================================================================
- *
- *  Written so the page reads as a finished layout for client review. Each
- *  system’s name, description and benefit list are taken from the real data
- *  in `src/data/home.js`; the wording added around them is generic, and
- *  anything the Union has not supplied is marked `[TO CONFIRM]`.
- *
- *  Nothing here is a price, a fee, a statistic or a claim about performance.
- * ===================================================================== */
-const SAMPLE_CONTENT = {
-  /** Section 1 — sits directly under the headline and the system cards. */
-  intro: [
-    "At harvest, timing decides the price. A crop that is ready but cannot move loses value every day it waits — and a farmer who does not know what the market is paying cannot judge a fair offer.",
-    "These three systems are built for that window: check what every market is paying, arrange the haulage to get there, and sell to a verified buyer.",
-  ],
+const priceBook = systems.items[0];
 
-  /**
-   * Who each system helps, and the steps to use it. The step wording is a
-   * generic description of the journey — the Union has not supplied the
-   * access or onboarding process.
-   */
-  whoItHelps: {
-    "e-farm-prices": "Farmers, associations and buyers comparing markets.",
-    "e-transport": "Farmers, transporters and buyers moving produce.",
-    "znfu-market": "Members buying and selling produce, livestock and inputs.",
+const faqs = [
+  {
+    question: "Who can use the systems?",
+    answer:
+      "They are member services, open to members of the Union. Membership is open to any person or organisation in the business of agriculture in Zambia.",
   },
-
-  howItWorks: {
-    "e-farm-prices": [
-      "Open the weekly price book for the current period. [TO CONFIRM — how access is granted.]",
-      "Compare the markets nearest to you and note the week’s movers.",
-      "Take the figures with you when you negotiate.",
-    ],
-    "e-transport": [
-      "Enter the pickup point, destination and cargo. [TO CONFIRM — the booking process.]",
-      "Receive and compare quotes from matched hauliers.",
-      "Track the job from loading to delivery.",
-    ],
-    "znfu-market": [
-      "Confirm your membership is paid up — listings are for paid-up members.",
-      "List your produce, livestock, equipment or inputs.",
-      "Deal directly with the buyer. A listing lapses with your membership.",
-    ],
+  {
+    question: "How do I get access?",
+    answer:
+      "Access is arranged through the Secretariat. [TO CONFIRM — the exact steps, timelines and any sign-in details.]",
   },
-
-  /** Section 3 — the sequence through the three systems. */
-  flow: {
-    heading: "How the systems work together",
-    steps: [
-      {
-        id: "e-farm-prices",
-        icon: "TrendingUp",
-        label: "Check prices",
-        detail: "See what each market is paying this week.",
-      },
-      {
-        id: "e-transport",
-        icon: "Truck",
-        label: "Arrange transport",
-        detail: "Book and track the haulage that gets it there.",
-      },
-      {
-        id: "znfu-market",
-        icon: "Store",
-        label: "Sell",
-        detail: "List to members and deal with a verified buyer.",
-      },
-    ],
+  {
+    question: "Do the systems cost extra?",
+    answer:
+      "Pricing is set by the Secretariat. [TO CONFIRM — whether the systems are included in the subscription or charged separately.]",
   },
-
-  /** Section 4 — access. */
-  access: {
-    heading: "Who can use these systems?",
-    body: "They are member services. Membership is open to any person or organisation in the business of agriculture in Zambia. [TO CONFIRM — how access to each system is granted and whether any are restricted by category.]",
-    ctaLabel: "See membership options",
-    ctaHref: "/membership",
+  {
+    question: "Who do I contact for help?",
+    answer:
+      "Contact the ZNFU Secretariat. [TO CONFIRM — the named support contact or desk.]",
   },
-
-  /** Section 5 — questions and answers. */
-  faqs: [
-    {
-      question: "Who can use the systems?",
-      answer:
-        "They are member services, open to members of the Union. Membership is open to any person or organisation in the business of agriculture in Zambia.",
-    },
-    {
-      question: "How do I get access?",
-      answer:
-        "Access is arranged through the Secretariat. [TO CONFIRM — the exact steps, timelines and any sign-in details.]",
-    },
-    {
-      question: "Do the systems cost extra?",
-      answer:
-        "Pricing is set by the Secretariat. [TO CONFIRM — whether the systems are included in the subscription or charged separately.]",
-    },
-    {
-      question: "Who do I contact for help?",
-      answer:
-        "Contact the ZNFU Secretariat. [TO CONFIRM — the named support contact or desk.]",
-    },
-  ],
-
-  /** Section 6 — closing banner. */
-  banner: {
-    title: "Join the Union to access these systems",
-    text: "Membership is open to any person or organisation in the business of agriculture in Zambia.",
-    ctaLabel: "Apply for membership",
-    ctaHref: "/membership",
-  },
-};
-
-/** FAQ answers toggle independently; nothing animates a height. */
-const openFaq = ref({});
-
-function toggleFaq(index) {
-  openFaq.value = { ...openFaq.value, [index]: !openFaq.value[index] };
-}
+];
 </script>
 
 <template>
-  <SystemsSection standalone />
-
-  <!-- 1 — Intro -->
-  <section class="systems-page-band">
-    <div class="systems-page-band__inner">
-      <p class="systems-page-intro__eyebrow" v-reveal>Why timing matters</p>
-      <p
-        v-for="(paragraph, index) in SAMPLE_CONTENT.intro"
-        :key="index"
-        class="systems-page-intro__text"
-        v-reveal="{ delay: 60 + index * 60 }"
-      >
-        {{ paragraph }}
-      </p>
-    </div>
-  </section>
-
-  <!-- 2 — One alternating feature row per system -->
-  <section class="systems-page-band systems-page-band--cream">
-    <div class="systems-page-band__inner">
-      <article
-        v-for="(item, index) in systems.items"
-        :key="item.id"
-        class="systems-page-feature"
-        v-reveal="{ delay: index * 80 }"
-      >
-        <div class="systems-page-feature__row">
-          <div class="systems-page-feature__text">
-            <p class="systems-page-feature__number">{{ item.number }} / 03</p>
-            <h2 class="systems-page-feature__title">{{ item.title }}</h2>
-
-            <p class="systems-page-feature__label">What it is</p>
-            <p class="systems-page-feature__body">{{ item.body }}</p>
-
-            <p class="systems-page-feature__label">Who it helps</p>
-            <p class="systems-page-feature__body">
-              {{ SAMPLE_CONTENT.whoItHelps[item.id] }}
-            </p>
-
-            <p class="systems-page-feature__label">How it works</p>
-            <ol class="systems-page-feature__steps">
-              <li
-                v-for="(step, stepIndex) in SAMPLE_CONTENT.howItWorks[item.id]"
-                :key="stepIndex"
-                class="systems-page-feature__step"
-              >
-                <span class="systems-page-feature__step-index">
-                  {{ stepIndex + 1 }}
-                </span>
-                <span>{{ step }}</span>
-              </li>
-            </ol>
-
-            <p class="systems-page-feature__label">Key benefits</p>
-            <ul class="systems-page-feature__benefits">
-              <li
-                v-for="benefit in item.features"
-                :key="benefit"
-                class="systems-page-feature__benefit"
-              >
-                {{ benefit }}
-              </li>
-            </ul>
-          </div>
-
-          <!-- Simple icon block rather than a photograph -->
-          <div
-            class="systems-page-feature__media"
-            :class="index % 2 === 1 ? 'systems-page-feature__media--flip' : ''"
-          >
-            <span class="systems-page-feature__tile">
-              <AppIcon :name="item.icon" class="systems-page-feature__glyph" />
-            </span>
-            <p class="systems-page-feature__tile-caption">{{ item.title }}</p>
-          </div>
-        </div>
-      </article>
-    </div>
-  </section>
-
-  <!-- 3 — How the systems work together -->
-  <section class="systems-page-band">
-    <div class="systems-page-band__inner">
-      <h2 class="systems-page-heading" v-reveal>
-        {{ SAMPLE_CONTENT.flow.heading }}
-      </h2>
-
-      <ol class="systems-page-flow">
-        <li
-          v-for="(step, index) in SAMPLE_CONTENT.flow.steps"
-          :key="step.id"
-          class="systems-page-flow__item"
-          v-reveal="{ delay: 80 + index * 90 }"
-        >
-          <div class="systems-page-flow__step">
-            <span class="systems-page-flow__tile">
-              <AppIcon :name="step.icon" class="systems-page-flow__glyph" />
-            </span>
-            <p class="systems-page-flow__label">{{ step.label }}</p>
-            <p class="systems-page-flow__detail">{{ step.detail }}</p>
-          </div>
-
-          <span
-            v-if="index < SAMPLE_CONTENT.flow.steps.length - 1"
-            class="systems-page-flow__connector"
-            aria-hidden="true"
-          >
-            <ArrowRight class="systems-page-flow__arrow" />
-            <ArrowDown class="systems-page-flow__arrow-down" />
-          </span>
-        </li>
-      </ol>
-    </div>
-  </section>
-
-  <!-- 4 — Who can use these systems -->
-  <section class="systems-page-band systems-page-band--cream">
-    <div class="systems-page-band__inner">
-      <div class="systems-page-access" v-reveal>
-        <h2 class="systems-page-access__heading">
-          {{ SAMPLE_CONTENT.access.heading }}
-        </h2>
-        <p class="systems-page-access__body">
-          {{ SAMPLE_CONTENT.access.body }}
-        </p>
-        <a
-          :href="SAMPLE_CONTENT.access.ctaHref"
-          class="btn btn--forest systems-page-access__cta"
-        >
-          {{ SAMPLE_CONTENT.access.ctaLabel }}
-          <ArrowRight
-            class="systems-page-access__cta-icon"
-            aria-hidden="true"
-          />
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- 5 — FAQ -->
-  <section class="systems-page-band">
-    <div class="systems-page-band__inner">
-      <h2 class="systems-page-heading" v-reveal>Questions</h2>
-
-      <ul class="systems-page-faq">
-        <li
-          v-for="(faq, index) in SAMPLE_CONTENT.faqs"
-          :key="index"
-          class="systems-page-faq__item"
-          v-reveal="{ delay: 80 + index * 60 }"
-        >
-          <button
-            type="button"
-            class="systems-page-faq__question"
-            :aria-expanded="openFaq[index] ? 'true' : 'false'"
-            @click="toggleFaq(index)"
-          >
-            <span class="systems-page-faq__text">{{ faq.question }}</span>
-            <span class="systems-page-faq__toggle" aria-hidden="true">
-              {{ openFaq[index] ? "−" : "+" }}
-            </span>
-          </button>
-
-          <p v-if="openFaq[index]" class="systems-page-faq__answer">
-            {{ faq.answer }}
-          </p>
-        </li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- 6 — Closing banner -->
-  <section class="systems-page-band">
-    <div class="systems-page-band__inner">
-      <div class="systems-page-banner" v-reveal>
+  <div class="sys">
+    <!-- Hero: headline beside the weekly price ledger -->
+    <section class="sys-hero" aria-labelledby="sys-heading">
+      <div class="sys-shell sys-hero__grid">
         <div>
-          <p class="systems-page-banner__title">
-            {{ SAMPLE_CONTENT.banner.title }}
+          <h1 id="sys-heading" class="sys-hero__title" v-reveal>
+            {{ systems.title }}
+          </h1>
+          <p class="sys-hero__lede" v-reveal="{ delay: 80 }">
+            {{ systems.lede }}
           </p>
-          <p class="systems-page-banner__text">
-            {{ SAMPLE_CONTENT.banner.text }}
-          </p>
+
+          <ul class="sys-jump" aria-label="Jump to a system">
+            <li v-for="item in systems.items" :key="item.id">
+              <a :href="`#${item.id}`">
+                <AppIcon :name="item.icon" class="sys-jump__icon" />
+                {{ item.title }}
+              </a>
+            </li>
+          </ul>
         </div>
 
-        <a
-          :href="SAMPLE_CONTENT.banner.ctaHref"
-          class="btn btn--maize systems-page-banner__cta"
-        >
-          {{ SAMPLE_CONTENT.banner.ctaLabel }}
-          <ArrowRight
-            class="systems-page-banner__cta-icon"
-            aria-hidden="true"
-          />
-        </a>
+        <div class="sys-ledger" v-reveal="{ delay: 140 }">
+          <div class="sys-ledger__head">
+            <p class="sys-ledger__title">e-Farm Prices</p>
+            <p class="sys-ledger__note">Sample figures</p>
+          </div>
+          <table class="sys-ledger__table">
+            <thead>
+              <tr>
+                <th scope="col">Commodity</th>
+                <th scope="col">Market</th>
+                <th scope="col" class="sys-ledger__num">Price</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="row in priceBook.prices" :key="row.commodity">
+                <th scope="row">{{ row.commodity }}</th>
+                <td>{{ row.market }}</td>
+                <td class="sys-ledger__num">
+                  {{ row.price }}
+                  <span class="sys-ledger__unit">/ {{ row.unit }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
+
+    <!-- The journey: three systems in the order a farmer uses them -->
+    <section class="sys-journey" aria-labelledby="sys-journey-heading">
+      <div class="sys-shell">
+        <h2 id="sys-journey-heading" class="sys-heading">
+          From the field to the buyer
+        </h2>
+
+        <ol class="sys-steps">
+          <li
+            v-for="(item, index) in systems.items"
+            :id="item.id"
+            :key="item.id"
+            class="sys-step"
+          >
+            <p class="sys-step__number" aria-hidden="true">{{ index + 1 }}</p>
+
+            <div class="sys-step__text">
+              <h3>{{ item.title }}</h3>
+              <p class="sys-step__body">{{ item.body }}</p>
+              <ul class="sys-step__features">
+                <li v-for="feature in item.features" :key="feature">
+                  {{ feature }}
+                </li>
+              </ul>
+            </div>
+
+            <img
+              class="sys-step__image"
+              :src="item.image"
+              :alt="item.imageAlt"
+              width="800"
+              height="600"
+              loading="lazy"
+              decoding="async"
+            />
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Questions, with the access note beside them -->
+    <section class="sys-faq" aria-labelledby="sys-faq-heading">
+      <div class="sys-shell sys-faq__grid">
+        <div>
+          <h2 id="sys-faq-heading" class="sys-heading">Questions</h2>
+          <p class="sys-faq__note">
+            The systems are member services. Membership is open to any person
+            or organisation in the business of agriculture in Zambia.
+          </p>
+          <a href="/membership" class="sys-faq__link">
+            See membership options
+            <ArrowRight class="h-4 w-4" aria-hidden="true" />
+          </a>
+        </div>
+
+        <div class="sys-faq__list">
+          <details v-for="faq in faqs" :key="faq.question">
+            <summary>{{ faq.question }}</summary>
+            <p>{{ faq.answer }}</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </div>
 </template>
 
 <style scoped>
-/**
- * The systems band above these sections is `position: sticky` at desktop
- * widths — a positioned element, which paints over plain in-flow content
- * whatever the document order. These bands therefore carry their own stacking
- * level (the same thing SiteFooter does with `relative z-10`) so they pass
- * over the pinned panel instead of behind it, plus an opaque background so
- * the dark panel never shows through the text.
- *
- * `position` and `z-index` are confined to `.systems-page-band`. Everything
- * inside is laid out with padding, borders, grid and type alone — no height,
- * no overflow and no transform — so no section can be clipped.
- */
-.systems-page-band {
+.sys {
   position: relative;
   z-index: 1;
-  background-color: var(--color-cream-50);
-  padding-top: 4.5rem;
-  padding-bottom: 4.5rem;
-}
-
-.systems-page-band--cream {
-  background-color: var(--color-cream-100);
-}
-
-.systems-page-band__inner {
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 80rem;
-  padding-left: 1.25rem;
-  padding-right: 1.25rem;
-}
-
-@media (min-width: 40rem) {
-  .systems-page-band__inner {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-}
-
-@media (min-width: 64rem) {
-  .systems-page-band {
-    padding-top: 6rem;
-    padding-bottom: 6rem;
-  }
-}
-
-.systems-page-heading {
-  font-family: var(--font-display);
-  font-size: var(--text-display);
-  font-weight: 500;
-  letter-spacing: -0.03em;
+  overflow: clip;
+  background: var(--color-cream-50);
   color: var(--color-forest-950);
 }
 
-/* ---- 1 — Intro ---- */
-.systems-page-intro__eyebrow {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
-  color: var(--color-forest-600);
+.sys-shell {
+  width: 100%;
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding-inline: var(--shell-pad);
 }
 
-.systems-page-intro__text {
-  margin-top: 1.25rem;
-  max-width: 52rem;
-  font-size: 1.05rem;
-  line-height: 1.75;
-  color: color-mix(in oklab, var(--color-ink-900) 72%, transparent);
-}
-
-/* ---- 2 — Feature rows ---- */
-.systems-page-feature + .systems-page-feature {
-  margin-top: 4.5rem;
-}
-
-.systems-page-feature__row {
-  display: grid;
-  gap: 2.5rem;
-}
-
-@media (min-width: 64rem) {
-  .systems-page-feature__row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 4rem;
-    align-items: start;
-  }
-}
-
-.systems-page-feature__number {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  color: var(--color-maize-400);
-}
-
-.systems-page-feature__title {
-  margin-top: 0.6rem;
+.sys-heading {
   font-family: var(--font-display);
-  font-size: var(--text-display);
+  font-size: var(--section-title);
   font-weight: 500;
-  letter-spacing: -0.03em;
-  color: var(--color-forest-950);
+  letter-spacing: -0.035em;
+  line-height: 1;
+  text-wrap: balance;
 }
 
-.systems-page-feature__label {
-  margin-top: 1.75rem;
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--color-ink-900) 45%, transparent);
-}
-
-.systems-page-feature__body {
-  margin-top: 0.6rem;
-  max-width: 40rem;
-  font-size: 0.95rem;
-  line-height: 1.7;
-  color: color-mix(in oklab, var(--color-ink-900) 72%, transparent);
-}
-
-.systems-page-feature__steps {
-  margin-top: 0.75rem;
-  padding: 0;
-  list-style: none;
-}
-
-.systems-page-feature__step {
-  display: flex;
-  align-items: baseline;
-  gap: 0.85rem;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: color-mix(in oklab, var(--color-ink-900) 72%, transparent);
-}
-
-.systems-page-feature__step + .systems-page-feature__step {
-  margin-top: 0.7rem;
-}
-
-.systems-page-feature__step-index {
-  display: inline-grid;
-  place-items: center;
-  flex-shrink: 0;
-  border-radius: 9999px;
-  background-color: var(--color-forest-900);
+/* ---- Hero ---- */
+.sys-hero {
+  padding-block: clamp(5.5rem, 6.5vw, 6.25rem) var(--space-section);
+  background: var(--color-forest-950);
   color: var(--color-cream-50);
-  font-family: var(--font-display);
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 0.3rem 0.65rem;
 }
 
-.systems-page-feature__benefits {
-  margin-top: 0.75rem;
-  padding: 0;
-  list-style: none;
-}
-
-.systems-page-feature__benefit {
-  display: flex;
-  gap: 0.75rem;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: color-mix(in oklab, var(--color-ink-900) 72%, transparent);
-}
-
-.systems-page-feature__benefit + .systems-page-feature__benefit {
-  margin-top: 0.7rem;
-}
-
-.systems-page-feature__benefit::before {
-  content: "";
-  flex-shrink: 0;
-  border-radius: 9999px;
-  background-color: var(--color-maize-400);
-  width: 0.375rem;
-  height: 0.375rem;
-  margin-top: 0.55rem;
-}
-
-/* Icon block instead of a photograph — no image, no invented imagery. */
-.systems-page-feature__media {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 1.25rem;
-  /* 5px, matching every other card on the site. */
-  border-radius: 5px;
-  border: 1px solid
-    color-mix(in oklab, var(--color-forest-900) 10%, transparent);
-  background-color: var(--color-cream-50);
-  padding: 3.5rem 2rem;
-}
-
-.systems-page-feature__tile {
+.sys-hero__grid {
   display: grid;
-  place-items: center;
-  border-radius: 9999px;
-  background-color: var(--color-maize-400);
-  color: var(--color-forest-950);
-  padding: 1.5rem;
+  gap: var(--space-gap);
+  align-items: center;
 }
 
-.systems-page-feature__glyph {
-  width: 2.25rem;
-  height: 2.25rem;
-}
-
-.systems-page-feature__tile-caption {
+.sys-hero__title {
   font-family: var(--font-display);
-  font-size: 1.05rem;
   font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--color-forest-950);
+  text-wrap: balance;
+  font-size: var(--page-title);
+  letter-spacing: var(--page-title-tracking);
+  line-height: var(--page-title-leading);
 }
 
-/**
- * Alternate the side the icon block sits on. `order` keeps the reading order
- * in the markup correct for screen readers — only the visual order flips.
- */
-@media (min-width: 64rem) {
-  .systems-page-feature__media--flip {
-    order: -1;
-  }
+.sys-hero__lede {
+  margin-top: 1.25rem;
+  color: rgb(251 249 243 / 0.72);
+  font-size: var(--page-lede);
+  line-height: var(--page-lede-leading);
+  max-width: var(--page-lede-measure);
 }
 
-/* ---- 3 — How the systems work together ---- */
-.systems-page-flow {
-  display: grid;
-  gap: 1.25rem;
-  margin-top: 2.5rem;
-  padding: 0;
-  list-style: none;
-}
-
-@media (min-width: 64rem) {
-  .systems-page-flow {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    align-items: stretch;
-  }
-}
-
-.systems-page-flow__item {
+.sys-jump {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1rem;
-}
-
-@media (min-width: 64rem) {
-  .systems-page-flow__item {
-    flex-direction: row;
-    align-items: stretch;
-  }
-}
-
-.systems-page-flow__step {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  flex-wrap: wrap;
   gap: 0.6rem;
-  flex: 1;
-  /* 5px, matching every other card on the site. */
-  border-radius: 5px;
-  border: 1px solid
-    color-mix(in oklab, var(--color-forest-900) 10%, transparent);
-  background-color: var(--color-cream-50);
-  padding: 2rem 1.5rem;
+  margin: 1.75rem 0 0;
+  padding: 0;
+  list-style: none;
 }
 
-.systems-page-flow__tile {
-  display: grid;
-  place-items: center;
+.sys-jump a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.1rem;
+  border: 1px solid rgb(251 249 243 / 0.28);
   border-radius: 9999px;
-  background-color: var(--color-forest-900);
-  color: var(--color-maize-400);
-  padding: 0.9rem;
+  color: var(--color-cream-50);
+  font-size: 0.88rem;
+  font-weight: 560;
+  text-decoration: none;
+  transition: background-color 180ms ease, color 180ms ease;
 }
 
-.systems-page-flow__glyph {
-  width: 1.4rem;
-  height: 1.4rem;
-}
-
-.systems-page-flow__label {
-  font-family: var(--font-display);
-  font-size: 1.1rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
+.sys-jump a:hover {
+  background: var(--color-maize-400);
+  border-color: var(--color-maize-400);
   color: var(--color-forest-950);
 }
 
-.systems-page-flow__detail {
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: color-mix(in oklab, var(--color-ink-900) 62%, transparent);
+.sys-jump a:focus-visible {
+  outline: 3px solid var(--color-maize-400);
+  outline-offset: 3px;
 }
 
-.systems-page-flow__connector {
-  display: grid;
-  place-items: center;
-  color: color-mix(in oklab, var(--color-forest-900) 35%, transparent);
-  flex-shrink: 0;
-}
-
-/* Two arrow glyphs, toggled by breakpoint — avoids rotating with a transform. */
-.systems-page-flow__arrow {
-  display: none;
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.systems-page-flow__arrow-down {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-@media (min-width: 64rem) {
-  .systems-page-flow__arrow {
-    display: block;
-  }
-
-  .systems-page-flow__arrow-down {
-    display: none;
-  }
-}
-
-/* ---- 4 — Who can use these systems ---- */
-.systems-page-access {
-  /* 5px, matching every other card on the site. */
-  border-radius: 5px;
-  border: 1px solid
-    color-mix(in oklab, var(--color-forest-900) 12%, transparent);
-  background-color: var(--color-cream-50);
-  padding: 2.5rem 2rem;
-}
-
-.systems-page-access__heading {
-  font-family: var(--font-display);
-  font-size: var(--text-display-sm);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  color: var(--color-forest-950);
-}
-
-.systems-page-access__body {
-  margin-top: 1rem;
-  max-width: 46rem;
-  font-size: 0.98rem;
-  line-height: 1.7;
-  color: color-mix(in oklab, var(--color-ink-900) 70%, transparent);
-}
-
-.systems-page-access__cta {
-  margin-top: 1.75rem;
-}
-
-.systems-page-access__cta-icon,
-.systems-page-banner__cta-icon {
+.sys-jump__icon {
   width: 1rem;
   height: 1rem;
 }
 
-/* ---- 5 — FAQ ---- */
-.systems-page-faq {
-  margin-top: 2.5rem;
+/* ---- The ledger: the memorable element ---- */
+.sys-ledger {
+  padding: clamp(1.25rem, 2.2vw, 1.9rem);
+  border-radius: 5px;
+  background: var(--color-cream-50);
+  color: var(--color-forest-950);
+}
+
+.sys-ledger__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 2px solid var(--color-forest-950);
+}
+
+.sys-ledger__title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.sys-ledger__note {
+  color: rgb(19 24 19 / 0.55);
+  font-size: 0.8rem;
+}
+
+.sys-ledger__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.sys-ledger__table thead th {
+  padding: 0.75rem 0 0.5rem;
+  color: rgb(19 24 19 / 0.55);
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-align: left;
+}
+
+.sys-ledger__table tbody th,
+.sys-ledger__table tbody td {
+  padding: 0.85rem 0;
+  border-top: 1px solid rgb(4 32 21 / 0.12);
+  text-align: left;
+}
+
+.sys-ledger__table tbody th {
+  font-weight: 600;
+}
+
+.sys-ledger__table .sys-ledger__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.sys-ledger__table tbody td.sys-ledger__num {
+  font-weight: 650;
+}
+
+.sys-ledger__unit {
+  color: rgb(19 24 19 / 0.5);
+  font-size: 0.78rem;
+  font-weight: 400;
+}
+
+/* ---- Journey ---- */
+.sys-journey {
+  padding-block: var(--space-section);
+}
+
+.sys-steps {
+  display: grid;
+  margin: clamp(1.5rem, 3vw, 2.5rem) 0 0;
   padding: 0;
   list-style: none;
-  border-top: 1px solid
-    color-mix(in oklab, var(--color-forest-900) 12%, transparent);
 }
 
-.systems-page-faq__item {
-  border-bottom: 1px solid
-    color-mix(in oklab, var(--color-forest-900) 12%, transparent);
+.sys-step {
+  display: grid;
+  gap: 1.25rem;
+  padding-block: var(--space-section);
+  border-top: 1px solid rgb(4 32 21 / 0.2);
+  scroll-margin-top: 6rem;
 }
 
-.systems-page-faq__question {
+.sys-step__number {
+  color: var(--color-forest-600);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 2.4vw, 2.25rem);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.sys-step__text h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2vw, 1.75rem);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.sys-step__body {
+  max-width: 34rem;
+  margin-top: 0.6rem;
+  color: rgb(19 24 19 / 0.72);
+  font-size: var(--page-lede);
+  line-height: var(--page-lede-leading);
+}
+
+.sys-step__features {
+  display: grid;
+  gap: 0.45rem;
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--page-lede);
+  line-height: 1.5;
+}
+
+.sys-step__features li {
+  display: flex;
+  gap: 0.7rem;
+}
+
+.sys-step__features li::before {
+  flex-shrink: 0;
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-top: 0.5rem;
+  border-radius: 50%;
+  background: var(--color-maize-400);
+  content: "";
+}
+
+.sys-step__image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+/* ---- FAQ ---- */
+.sys-faq {
+  padding-block: var(--space-section);
+  background: var(--color-cream-100);
+}
+
+.sys-faq__grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.sys-faq__note {
+  max-width: 24rem;
+  margin-top: 1rem;
+  color: rgb(19 24 19 / 0.7);
+  line-height: 1.65;
+}
+
+.sys-faq__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+  color: var(--color-forest-950);
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+.sys-faq__link:focus-visible,
+.sys-faq__list summary:focus-visible {
+  outline: 3px solid var(--color-forest-600);
+  outline-offset: 3px;
+}
+
+.sys-faq__list {
+  border-top: 1px solid rgb(4 32 21 / 0.2);
+}
+
+.sys-faq__list details {
+  border-bottom: 1px solid rgb(4 32 21 / 0.2);
+}
+
+.sys-faq__list summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
-  width: 100%;
-  padding: 1.35rem 0;
-  text-align: left;
+  padding-block: 1.1rem;
   cursor: pointer;
-}
-
-.systems-page-faq__text {
   font-family: var(--font-display);
-  font-size: 1.05rem;
+  font-size: 1.1rem;
   font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--color-forest-950);
+  list-style: none;
 }
 
-.systems-page-faq__toggle {
-  flex-shrink: 0;
-  font-family: var(--font-display);
-  font-size: 1.35rem;
+.sys-faq__list summary::-webkit-details-marker {
+  display: none;
+}
+
+.sys-faq__list summary::after {
+  color: var(--color-forest-600);
+  font-size: 1.5rem;
   font-weight: 400;
   line-height: 1;
-  color: var(--color-maize-400);
+  content: "+";
 }
 
-.systems-page-faq__answer {
-  margin-top: -0.25rem;
-  padding-bottom: 1.5rem;
-  max-width: 52rem;
-  font-size: 0.95rem;
+.sys-faq__list details[open] summary::after {
+  content: "−";
+}
+
+.sys-faq__list details p {
+  max-width: 40rem;
+  padding-bottom: 1.25rem;
+  color: rgb(19 24 19 / 0.7);
   line-height: 1.7;
-  color: color-mix(in oklab, var(--color-ink-900) 68%, transparent);
-}
-
-/* ---- 6 — Closing banner ---- */
-.systems-page-banner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1.75rem;
-  /* 5px, matching every other card on the site. */
-  border-radius: 5px;
-  background-color: var(--color-forest-900);
-  padding: 2.5rem 2rem;
 }
 
 @media (min-width: 48rem) {
-  .systems-page-banner {
-    padding: 3rem;
+  .sys-hero__grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
-}
 
-.systems-page-banner__title {
-  font-family: var(--font-display);
-  font-size: var(--text-display);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  color: var(--color-cream-50);
-}
+  .sys-step {
+    grid-template-columns: 3rem minmax(0, 1.1fr) minmax(0, 1fr);
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    align-items: center;
+  }
 
-.systems-page-banner__text {
-  margin-top: 0.75rem;
-  max-width: 34rem;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: color-mix(in oklab, var(--color-cream-200) 75%, transparent);
+  /* The photo takes its height from the text beside it instead of setting the
+     row's height: `contain: size` stops the image's own proportions from
+     counting, and stretching then fills exactly the text block's height. */
+  .sys-step__image {
+    align-self: stretch;
+    height: 100%;
+    min-height: 11rem;
+    aspect-ratio: auto;
+    contain: size;
+  }
+
+  .sys-faq__grid {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--space-gap);
+  }
 }
 </style>

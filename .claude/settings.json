@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(echo \"exit:$?\")",
+      "Bash(sed -i '' 's/letter-spacing: -0.02em;/letter-spacing: -0.008em;/g' src/components/sections/WhatWeDo.vue src/components/sections/MembershipSection.vue)",
+      "Bash(sed -i '' 's/tracking-\\\\[-0.02em\\\\]/tracking-[-0.008em]/g' src/components/sections/WhatWeDo.vue src/components/sections/PurposeVision.vue src/components/sections/SystemsSection.vue)",
+      "Bash(python3 -)",
+      "Bash(xargs -I{} sh -c 'echo \"== {} ==\"; grep -n -B4 \"letter-spacing: -0\" {}')"
+    ]
+  }
+}

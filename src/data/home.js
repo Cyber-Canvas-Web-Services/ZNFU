@@ -42,19 +42,15 @@ export const logo = znfuLogo;
 /*  Media — everything is served from /public/media                    */
 /* ------------------------------------------------------------------ */
 export const media = {
-  /* The hero rotates between the montage and two stills of Zambian farmland,
-     so they are grouped together. `scripts/optimize-media.sh` builds all of
-     these from `assets/media-source/`. */
-  heroBackground: {
-    /* Two encodes of the same montage: 1280×720 desktop, 540×720 phones. */
-    mp4: "/media/hero-background.mp4",
-    mp4Mobile: "/media/hero-background-mobile.mp4",
-    poster: "/media/hero-background-poster.webp",
-  },
-  /* Still order. The first entry is the hero's opening frame — it is what the
-     visitor sees before the montage plays, so put the strongest photograph
-     here. The rest follow the video in the order listed. */
-  heroStills: ["/media/agri.webp", "/media/cows.webp"],
+  /* The home hero is ported from the Farm-Marketplace project, including its
+     four source photographs. The first entry is the opening frame and LCP
+     image, so keep the preload in index.html in step with this array. */
+  heroSlides: [
+    "/media/farm-marketplace-hero/slide-1.jpg",
+    "/media/farm-marketplace-hero/slide-2.jpg",
+    "/media/farm-marketplace-hero/slide-3.jpg",
+    "/media/farm-marketplace-hero/slide-4.jpg",
+  ],
   fieldFootage: {
     mp4: "/media/field-footage.mp4",
     poster: "/media/field-footage-poster.webp",
@@ -96,10 +92,43 @@ export const hero = {
   /* Verified facts only — the badge is the visitor's first introduction to the
      Union, since the headline deliberately does not name it. */
   badge: { chip: "Est. 1905", text: "Zambia National Farmers’ Union" },
-  tagline: "A united voice for Zambian agriculture.",
+  tagline:
+    "A united voice for Zambian agriculture. We bring farmers, commodity associations and agribusinesses together to strengthen the sector and build a more prosperous future.",
   body: "The Zambia National Farmers’ Union is a non-political, member-led union that promotes and safeguards the interests of farmers, commodity associations and agribusinesses across Zambia.",
-  primaryCta: { label: "Become a member", href: "#membership" },
-  secondaryCta: { label: "Explore the Union", href: "#about" },
+  primaryCta: { label: "Become a member", href: "/membership" },
+  secondaryCta: { label: "Explore the Union", href: "/about" },
+};
+
+/* ------------------------------------------------------------------ */
+/*  Home introduction                                                  */
+/* ------------------------------------------------------------------ */
+export const homeIntroduction = {
+  partnerLead: {
+    title: "Working together",
+    subtitle: "with national partners",
+  },
+  badge: "ZNFU Legacy",
+  primary:
+    "ZNFU exists to give Zambia’s farmers a stronger collective voice and bring the agricultural value chain together.",
+  secondaryBeforeImage: "Through advocacy, member services and",
+  secondaryAfterImage:
+    "practical information, we help the sector move forward.",
+  image: "/media/farm-marketplace-hero/slide-3.jpg",
+};
+
+/* ------------------------------------------------------------------ */
+/*  Verified trust strip                                               */
+/* ------------------------------------------------------------------ */
+export const trustStrip = {
+  founded: "1905",
+  foundedLabel: "Serving Zambian agriculture",
+  items: [
+    { label: "Lobbying & advocacy", icon: "advocacy" },
+    { label: "Member services", icon: "members" },
+    { label: "Market information", icon: "markets" },
+    { label: "Non-political", icon: "independent" },
+  ],
+  badge: "Member-led",
 };
 
 /* ------------------------------------------------------------------ */
@@ -279,7 +308,10 @@ export const news = {
   eyebrow: "From the newsroom",
   title: "Policy, weather, markets and member affairs.",
   lede: "The same stories the Union publishes for farmers nationwide.",
-  allLink: { label: "All news", href: "#news" },
+  homeTitle: "Discover the latest from Zambian agriculture.",
+  homeLede:
+    "Timely updates on policy, weather, markets and member affairs from across the farming sector.",
+  allLink: { label: "See all news", href: "/news" },
   featured: {
     category: "Policy",
     date: "28 September 2026",
@@ -290,26 +322,32 @@ export const news = {
     image: media.gardenSunsetIrrigation,
     imageAlt:
       "A vegetable garden at sunset with a water tank and drip irrigation lines",
-    href: "#news",
+    href: "/news",
   },
   items: [
     {
       category: "Policy",
       date: "24 September 2026",
       title: "Union tables input-cost submission ahead of the national budget",
-      href: "#news",
+      image: media.producePeppersBaskets,
+      imageAlt: "Freshly harvested peppers arranged in baskets at a farm",
+      href: "/news",
     },
     {
       category: "Member affairs",
       date: "18 September 2026",
       title: "FISP distribution: guidance for District Farmers’ Associations",
-      href: "#news",
+      image: media.fieldMaizeDemoDay,
+      imageAlt: "Farmers visiting maize variety demonstration plots",
+      href: "/news",
     },
     {
       category: "Livestock",
       date: "12 September 2026",
       title: "Livestock movement permits — the new digital process explained",
-      href: "#news",
+      image: media.livestockCattleWater,
+      imageAlt: "A cow drinking from a concrete water trough",
+      href: "/news",
     },
   ],
   fridayBrief: {
@@ -327,6 +365,9 @@ export const membership = {
   eyebrow: "Membership",
   title: "Who can join?",
   lede: "Whoever you are in Zambian agriculture, there is a seat for you at the table.",
+  homeTitle: "Empowering Zambian agriculture through a stronger collective voice.",
+  homeLede:
+    "Membership is open to any person or organisation in the business of agriculture in Zambia.",
   image: media.growerMaizeField,
   imageAlt: "A farmer in a straw hat walking through tall maize",
   imageCaption: "One Union. Every farmer.",
@@ -594,10 +635,10 @@ export const footer = {
     {
       title: "Member systems",
       links: [
-        { label: "e-Farm Prices", href: "#e-farm-prices" },
-        { label: "e-Transport", href: "#e-transport" },
-        { label: "ZNFU Market", href: "#znfu-market" },
-        { label: "Zambian Farmer magazine", href: "#news" },
+        { label: "e-Farm Prices", href: "/systems#e-farm-prices" },
+        { label: "e-Transport", href: "/systems#e-transport" },
+        { label: "ZNFU Market", href: "/systems#znfu-market" },
+        { label: "Zambian Farmer magazine", href: "/news" },
       ],
     },
   ],

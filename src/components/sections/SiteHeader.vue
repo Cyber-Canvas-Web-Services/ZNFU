@@ -63,7 +63,7 @@ onBeforeUnmount(() =>
     class="fixed inset-x-0 top-0 z-50 transition-[background-color,box-shadow,padding] duration-300"
     :class="
       onLight
-        ? 'bg-cream-50 py-2.5 shadow-[0_8px_30px_-16px_rgba(10,30,19,0.24)]'
+        ? 'bg-cream-50 py-2.5 shadow-[0_8px_30px_-16px_rgba(4,32,21,0.24)]'
         : 'bg-gradient-to-b from-forest-950/80 via-forest-950/35 to-transparent py-4'
     "
   >
@@ -95,7 +95,10 @@ onBeforeUnmount(() =>
       </nav>
 
       <div class="hidden lg:block">
-        <a href="/apply-membership" class="btn btn--maize">
+        <a
+          href="/apply-membership"
+          class="btn btn--maize rounded-[3px]"
+        >
           Join ZNFU
           <ArrowUpRight class="h-4 w-4" aria-hidden="true" />
         </a>
@@ -173,7 +176,7 @@ onBeforeUnmount(() =>
             <li class="p-4">
               <a
                 href="/apply-membership"
-                class="btn btn--maize w-full"
+                class="btn btn--maize w-full rounded-[3px]"
                 @click="closeMenu"
               >
                 Join ZNFU

@@ -1,76 +1,210 @@
 <script setup>
-import { usePrefersReducedMotion } from '@/composables/useMediaQuery'
-import StackedPanel from '@/components/sections/StackedPanel.vue'
-import StatCounter from '@/components/ui/StatCounter.vue'
-import { stats } from '@/data/home'
+import { ArrowRight } from "@lucide/vue";
 
-const reducedMotion = usePrefersReducedMotion()
+import { membership, stats } from "@/data/home";
+
+function formatStat(item) {
+  return `${item.prefix ?? ""}${item.value.toLocaleString("en-US")}${item.suffix ?? ""}`;
+}
 </script>
 
 <template>
-  <!-- The panel peeks just far enough to show its heading — “By the numbers”
-       and the sentence under it — and deliberately stops short of the figures.
+  <section class="membership-stats" aria-labelledby="membership-stats-title">
+    <div class="shell">
+      <div class="membership-stats__header">
+        <h2 id="membership-stats-title" v-reveal>
+          {{ membership.homeTitle }}
+        </h2>
 
-       The figures used to be in that first screenful, which meant the
-       count-up had already run to completion by the time anyone scrolled down
-       to them (both the count and the reveal fire on visibility), so the
-       animation was never actually seen. Keeping them below the fold is what
-       gives the animation somewhere to happen.
-
-       `dense` keeps the vertical rhythm tight, and `first` gives the panel a
-       flush top edge — its rounded corners used to show the page background
-       through them once the panel pinned.
-
-       `bg-cream-50` (the lightest surface) rather than the warmer `cream-100`:
-       this panel sits directly above PurposeVision, which is `cream-100`, and
-       the two share an edge. On the same colour that edge would vanish and the
-       card-stack would read as a flat block, so the two surfaces stay one step
-       apart — the whitest panel first, the off-white one below it. -->
-  <StackedPanel surface="bg-cream-50" tone="text-ink-900" dense first>
-    <!-- Decorative glow. The gold hairline that used to sit along this panel's
-         top edge is gone at the client's request — against the near-white
-         surface it read as a stray mustard line rather than an accent.
-
-         The glow itself is also lighter than it was. It sits on a near-white
-         panel, where a wide gold gradient reads as the panel being dimmed or
-         smudged rather than as an accent; the supervisor asked for that to be
-         pulled back everywhere it appears. -->
-    <div
-      class="glow -right-40 top-0 h-[420px] w-[420px] bg-[radial-gradient(closest-side,rgba(245,198,42,0.07),transparent)]"
-      aria-hidden="true"
-    />
-
-    <div class="relative">
-      <div class="max-w-2xl" v-reveal>
-        <!-- Brand yellow `maize-400`. This used to be `maize-700`, an ochre
-             that read as brown against the light panel; the darker maize steps
-             have since been deleted from the palette entirely, so brown cannot
-             come back. Note the trade-off this encodes: on this surface 400
-             measures ~1.5:1, far below the 4.5:1 WCAG AA needs for text this
-             size. It is a deliberate decorative choice, not an oversight —
-             check before "fixing" it. -->
-        <p class="eyebrow text-maize-400">{{ stats.eyebrow }}</p>
-        <h2 class="section-title mt-3 text-ink-900">{{ stats.title }}</h2>
+        <div class="membership-stats__intro" v-reveal="{ delay: 80 }">
+          <p>{{ membership.homeLede }}</p>
+          <div class="membership-stats__actions">
+            <a :href="membership.cta.href" class="btn btn--forest">
+              {{ membership.cta.label }}
+            </a>
+            <a :href="membership.secondaryCta.href" class="btn btn--outline">
+              {{ membership.secondaryCta.label }}
+            </a>
+          </div>
+        </div>
       </div>
 
-      <!-- The gap above the grid is load-bearing, not decorative: it is what
-           keeps the figures clear of the peeking edge at every viewport, so
-           the count-up always has to be scrolled to. It is generous because
-           the heading above it grows with the viewport while the peek does
-           not — at 1920 the heading reaches ~115px down and the figures start
-           ~148px down, and this spacing is what holds that window open.
+      <div class="membership-stats__grid">
+        <a
+          :href="membership.cta.href"
+          class="membership-stats__quick-link"
+          aria-label="Apply for ZNFU membership"
+        >
+          <ArrowRight aria-hidden="true" />
+        </a>
 
-           Do not tighten this to make the panel shorter. Everything that
-           shrinks the panel has to happen below the grid. -->
-      <div class="mt-10 grid grid-cols-2 gap-x-6 gap-y-6 sm:mt-12 sm:gap-x-10 lg:grid-cols-4">
-        <StatCounter
+        <article
           v-for="(item, index) in stats.items"
           :key="item.label"
-          v-reveal="{ delay: index * 90 }"
-          v-bind="item"
-          :reduced-motion="reducedMotion"
-        />
+          class="membership-stats__card"
+          v-reveal="{ delay: index * 70 }"
+        >
+          <strong>{{ formatStat(item) }}</strong>
+          <span>{{ item.label }}</span>
+        </article>
+      </div>
+
+      <div class="membership-stats__divider" aria-hidden="true">
+        <span>Membership</span>
+        <span class="membership-stats__line" />
+        <span>Zambian agriculture</span>
       </div>
     </div>
-  </StackedPanel>
+  </section>
 </template>
+
+<style scoped>
+.membership-stats {
+  position: relative;
+  z-index: 1;
+  background: #f9fbf8;
+  color: #1a201c;
+  padding-block: clamp(4rem, 7vw, 6rem);
+}
+
+.membership-stats__header {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+  margin-bottom: clamp(3.5rem, 6vw, 5rem);
+}
+
+.membership-stats__header h2 {
+  max-width: 37rem;
+  color: var(--color-forest-950);
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+}
+
+.membership-stats__intro {
+  max-width: 28rem;
+}
+
+.membership-stats__intro p {
+  max-width: 25rem;
+  color: #6e7771;
+  font-size: clamp(0.875rem, 1.15vw, 1rem);
+  line-height: 1.5;
+}
+
+.membership-stats__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.membership-stats__grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.membership-stats__card {
+  display: flex;
+  min-height: 9.5rem;
+  flex-direction: column;
+  justify-content: center;
+  border: 1px solid rgb(4 32 21 / 0.035);
+  border-radius: 1.25rem;
+  background: #eaf3ec;
+  padding: clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.membership-stats__card strong {
+  color: #1a201c;
+  font-family: var(--font-sans);
+  font-size: clamp(1.875rem, 3vw, 2.5rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.membership-stats__card span {
+  margin-top: 0.65rem;
+  color: #525b56;
+  font-size: 0.875rem;
+  font-weight: 520;
+  line-height: 1.35;
+}
+
+.membership-stats__quick-link {
+  display: none;
+}
+
+.membership-stats__divider {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  margin-top: clamp(3.5rem, 6vw, 5rem);
+  color: var(--color-forest-950);
+  font-size: 0.75rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.membership-stats__line {
+  height: 1px;
+  flex: 1;
+  background: rgb(4 32 21 / 0.28);
+}
+
+@media (min-width: 40rem) {
+  .membership-stats__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .membership-stats__header {
+    grid-template-columns: minmax(0, 1.25fr) minmax(22rem, 0.75fr);
+    justify-content: space-between;
+  }
+
+  .membership-stats__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .membership-stats__quick-link {
+    position: absolute;
+    top: 50%;
+    left: calc(25% - 1.625rem);
+    z-index: 2;
+    display: grid;
+    width: 3.25rem;
+    height: 3.25rem;
+    place-items: center;
+    translate: 0 -50%;
+    border: 4px solid #f9fbf8;
+    border-radius: 50%;
+    background: #1a201c;
+    box-shadow: 0 12px 28px rgb(4 32 21 / 0.2);
+    color: #fff;
+    transition:
+      scale 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .membership-stats__quick-link:hover {
+    scale: 1.08;
+    background: var(--color-forest-700);
+  }
+
+  .membership-stats__quick-link svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+</style>

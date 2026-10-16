@@ -95,7 +95,7 @@ defineProps({
 
         <div class="flex flex-1 flex-col p-6">
           <h3
-            class="font-display text-xl font-medium tracking-[-0.02em] text-forest-950"
+            class="font-display text-xl font-medium tracking-[-0.008em] text-forest-950"
           >
             {{ item.title }}
           </h3>
@@ -167,7 +167,7 @@ defineProps({
   font-family: var(--font-display);
   font-size: 1.35rem;
   font-weight: 500;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.008em;
   color: var(--color-forest-950);
 }
 
@@ -211,7 +211,7 @@ defineProps({
   font-family: var(--font-display);
   font-size: 1.25rem;
   font-weight: 500;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.008em;
   color: var(--color-forest-950);
 }
 
@@ -239,7 +239,7 @@ defineProps({
   font-family: var(--font-display);
   font-size: var(--text-display-sm);
   font-weight: 500;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.008em;
   color: var(--color-cream-50);
 }
 

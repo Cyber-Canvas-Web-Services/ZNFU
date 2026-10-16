@@ -31,6 +31,9 @@
   make its neighbours look inconsistently sized when they are fitted
   into a shared box.
 
+  Each export also gets a transparent, forest-green variant for partner
+  rows that sit on surfaces other than the footer's fixed cream chip.
+
 Usage:
     scripts/optimize-logos.py [--dry-run]
 """
@@ -79,6 +82,7 @@ WEBP_QUALITY = 92
 # the off-white band, white chips show as slightly cool rectangles — the hue
 # gap is small but flat areas make it obvious.)
 CHIP_BG = (245, 242, 232)   # --color-cream-100
+GREEN_LOGO = (11, 74, 36)   # --color-forest-700
 
 # Logos are sized to a shared visual AREA rather than a shared height.
 #
@@ -293,6 +297,14 @@ def compose_chip(logo):
     return chip
 
 
+def compose_transparent(logo):
+    """Centre a transparent logo on a transparent chip of the shared size."""
+    cw, ch = CHIP_W * SCALE, CHIP_H * SCALE
+    chip = Image.new("RGBA", (cw, ch), (0, 0, 0, 0))
+    chip.paste(logo, ((cw - logo.width) // 2, (ch - logo.height) // 2))
+    return chip
+
+
 def desaturate_on_chip(im):
     """
     Greyscale variant, with the chip left exactly as it is.
@@ -321,6 +333,55 @@ def desaturate_on_chip(im):
             if src[x, y] == CHIP_BG:
                 dst[x, y] = CHIP_BG
     return grey
+
+
+def color_on_transparency(im):
+    """Recover each logo as true-colour ink on a transparent ground.
+
+    Runs on the white-flattened logo, before it is retinted onto the chip.
+    Each pixel is ink*a + white*(1-a); `a` is estimated from the weakest
+    channel (0 for white, 1 for saturated ink), then the ink colour is
+    un-blended from it, so glyph edges stay clean with no white halo.
+    """
+    import numpy as np
+
+    rgb = np.asarray(im.convert("RGB"), dtype=np.float32)
+    a = 1.0 - rgb.min(axis=2) / 255.0
+    a = np.where(a < 0.03, 0.0, a)
+    safe = np.maximum(a, 1e-3)[..., None]
+    ink = np.clip((rgb - 255.0 * (1.0 - safe)) / safe, 0, 255)
+    out = np.dstack([ink, (a * 255.0)[..., None]]).round().astype(np.uint8)
+    return Image.fromarray(out, "RGBA")
+
+
+def green_on_transparency(im):
+    """Turn the finished chip into a transparent forest-green logo.
+
+    The chip is composed before this step, so every logo keeps the exact
+    sizing and alignment used by the colour and greyscale variants. Pixels
+    matching ``CHIP_BG`` become fully transparent; distance from that known
+    background becomes alpha, preserving antialiased glyph edges without
+    carrying any rectangular backdrop into the page.
+    """
+    src = im.convert("RGB")
+    out = Image.new("RGBA", src.size, (*GREEN_LOGO, 0))
+    source_px = src.load()
+    output_px = out.load()
+    w, h = src.size
+    max_difference = max(CHIP_BG)
+
+    for y in range(h):
+        for x in range(w):
+            pixel = source_px[x, y]
+            difference = max(
+                abs(pixel[0] - CHIP_BG[0]),
+                abs(pixel[1] - CHIP_BG[1]),
+                abs(pixel[2] - CHIP_BG[2]),
+            )
+            alpha = min(255, round(difference * 255 / max_difference))
+            output_px[x, y] = (*GREEN_LOGO, alpha)
+
+    return out
 
 
 # ---------------------------------------------------------------------
@@ -382,21 +443,31 @@ def main():
             im = im.resize((im.width * SCALE, im.height * SCALE), Image.LANCZOS)
             # Retint AFTER resampling: the glyph edges are then rebuilt once,
             # in the colour they will actually be displayed in.
+            transparent = compose_transparent(color_on_transparency(im))
             im = retint_flat_white(im, CHIP_BG)
             im = compose_chip(im)
             assert im.size == (canvas_w, canvas_h)
 
             dest = OUT / f"{out_name}.webp"
             grey_dest = OUT / f"{out_name}-grey.webp"
+            green_dest = OUT / f"{out_name}-green.webp"
+            color_dest = OUT / f"{out_name}-color.webp"
             # Greyscale is derived from the finished colour chip, so the two
             # are guaranteed to be the same composition.
             grey = desaturate_on_chip(im)
+            green = green_on_transparency(im)
             if args.dry_run:
-                print(f"  {out_name:<36}{src_name:<26}{im.size[0]}x{im.size[1]} +grey (dry run) {note}")
+                print(f"  {out_name:<36}{src_name:<26}{im.size[0]}x{im.size[1]} +grey +green (dry run) {note}")
             else:
                 im.save(dest, "WEBP", quality=WEBP_QUALITY, method=6)
                 grey.save(grey_dest, "WEBP", quality=WEBP_QUALITY, method=6)
-                kb = (dest.stat().st_size + grey_dest.stat().st_size) / 1024
+                green.save(green_dest, "WEBP", lossless=True, method=6)
+                transparent.save(color_dest, "WEBP", lossless=True, method=6)
+                kb = (
+                    dest.stat().st_size
+                    + grey_dest.stat().st_size
+                    + green_dest.stat().st_size
+                ) / 1024
                 print(f"  {out_name:<36}{src_name:<26}{im.size[0]}x{im.size[1]}  {kb:.0f} kB {note}")
 
 

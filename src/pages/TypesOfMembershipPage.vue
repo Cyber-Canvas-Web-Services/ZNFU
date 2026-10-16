@@ -1,247 +1,341 @@
 <script setup>
 /**
- * Types of Membership — a standalone page at /types-of-membership, opened
- * from the “Types of membership” buttons in the membership section.
+ * Types of Membership — the standalone page at /types-of-membership.
  *
- * The categories, subscription bands and the District Farmers’ Association
- * link are exactly as supplied by the Secretariat; the wording is unchanged.
+ * Both blocks are comparisons, so both are real tables: the six categories
+ * (who each is for, and how it pays) and the annual subscription bands. On
+ * phones each row collapses into a stacked block whose cells carry their own
+ * column label, so nothing scrolls sideways.
+ *
+ * The categories and the District Farmers’ Association link are exactly as
+ * supplied by the Secretariat. The band ranges and fees are PLACEHOLDERS (see
+ * `typesOfMembership.bands`) and must be replaced before launch.
  */
-import StackedPanel from "@/components/sections/StackedPanel.vue";
-import { typesOfMembership } from "@/data/home";
+import { ArrowRight } from "@lucide/vue";
+
+import { membership, typesOfMembership as types } from "@/data/home";
 </script>
 
 <template>
-  <!-- Band 1 — the membership categories -->
-  <StackedPanel
-    id="types-of-membership"
-    class="types-of-membership-band"
-    surface="bg-forest-50"
-    :first="true"
-  >
-    <div>
-      <p class="eyebrow text-forest-600" v-reveal>
-        {{ typesOfMembership.eyebrow }}
-      </p>
-      <h1 class="section-title mt-5 text-forest-950" v-reveal="{ delay: 60 }">
-        {{ typesOfMembership.title }}
-      </h1>
-      <p class="lede mt-5 max-w-2xl text-ink-900/65" v-reveal="{ delay: 110 }">
-        {{ typesOfMembership.intro.before
-        }}<a
-          :href="typesOfMembership.intro.linkHref"
-          class="font-medium text-forest-700 underline underline-offset-4 transition hover:text-forest-900"
-          >{{ typesOfMembership.intro.linkLabel }}</a
-        >{{ typesOfMembership.intro.after }}
-      </p>
-    </div>
-
-    <h2
-      class="mt-12 font-display text-2xl font-medium tracking-[-0.03em] text-forest-950 sm:text-3xl"
-      v-reveal
-    >
-      {{ typesOfMembership.categoriesHeading }}
-    </h2>
-
-    <div class="mt-8 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-      <article
-        v-for="(category, index) in typesOfMembership.categories"
-        :key="category.title"
-        v-reveal="{ delay: 120 + index * 60 }"
-        class="rounded-2xl bg-cream-50 p-6 shadow-soft ring-1 ring-forest-900/5"
-      >
-        <h3
-          class="font-display text-lg font-medium tracking-[-0.02em] text-forest-950"
-        >
-          {{ category.title }}
-        </h3>
-
-        <p
-          class="mt-4 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ink-900/45"
-        >
-          Who it is for
+  <div class="tom">
+    <section id="types-of-membership" class="tom-hero" aria-labelledby="tom-heading">
+      <div class="tom-shell tom-hero__grid">
+        <h1 id="tom-heading" class="tom-hero__title" v-reveal>{{ types.title }}</h1>
+        <p class="tom-hero__lede" v-reveal="{ delay: 80 }">
+          {{ types.intro.before
+          }}<a :href="types.intro.linkHref">{{ types.intro.linkLabel }}</a
+          >{{ types.intro.after }}
         </p>
-        <p class="mt-1.5 text-[0.92rem] leading-relaxed text-ink-900/75">
-          {{ category.whoFor }}
-        </p>
+      </div>
+    </section>
 
-        <p
-          class="mt-4 text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-ink-900/45"
-        >
-          Notes
-        </p>
-        <p class="mt-1.5 text-[0.9rem] leading-relaxed text-ink-900/60">
-          {{ category.notes }}
-        </p>
-      </article>
-    </div>
-  </StackedPanel>
+    <!-- Categories -->
+    <section class="tom-block" aria-labelledby="tom-cat-heading">
+      <div class="tom-shell">
+        <h2 id="tom-cat-heading" class="tom-heading">{{ types.categoriesHeading }}</h2>
 
-  <!-- Band 2 — the annual subscription bands -->
-  <StackedPanel class="types-of-membership-band" surface="bg-cream-100" compact>
-    <h2
-      class="font-display text-2xl font-medium tracking-[-0.03em] text-forest-950 sm:text-3xl"
-      v-reveal
-    >
-      {{ typesOfMembership.bandsHeading }}
-    </h2>
-    <p
-      class="mt-4 max-w-2xl leading-relaxed text-ink-900/65"
-      v-reveal="{ delay: 60 }"
-    >
-      {{ typesOfMembership.bandsNote }}
-    </p>
+        <table class="tom-table tom-table--categories">
+          <thead>
+            <tr>
+              <th scope="col">Category</th>
+              <th scope="col">Who it is for</th>
+              <th scope="col">How it pays</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="category in types.categories" :key="category.title">
+              <th scope="row">{{ category.title }}</th>
+              <td data-label="Who it is for">{{ category.whoFor }}</td>
+              <td data-label="How it pays">{{ category.notes }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
-    <!-- Full-width price list: one row per band with a hairline divider. The
-         fee is the largest type on the row; on phones it stacks under the
-         band name instead of sitting to the right. -->
-    <ul class="subscription-list">
-      <li
-        v-for="(band, index) in typesOfMembership.bands"
-        :key="band.band"
-        v-reveal="{ delay: 120 + index * 60 }"
-        class="subscription-row"
-      >
-        <div class="subscription-row__band">
-          <h3 class="subscription-row__name">{{ band.band }}</h3>
-          <p class="subscription-row__ranges">
-            <span class="subscription-row__range">
-              <span class="subscription-row__label">
-                {{ typesOfMembership.bandColumns.people }}
-              </span>
-              <span class="subscription-row__range-value">{{
-                band.people
-              }}</span>
-            </span>
-            <span class="subscription-row__range">
-              <span class="subscription-row__label">
-                {{ typesOfMembership.bandColumns.hectares }}
-              </span>
-              <span class="subscription-row__range-value">{{
-                band.hectares
-              }}</span>
-            </span>
-          </p>
+    <!-- Subscription bands -->
+    <section class="tom-bands" aria-labelledby="tom-bands-heading">
+      <div class="tom-shell tom-bands__grid">
+        <div class="tom-bands__intro">
+          <h2 id="tom-bands-heading" class="tom-heading">{{ types.bandsHeading }}</h2>
+          <p>{{ types.bandsNote }}</p>
+          <a :href="membership.cta.href" class="tom-bands__cta">
+            {{ membership.cta.label }}
+            <ArrowRight class="h-4 w-4" aria-hidden="true" />
+          </a>
         </div>
 
-        <p class="subscription-row__fee">
-          <span class="subscription-row__amount">{{ band.fee }}</span>
-          <span class="subscription-row__label">
-            {{ typesOfMembership.bandColumns.fee }}
-          </span>
-        </p>
-      </li>
-    </ul>
-  </StackedPanel>
+        <table class="tom-table tom-table--bands">
+          <thead>
+            <tr>
+              <th scope="col">{{ types.bandColumns.band }}</th>
+              <th scope="col">{{ types.bandColumns.people }}</th>
+              <th scope="col">{{ types.bandColumns.hectares }}</th>
+              <th scope="col" class="tom-num">{{ types.bandColumns.fee }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="band in types.bands" :key="band.band">
+              <th scope="row">{{ band.band }}</th>
+              <td :data-label="types.bandColumns.people">{{ band.people }}</td>
+              <td :data-label="types.bandColumns.hectares">{{ band.hectares }}</td>
+              <td class="tom-num" :data-label="types.bandColumns.fee">{{ band.fee }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </div>
 </template>
 
 <style scoped>
-/**
- * Both bands hold more than a screen of content. A panel pinned to the top
- * of the viewport (StackedPanel’s default on large screens) that is taller
- * than the screen traps everything below the fold, so these bands stay in
- * normal flow — the same approach as the Apply for Membership page.
- */
-.types-of-membership-band {
+.tom {
   position: relative;
+  z-index: 1;
+  overflow: clip;
+  background: var(--color-cream-50);
+  color: var(--color-forest-950);
 }
 
-/**
- * Band 2 as a full-width price list: one row per band, hairline dividers and
- * the annual fee as the largest type on the row. Phones stack the fee beneath
- * the band name; from `sm` up it sits at the far right.
- *
- * Only spacing, borders, flex and type are set here — no position, height,
- * overflow or transform — so the rows stay in the bands’ normal flow.
- */
-.subscription-list {
-  margin-top: 2.5rem;
-  padding: 0;
-  list-style: none;
-  border-top: 1px solid
-    color-mix(in oklab, var(--color-forest-900) 12%, transparent);
-  border-bottom: 1px solid
-    color-mix(in oklab, var(--color-forest-900) 12%, transparent);
+.tom-shell {
+  width: 100%;
+  max-width: var(--shell-max);
+  margin-inline: auto;
+  padding-inline: var(--shell-pad);
 }
 
-.subscription-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding: 1.5rem 0;
-}
-
-.subscription-row + .subscription-row {
-  border-top: 1px solid
-    color-mix(in oklab, var(--color-forest-900) 12%, transparent);
-}
-
-.subscription-row__name {
-  margin: 0;
+.tom-heading {
   font-family: var(--font-display);
-  font-size: 1.125rem;
+  font-size: var(--section-title);
   font-weight: 500;
-  letter-spacing: -0.02em;
-  color: var(--color-forest-950);
+  letter-spacing: -0.035em;
+  line-height: 1.02;
+  text-wrap: balance;
 }
 
-.subscription-row__ranges {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  column-gap: 1.75rem;
-  row-gap: 0.35rem;
-  margin: 0.6rem 0 0;
+/* ---- Hero ---- */
+.tom-hero {
+  padding-block: clamp(5.5rem, 6.5vw, 6.25rem) var(--space-section);
 }
 
-.subscription-row__range {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.5rem;
+.tom-hero__grid {
+  display: block;
 }
 
-.subscription-row__range-value {
-  font-size: 0.92rem;
-  color: color-mix(in oklab, var(--color-ink-900) 75%, transparent);
-}
-
-.subscription-row__fee {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  margin: 0;
-}
-
-.subscription-row__amount {
+.tom-hero__title {
   font-family: var(--font-display);
-  font-size: 1.75rem;
-  font-weight: 600;
+  font-weight: 500;
+  text-wrap: balance;
+  font-size: var(--page-title);
+  letter-spacing: var(--page-title-tracking);
+  line-height: var(--page-title-leading);
+}
+
+.tom-hero__lede {
+  margin-top: 1rem;
+  color: rgb(19 24 19 / 0.72);
+  font-size: var(--page-lede);
+  line-height: var(--page-lede-leading);
+  max-width: var(--page-lede-measure);
+}
+
+.tom-hero__lede a,
+.tom-bands__cta {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.tom-hero__lede a:focus-visible,
+.tom-bands__cta:focus-visible {
+  outline: 3px solid var(--color-forest-600);
+  outline-offset: 3px;
+}
+
+/* ---- Shared table (stacked on phones) ---- */
+.tom-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.tom-table thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+
+.tom-table tbody tr {
+  display: grid;
+  gap: 0.6rem;
+  padding-block: 1.1rem;
+  border-top: 1px solid rgb(4 32 21 / 0.16);
+}
+
+.tom-table tbody tr:last-child {
+  border-bottom: 1px solid rgb(4 32 21 / 0.16);
+}
+
+.tom-table tbody th {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+.tom-table td::before {
+  display: block;
+  margin-bottom: 0.15rem;
+  color: rgb(19 24 19 / 0.52);
+  font-size: 0.8rem;
+  content: attr(data-label);
+}
+
+/* ---- Categories ---- */
+.tom-block {
+  padding-block: var(--space-section) var(--space-section);
+}
+
+.tom-table--categories {
+  margin-top: 1.25rem;
+}
+
+.tom-table--categories tbody th {
+  font-size: clamp(1.2rem, 1.6vw, 1.4rem);
   letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.tom-table--categories td {
+  color: rgb(19 24 19 / 0.72);
+  font-size: var(--page-lede);
+  line-height: var(--page-lede-leading);
+}
+
+/* ---- Bands ---- */
+.tom-bands {
+  padding-block: var(--space-section);
+  background: var(--color-maize-400);
   color: var(--color-forest-950);
 }
 
-.subscription-row__label {
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: color-mix(in oklab, var(--color-ink-900) 45%, transparent);
+.tom-bands__grid {
+  display: grid;
+  gap: 1.5rem;
+  align-items: start;
 }
 
-@media (min-width: 40rem) {
-  .subscription-row {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 2rem;
+.tom-bands__intro p {
+  max-width: 26rem;
+  margin-top: 0.9rem;
+  font-size: var(--page-lede);
+  line-height: var(--page-lede-leading);
+  color: rgb(4 32 21 / 0.82);
+  line-height: 1.65;
+}
+
+.tom-bands__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 1.1rem;
+  color: var(--color-forest-950);
+  font-weight: 650;
+}
+
+.tom-table--bands tbody tr {
+  border-color: rgb(4 32 21 / 0.35);
+}
+
+.tom-table--bands td::before {
+  color: rgb(4 32 21 / 0.62);
+}
+
+.tom-table--bands tbody th {
+  font-size: 1.2rem;
+}
+
+.tom-table--bands tbody .tom-num {
+  color: var(--color-forest-950);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 1.9vw, 1.75rem);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+@media (min-width: 48rem) {
+  .tom-bands__grid {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--space-gap);
   }
 
-  .subscription-row__fee {
-    align-items: flex-end;
+  /* The note and button stay in view beside the long table. */
+  .tom-bands__intro {
+    position: sticky;
+    top: 6.5rem;
+  }
+
+  /* Real table layout again: headers return, cells sit on shared columns. */
+  .tom-table thead {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip-path: none;
+  }
+
+  .tom-table thead th {
+    padding: 0.5rem 1.25rem 0.6rem 0;
+    color: rgb(19 24 19 / 0.55);
+    font-size: 0.82rem;
+    font-weight: 500;
+  }
+
+  .tom-table--bands thead th {
+    color: rgb(4 32 21 / 0.62);
+  }
+
+  .tom-table tbody tr {
+    display: table-row;
+  }
+
+  .tom-table tbody th,
+  .tom-table tbody td {
+    padding: 1.1rem 1.25rem 1.1rem 0;
+    border-top: 1px solid rgb(4 32 21 / 0.16);
+    vertical-align: baseline;
+  }
+
+  .tom-table--bands tbody th,
+  .tom-table--bands tbody td {
+    border-top-color: rgb(4 32 21 / 0.35);
+  }
+
+  .tom-table tbody tr {
+    border: 0;
+  }
+
+  .tom-table tbody tr:last-child th,
+  .tom-table tbody tr:last-child td {
+    border-bottom: 1px solid rgb(4 32 21 / 0.16);
+  }
+
+  .tom-table--bands tbody tr:last-child th,
+  .tom-table--bands tbody tr:last-child td {
+    border-bottom-color: rgb(4 32 21 / 0.35);
+  }
+
+  .tom-table td::before {
+    display: none;
+  }
+
+  .tom-table--categories th[scope="row"] {
+    width: 24%;
+  }
+
+  .tom-table .tom-num {
+    padding-right: 0;
     text-align: right;
-  }
-
-  .subscription-row__amount {
-    font-size: 2rem;
   }
 }
 </style>

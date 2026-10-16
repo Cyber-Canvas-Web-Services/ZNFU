@@ -1,0 +1,117 @@
+/**
+ * Design 2 — "Colour-blocked".
+ *
+ * Opt-in alternate design (see the DESIGN switch in App.vue). Every class is
+ * prefixed `v2-` so nothing here can touch the original pages.
+ *
+ * Ideas: a pale sage page with big rounded colour panels floating on it
+ * (forest, maize, white, leaf-green); Outfit at heavy weights for headings,
+ * Fraunces kept only for quotations; generous radii on media and panels; one
+ * floating pill header. Panels, not full-bleed bands, are the unit of layout.
+ */
+.v2 {
+  --v2-page: #eaf0e4;
+  --v2-forest: #0c3720;
+  --v2-forest-deep: #06251a;
+  --v2-maize: #f5c62a;
+  --v2-leaf: #cfe8b5;
+  --v2-white: #ffffff;
+  --v2-ink: #10241a;
+  --v2-radius: 28px;
+  --v2-gutter: clamp(0.75rem, 1.6vw, 1.25rem);
+
+  position: relative;
+  z-index: 1;
+  background: var(--v2-page);
+  color: var(--v2-ink);
+  font-family: var(--font-sans);
+}
+
+/* A panel floats on the page with a gutter on every side. */
+.v2-panel {
+  margin: 0 var(--v2-gutter) var(--v2-gutter);
+  padding: clamp(1.25rem, 2.6vw, 2.25rem);
+  border-radius: var(--v2-radius);
+  background: var(--v2-white);
+}
+.v2-panel--forest { background: var(--v2-forest); color: #f3f6ee; }
+.v2-panel--maize { background: var(--v2-maize); }
+.v2-panel--leaf { background: var(--v2-leaf); }
+.v2-panel--first { margin-top: calc(var(--v2-gutter) + 4.75rem); }
+
+.v2-shell { width: 100%; max-width: 84rem; margin-inline: auto; }
+
+/* Type */
+.v2-h1,
+.v2-h2,
+.v2-h3 {
+  font-family: var(--font-sans);
+  font-weight: 650;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+  text-wrap: balance;
+}
+.v2-h1 { font-size: var(--page-title); letter-spacing: var(--page-title-tracking); line-height: var(--page-title-leading); }
+.v2-h2 { font-size: var(--section-title); }
+.v2-h3 { font-size: clamp(1.35rem, 2vw, 1.8rem); letter-spacing: -0.03em; line-height: 1.1; }
+.v2-lede { max-width: var(--page-lede-measure); font-size: var(--page-lede); line-height: var(--page-lede-leading); opacity: 0.8; }
+.v2-quote {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.18;
+}
+.v2-small { font-size: 0.9rem; opacity: 0.7; }
+
+/* Pill buttons */
+.v2-btn {
+  display: inline-flex;
+  min-height: 3.1rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding-inline: 1.5rem;
+  border-radius: 9999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 180ms ease, background-color 180ms ease;
+  cursor: pointer;
+}
+.v2-btn:hover { transform: translateY(-2px); }
+.v2-btn--maize { background: var(--v2-maize); color: var(--v2-forest-deep); }
+.v2-btn--forest { background: var(--v2-forest); color: #fff; }
+.v2-btn--ghost { border: 1.5px solid currentColor; }
+.v2 a:focus-visible,
+.v2 button:focus-visible,
+.v2 summary:focus-visible,
+.v2 input:focus-visible {
+  outline: 3px solid var(--v2-maize);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px var(--v2-forest);
+}
+
+/* Rounded media */
+.v2-img { width: 100%; border-radius: calc(var(--v2-radius) - 8px); object-fit: cover; }
+
+/* Chips and simple rows */
+.v2-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.4rem 0.95rem;
+  border-radius: 9999px;
+  background: rgb(12 55 32 / 0.09);
+  font-size: 0.85rem;
+  font-weight: 560;
+}
+.v2-panel--forest .v2-chip { background: rgb(255 255 255 / 0.12); }
+.v2-rows { margin: 0; padding: 0; list-style: none; }
+.v2-rows > li { border-top: 1.5px solid currentColor; border-top-color: rgb(16 36 26 / 0.18); }
+.v2-panel--forest .v2-rows > li { border-top-color: rgb(255 255 255 / 0.2); }
+
+.v2-grid-2 { display: grid; gap: var(--space-gap); }
+@media (min-width: 56rem) { .v2-grid-2 { grid-template-columns: 1fr 1fr; align-items: center; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-btn { transition: none; }
+  .v2-btn:hover { transform: none; }
+}

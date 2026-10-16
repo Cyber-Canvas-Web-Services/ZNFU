@@ -32,7 +32,8 @@ const display = computed(() => {
        surface, which is invisible on cream. -->
   <div ref="elRef" class="flex flex-col gap-2">
     <span
-      class="font-display text-display-sm font-semibold leading-none tracking-[-0.03em] text-ink-900"
+      class="font-display text-display-sm font-semibold leading-none tracking-[-0.01em] text-ink-900"
+      style="font-variant-numeric: tabular-nums"
     >
       <span aria-hidden="true">{{ prefix }}{{ display }}{{ suffix }}</span>
       <span class="sr-only">{{ prefix }}{{ value.toLocaleString('en-US') }}{{ suffix }}</span>
